@@ -1,0 +1,495 @@
+.page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 48px var(--page-padding);
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.sessionInfo {
+  text-align: right;
+}
+
+.sessionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.sessionId {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Phase Tracker */
+.trackerCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+}
+
+.trackerStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.stepIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-bg-secondary);
+}
+
+.stepIcon.active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.activeDot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.stepIcon.completed {
+  background: var(--color-success-light);
+  border-color: var(--color-success-light);
+  color: var(--color-success);
+  font-size: 12px;
+}
+
+.stepIcon.failed {
+  background: var(--color-danger-light);
+  border-color: var(--color-danger-light);
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.stepIcon.pending {
+  background: var(--color-bg);
+  border-color: var(--color-border);
+}
+
+.stepIcon.pending .pendingDot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 50%;
+}
+
+.stepTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.stepDesc {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.trackerLine {
+  position: absolute;
+  top: 44px; /* offset to align with center of icons */
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--color-border-light);
+  z-index: 0;
+}
+
+.trackerLineFill {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.5s ease;
+}
+
+/* Transmitting State (Screenshot 4) */
+.transmittingBox {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 300px;
+}
+
+.chipIcon {
+  font-size: 32px;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.transmittingText {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.transmittingSub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* Table Area */
+.tableCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+
+.tableTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.tableStats {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+}
+
+.logTableWrapper {
+  position: relative;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.logTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.logTable th {
+  padding: 12px 20px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logTable td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+/* Photon Arrows */
+.photonArrow {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Blurring mechanism */
+.blurredArea {
+  filter: blur(8px);
+  opacity: 0.3;
+  user-select: none;
+  pointer-events: none;
+  transition: all 1s ease;
+}
+
+/* Results in table */
+.resultKeep {
+  color: var(--color-success);
+}
+
+.resultError {
+  color: var(--color-danger);
+  font-weight: bold;
+}
+
+.resultDiscard {
+  color: var(--color-text-muted);
+}
+
+/* Action Area */
+.actionArea {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.primaryButton:hover {
+  background: #333;
+}
+
+/* Panels (QBER, Cascade, Key) */
+.panel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+  background: var(--color-bg);
+}
+
+.panel.danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(254, 242, 242, 0.5);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.panelTitle.blue {
+  color: var(--color-primary);
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusSuccess {
+  color: var(--color-success);
+}
+
+.statusDanger {
+  color: var(--color-danger);
+}
+
+.statsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+}
+
+.statCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.statValue.danger {
+  color: var(--color-danger);
+}
+
+/* Progress bar for QBER */
+.barContainer {
+  margin-top: 24px;
+  position: relative;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  width: 100%;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-danger);
+  transition: width 1s ease-in-out;
+}
+
+.barThresholdTick {
+  position: absolute;
+  top: 4px;
+  width: 1px;
+  height: 6px;
+  background: var(--color-text-muted);
+}
+
+.barThresholdLabel {
+  position: absolute;
+  top: 12px;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  transform: translateX(-50%);
+}
+
+.panelFooterText {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* Alert Box */
+.alertBox {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(254, 242, 242, 0.8);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+}
+
+.alertIcon {
+  color: var(--color-danger);
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.alertContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alertTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.alertText {
+  font-size: 13px;
+  color: var(--color-danger);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.retryButton {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: white;
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.retryButton:hover {
+  background: var(--color-danger-light);
+}
+
+/* Key Display */
+.keyText {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.keyBlocks {
+  display: flex;
+  gap: 4px;
+}
+
+.keyBlock {
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
