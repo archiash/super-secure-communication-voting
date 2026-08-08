@@ -1,0 +1,6 @@
+# Agent skills
+.agents/
+
+.env
+
+skills-lock.json
