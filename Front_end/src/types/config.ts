@@ -32,7 +32,7 @@ export const DEFAULT_CONFIG: ProtocolConfig = {
   targetKeyLength: 8,
   useRealQuantum: false,
   eveSimulation: false,
-  errorCorrectionEnabled: true,
+  errorCorrectionEnabled: false,
   errorThreshold: 0.11,
   testBitCount: 4,
 };

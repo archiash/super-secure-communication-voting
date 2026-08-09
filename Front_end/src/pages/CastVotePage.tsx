@@ -19,7 +19,8 @@ export function CastVotePage() {
           id: `candidate-${i}`,
           name: c.candidateName,
           party: c.candidateParty,
-          binaryId: c.binaryId,
+          // Generate binaryId from index as fallback if API doesn't return one
+          binaryId: c.binaryId || i.toString(2).padStart(3, '0'),
           count: 0
         })));
       }).catch(err => console.error("Failed to load candidates", err));
@@ -36,6 +37,7 @@ export function CastVotePage() {
   const getEncryptedVote = () => {
     if (!selectedCandidate || !otpKey) return null;
     const voteBinary = selectedCandidate.binaryId;
+    if (!voteBinary) return null;
     // Just grab the first N bits of the OTP key (where N = voteBinary.length)
     const keyToUse = otpKey.substring(0, voteBinary.length).padEnd(voteBinary.length, '0');
     const encrypted = xorEncrypt(voteBinary, keyToUse);
@@ -57,7 +59,7 @@ export function CastVotePage() {
 
     try {
       const response = await api.castVote({
-        sessionId: state.auth.sessionId,
+        sessionId: qkdResult.sessionId,   // must match the session stored by generate-key
         voterId: state.auth.voterId,
         encryptedVote: encryption.encrypted,
       });

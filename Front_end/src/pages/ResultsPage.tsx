@@ -34,10 +34,10 @@ export function ResultsPage() {
         api.getElectionResult(electionCode),
         api.getVotingAudit(electionCode)
       ]);
-      
+
       // Sort candidates by votes descending
       electionData.candidates.sort((a, b) => b.votes - a.votes);
-      
+
       setElectionResult(electionData);
       setAuditLog(auditData);
     } catch (err) {
@@ -91,7 +91,7 @@ export function ResultsPage() {
 
       <div className={styles.chartContainer}>
         <div className={styles.chartTitle}>VOTE DISTRIBUTION</div>
-        
+
         {/* Vertical Bar Chart */}
         <div className={styles.chartWrapper}>
           <div className={styles.yAxis}>
@@ -101,13 +101,13 @@ export function ResultsPage() {
             <span>{Math.floor(maxCount * 0.25)}</span>
             <span>0</span>
           </div>
-          
+
           {electionResult.candidates.map((option) => (
             <div key={option.candidateName} className={styles.barColWrapper}>
               <div className={styles.barCol}>
                 <div
                   className={styles.barFill}
-                  style={{ 
+                  style={{
                     height: `${(option.votes / maxCount) * 100}%`,
                     backgroundColor: CANDIDATE_COLORS[option.candidateName] || '#cbd5e1'
                   }}
@@ -131,16 +131,16 @@ export function ResultsPage() {
           </thead>
           <tbody>
             {electionResult.candidates.map((option: VotingCandidate, index: number) => {
-              const share = totalVotes > 0 
-                ? Math.round((option.votes / totalVotes) * 100) 
+              const share = totalVotes > 0
+                ? Math.round((option.votes / totalVotes) * 100)
                 : 0;
-                
+
               return (
                 <tr key={option.candidateName}>
                   <td>{index + 1}</td>
                   <td className={styles.candidateNameCell}>
-                    <div 
-                      className={styles.colorDot} 
+                    <div
+                      className={styles.colorDot}
                       style={{ backgroundColor: CANDIDATE_COLORS[option.candidateName] || '#cbd5e1' }}
                     />
                     {option.candidateName}
@@ -158,15 +158,15 @@ export function ResultsPage() {
         </table>
 
         {/* Toggle Audit Log */}
-        <button 
+        {/* <button 
           className={styles.auditToggle}
           onClick={() => setShowAuditLog(!showAuditLog)}
         >
           {showAuditLog ? '👁 Hide' : '👁 Show'} Quantum Audit Log ({auditLog.sessions.length} records)
-        </button>
+        </button> */}
 
         {/* Audit Log Table */}
-        {showAuditLog && (
+        {/* {showAuditLog && (
           <table className={styles.auditTable}>
             <thead>
               <tr>
@@ -189,7 +189,7 @@ export function ResultsPage() {
               ))}
             </tbody>
           </table>
-        )}
+        )} */}
       </div>
     </div>
   );

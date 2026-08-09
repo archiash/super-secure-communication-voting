@@ -17,7 +17,7 @@ export function ConfirmationPage() {
           id: `candidate-${i}`,
           name: c.candidateName,
           party: c.candidateParty,
-          binaryId: c.binaryId,
+          binaryId: c.binaryId || i.toString(2).padStart(3, '0'),
           count: 0
         })));
       }).catch(err => console.error('Failed to load candidates', err));
