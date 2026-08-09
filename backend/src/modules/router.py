@@ -13,6 +13,9 @@ async def generate_key(payload: GenerateKeyInput):
 async def cast_ballot(payload: CastBallotInput):
     return await service.cast_ballot(payload)
 
+@router.get("/candidates/{election_code}", status_code = 200)
+async def election_candidates(election_code: str):
+    return await service.get_election_candidates(election_code)
 
 @router.get("/election-results/{election_code}", status_code=200)
 async def election_result(election_code: str):
