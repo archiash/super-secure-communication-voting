@@ -16,9 +16,10 @@ dependencies = [
     "numpy>=2.2.6",
     "pydantic-settings>=2.15.0",
     "pymongo>=4.14.0",
-    "qiskit>=1.4.0",
-    "qiskit-aer>=0.15.0",
-    "qiskit-ibm-runtime>=0.35.0",
+    "qiskit==2.5.1",
+    "qiskit-aer==0.17.2",
+    "qiskit-ibm-runtime==0.48.0",
+    "qiskit-qasm3-import==0.6.0",
 ]
 
 [project.scripts]
