@@ -5,7 +5,7 @@ import { Stepper } from '../components/layout/Stepper';
 import styles from './KeyGenerationPage.module.css';
 import type { QKDPhase, TransmissionLogEntry, Basis } from '../types';
 
-const QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
+const ALL_QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
   { id: 'transmission', title: 'Transmission', subtitle: '40 photons' },
   { id: 'basisSifting', title: 'Basis Sifting', subtitle: 'Reconciliation' },
   { id: 'qberEstimation', title: 'QBER Estimation', subtitle: 'Error analysis' },
@@ -75,6 +75,10 @@ export function KeyGenerationPage() {
 
   const qkdResult = state.qkd.result;
   const isAborted = qkdResult && !qkdResult.phases.qberEstimation.passed;
+  const errorCorrectionEnabled = state.config.errorCorrectionEnabled;
+  const QKD_PHASES = errorCorrectionEnabled
+    ? ALL_QKD_PHASES
+    : ALL_QKD_PHASES.filter(p => p.id !== 'errorCorrection');
   const currentPhaseIndex = QKD_PHASES.findIndex(p => p.id === currentPhase);
 
   const handleNextPhase = () => {
@@ -91,7 +95,8 @@ export function KeyGenerationPage() {
         setCurrentPhase('qberEstimation');
       }
     } else if (currentPhase === 'qberEstimation' && !isAborted) {
-      setCurrentPhase('errorCorrection');
+      // Skip error correction phase if disabled
+      setCurrentPhase(errorCorrectionEnabled ? 'errorCorrection' : 'keyEstablished');
     } else if (currentPhase === 'errorCorrection') {
       setCurrentPhase('keyEstablished');
     } else if (currentPhase === 'keyEstablished') {
@@ -280,7 +285,7 @@ export function KeyGenerationPage() {
       )}
 
       {/* Error Correction Panel */}
-      {!isTransmitting && qkdResult && currentPhaseIndex >= 3 && qkdResult.phases.qberEstimation.passed && (
+      {!isTransmitting && qkdResult && errorCorrectionEnabled && currentPhaseIndex >= 3 && qkdResult.phases.qberEstimation.passed && (
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>CASCADE ERROR CORRECTION</span>
@@ -310,7 +315,7 @@ export function KeyGenerationPage() {
       )}
 
       {/* Key Established Panel */}
-      {!isTransmitting && qkdResult && currentPhaseIndex >= 4 && qkdResult.phases.qberEstimation.passed && (
+      {!isTransmitting && qkdResult && currentPhase === 'keyEstablished' && qkdResult.phases.qberEstimation.passed && (
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <span className={`${styles.panelTitle} ${styles.blue}`}>
@@ -350,9 +355,14 @@ export function KeyGenerationPage() {
               Calculate QBER ›
             </button>
           )}
-          {currentPhase === 'qberEstimation' && !isAborted && (
+          {currentPhase === 'qberEstimation' && !isAborted && errorCorrectionEnabled && (
             <button className={styles.primaryButton} onClick={handleNextPhase}>
               Run Cascade Protocol ›
+            </button>
+          )}
+          {currentPhase === 'qberEstimation' && !isAborted && !errorCorrectionEnabled && (
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Establish Key ›
             </button>
           )}
           {currentPhase === 'errorCorrection' && !isAborted && (
