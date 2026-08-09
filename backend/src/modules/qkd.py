@@ -6,7 +6,7 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-USE_IBM_QUANTUM = True
+USE_IBM_QUANTUM = False
 IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
 
 def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
@@ -61,7 +61,7 @@ def simulate_bb84_protocal(key_size = 64, per_time_bits = 64, has_eavesdropping 
         eavesdropping_basis = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
         eavesdropping_result = eavesdropping(qc, eavesdropping_basis, use_ibm=use_ibm)
 
-        qc = eavesdropping_result["fake_qc"]
+        qc = eavesdropping_result["eavesdropping_copy"]
 
     qc = receive_qubit(qc, decryption_basis)
 
@@ -147,6 +147,6 @@ def sifting(key, basis1, basis2):
 
     return sifted_key
 
-key = (random_binary(64, 32))
-print(len(key))
-print(key)
+# key = (random_binary(64, 32))
+# print(len(key))
+# print(key)

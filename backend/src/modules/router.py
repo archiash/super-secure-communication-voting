@@ -7,7 +7,7 @@ router = APIRouter(prefix="/vote")
 @router.post("/generate-key", response_model=GenerateKeyRespond, status_code=status.HTTP_200_OK)
 async def generate_key(payload: GenerateKeyInput):
     
-    return await service.create_qkd_key()
+    return await service.create_qkd_key(payload)
 
 @router.post("/cast-ballot", status_code=status.HTTP_201_CREATED)
 async def cast_ballot():
