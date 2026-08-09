@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
@@ -17,15 +17,22 @@ export function KeyGenerationPage() {
   const { state, dispatch, api } = useApp();
   const navigate = useNavigate();
 
-  const [currentPhase, setCurrentPhase] = useState<QKDPhase>('transmission');
-  const [isBlurred, setIsBlurred] = useState(true);
-  const [isTransmitting, setIsTransmitting] = useState(true);
+  // Phase state lives in global store so it survives navigation to/from Configure
+  const currentPhase = state.qkd.currentPhase;
+  const isBlurred = state.qkd.isBlurred;
+  const isTransmitting = state.qkd.isTransmitting;
+
+  const setCurrentPhase = (phase: QKDPhase) =>
+    dispatch({ type: 'SET_QKD_PHASE', payload: { currentPhase: phase } });
+  const setIsBlurred = (val: boolean) =>
+    dispatch({ type: 'SET_QKD_PHASE', payload: { currentPhase, isBlurred: val } });
 
   // If no auth, go back
   useEffect(() => {
     if (!state.auth.isAuthenticated) {
       navigate('/');
-    } else {
+    } else if (!state.qkd.result && !state.qkd.isGenerating) {
+      // Only start generation if we don't already have a result
       startKeyGeneration();
     }
   }, [state.auth.isAuthenticated, navigate]);
@@ -41,14 +48,9 @@ export function KeyGenerationPage() {
 
       dispatch({ type: 'QKD_SUCCESS', payload: result });
 
-      setIsTransmitting(true);
-      setCurrentPhase('transmission');
-      setIsBlurred(true);
-
-      // Simulate transmission time
+      // Simulate transmission time then advance to basisSifting
       setTimeout(() => {
-        setIsTransmitting(false);
-        setCurrentPhase('basisSifting');
+        dispatch({ type: 'SET_QKD_PHASE', payload: { currentPhase: 'basisSifting', isTransmitting: false, isBlurred: true } });
       }, 2000);
 
     } catch (err) {

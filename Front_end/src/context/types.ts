@@ -1,4 +1,4 @@
-import type { ProtocolConfig, QKDResponse, VoteResultsResponse } from '../types';
+import type { ProtocolConfig, QKDResponse, VoteResultsResponse, QKDPhase } from '../types';
 
 /** The 4 wizard steps shown in the top stepper */
 export type WizardStep = 'authentication' | 'keyGeneration' | 'castVote' | 'confirmation';
@@ -24,6 +24,12 @@ export interface AppState {
     isGenerating: boolean;
     result: QKDResponse | null;
     error: string | null;
+    /** The current visible phase in the QKD stepper */
+    currentPhase: QKDPhase;
+    /** Whether basis sifting table is blurred */
+    isBlurred: boolean;
+    /** Whether transmission animation is running */
+    isTransmitting: boolean;
   };
 
   /** Vote state */
@@ -64,6 +70,7 @@ export type AppAction =
       payload: { voteId: string; timestamp: string };
     }
   | { type: 'SET_RESULTS'; payload: VoteResultsResponse }
+  | { type: 'SET_QKD_PHASE'; payload: { currentPhase: QKDPhase; isBlurred?: boolean; isTransmitting?: boolean } }
   | { type: 'SET_ERROR'; payload: string }
   | { type: 'CLEAR_ERROR' }
   | { type: 'RESET_SESSION' };
