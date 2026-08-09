@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput
+from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput, CandidateData, CandidateRespond, CastBallotRespond
 from . import qkd
 import secrets
 import string
@@ -38,22 +38,36 @@ async def create_qkd_key(payload : GenerateKeyInput):
 
     await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
 
-    return {
-        "election_code": payload.election_code,
-        "session_id" : session_id,
-        "key_generated": key_generated,
-        "alice_bit": simulation_result["server_key"],
-        "alice_basis": simulation_result["server_encryption_basis"],
-        "bob_read": simulation_result["client_decryption_basis"],
-        "bob_basis": simulation_result["client_key"],
-        "test_sample": 0,
-        "error_found": 0,
-        "qber_percent": 0,
-        "threshold_percent": 11
-    }
+    return GenerateKeyRespond(
+        elction_code=  payload.election_code,
+        voter_id= payload.voter_id,
+        session_id= session_id,
+        key_generated= key_generated,
+        alice_bit = simulation_result["server_key"],
+        alice_basis = simulation_result["server_encryption_basis"],
+        bob_read =  simulation_result["client_decryption_basis"],
+        bob_basis =simulation_result["client_key"],
+        test_sample = 0,
+        error_found = 0,
+        qber_percent = 0,
+        threshold_percent = 11
+    )
+
+    # return {
+    #     "election_code": payload.election_code,
+    #     "session_id" : session_id,
+    #     "key_generated": key_generated,
+    #     "alice_bit": simulation_result["server_key"],
+    #     "alice_basis": simulation_result["server_encryption_basis"],
+    #     "bob_read": simulation_result["client_decryption_basis"],
+    #     "bob_basis": simulation_result["client_key"],
+    #     "test_sample": 0,
+    #     "error_found": 0,
+    #     "qber_percent": 0,
+    #     "threshold_percent": 11
+    # }
 
 async def cast_ballot(payload: CastBallotInput):
-    # 1. Fetch the document just to validate it exists and extract the key
     election = await ElectionSchema.find_one(
         ElectionSchema.sessions.session_id == payload.session_id
     )
@@ -76,30 +90,50 @@ async def cast_ballot(payload: CastBallotInput):
     voted_candidate_index = int(res_binary, 2)
     current_time = time.time()
 
-    # 2. THE FIX: Chain the update directly to the find_one query
-    # This forces MongoDB to remember the array match for the '$' operator
     await ElectionSchema.find_one(
         ElectionSchema.sessions.session_id == payload.session_id
     ).update({
         "$inc": {
-            f"candidates.{voted_candidate_index}.vote": 1
+            f"candidates.{voted_candidate_index}.votes": 1
         },
         "$set": {
-            # Note: I changed target_session.voter_id to payload.voter_id
-            # so it actually saves the incoming voter ID instead of the old one!
             "sessions.$.voter_id": payload.voter_id, 
             "sessions.$.encrypted_vote": payload.encrypted_vote,
             "sessions.$.timestamp": current_time
         }
     })
+    return CastBallotRespond(
+        session_id= payload.session_id,
+        voter_id = payload.voter_id,
+        encrypted_vote = payload.encrypted_vote,
+        created_at = current_time,
+        updated_time = current_time    
+        )
+    # return {
+    #     "session_id": payload.session_id,
+    #     "voter_id": payload.voter_id,
+    #     "encrypted_vote": payload.encrypted_vote,
+    #     "created_at": current_time,
+    #     "updated_time": current_time
+    # }
 
-    return {
-        "session_id": payload.session_id,
-        "voter_id": payload.voter_id,
-        "encrypted_vote": payload.encrypted_vote,
-        "created_at": current_time,
-        "updated_time": current_time
-    }
+async def get_election_candidates(election_code: str):
+    election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
+    if not election:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Election with code '{election_code}' not found"
+        )
+
+    mapped_candidates = [
+        CandidateData(
+            candidate_name=db_cand.candidate_name,
+            candidate_party=db_cand.candidate_party,
+        )
+        for db_cand in election.candidates
+    ]
+
+    return CandidateRespond(candidates=mapped_candidates)
 
 async def get_election_results(election_code: str):
     election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
