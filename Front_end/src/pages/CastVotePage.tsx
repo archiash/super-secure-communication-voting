@@ -112,9 +112,8 @@ export function CastVotePage() {
         {candidates.map((candidate) => (
           <div
             key={candidate.id}
-            className={`${styles.candidateCard} ${
-              selectedId === candidate.id ? styles.selected : ''
-            }`}
+            className={`${styles.candidateCard} ${selectedId === candidate.id ? styles.selected : ''
+              }`}
             onClick={() => dispatch({ type: 'SELECT_VOTE_OPTION', payload: candidate.id })}
           >
             <div className={styles.candidateInfo}>
@@ -132,13 +131,13 @@ export function CastVotePage() {
       {encryption && selectedCandidate && (
         <div className={styles.encryptionPreview}>
           <div className={styles.encryptionPreviewTitle}>ONE-TIME PAD ENCRYPTION</div>
-          
+
           <div className={styles.encryptionRow}>
             <span className={styles.encryptionLabel}>Vote (plaintext)</span>
             <span className={styles.encryptionValue}>{spaceBinary(encryption.voteBinary)}</span>
             <span className={styles.encryptionDesc}>Candidate {parseInt(encryption.voteBinary, 2)}</span>
           </div>
-          
+
           <div className={styles.encryptionRow}>
             <span className={styles.encryptionLabel}>Key (QKD)</span>
             <span className={`${styles.encryptionValue} ${styles.qkd}`}>{spaceBinary(encryption.keyToUse)}</span>
@@ -146,7 +145,7 @@ export function CastVotePage() {
           </div>
 
           <div className={styles.encryptionDivider} />
-          
+
           <div className={styles.encryptionRow}>
             <span className={styles.encryptionLabel}>Encrypted vote</span>
             <span className={`${styles.encryptionValue} ${styles.encrypted}`}>{spaceBinary(encryption.encrypted)}</span>
@@ -165,7 +164,12 @@ export function CastVotePage() {
           onClick={handleSubmitVote}
           disabled={!selectedId || state.vote.isSubmitting}
         >
-          <span className={styles.lockIcon}>🔓</span>
+          <span className={styles.lockIcon}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+            </svg>
+          </span>
           {state.vote.isSubmitting ? 'Submitting...' : 'Submit Encrypted Ballot'}
         </button>
       </div>
