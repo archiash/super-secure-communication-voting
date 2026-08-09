@@ -1,15 +1,13 @@
 from fastapi import HTTPException
 from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult
+from . import qkd
 
 async def create_qkd_key(payload : GenerateKeyInput) -> dict:
-    return {"key": "generated_key_value", "status": "success"}
+    # key_size = 64, per_time_bit = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM)
+    return qkd.simulate_bb84_protocal(key_size= payload.target_key_length, per_time_bit= payload.qubit_per_session, has_eavesdropping= payload.enable_eavesdropper, use_ibm= payload.is_using_quantum_computer)
 
 async def get_election_results(election_code: str) -> ElectionResultResponse:
     election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
-    # all_docs = ElectionSchema.find_all().to_list()
-
-    # for e in all_docs: 
-    #     print(e.election_code)
 
     if not election:
         raise HTTPException(
