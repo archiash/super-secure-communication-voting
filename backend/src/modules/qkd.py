@@ -6,7 +6,7 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-USE_IBM_QUANTUM = False
+USE_IBM_QUANTUM = True
 IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
 
 def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
@@ -31,6 +31,7 @@ def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN):
     service = QiskitRuntimeService(
         channel="ibm_quantum_platform",
         token=token,
+        instance="CRN",
     )
 
     backend = service.least_busy(operational=True, simulator=False)
@@ -146,6 +147,14 @@ def sifting(key, basis1, basis2):
         sifted_key += key[i]
 
     return sifted_key
+
+def QBER(key1, key2):
+    key_length = len(key1)
+    match_indexes = get_match_indexes(key1, key2)
+    match_count = len(match_indexes)
+
+    return (key_length - match_count) / key_length
+
 
 # key = (random_binary(64, 32))
 # print(len(key))
