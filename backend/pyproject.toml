@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "GNOGz", email = "99389733+GNOGz@users.noreply.github.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11.15"
 dependencies = [
     "beanie>=2.2.0",
     "fastapi[standard]>=0.141.1",

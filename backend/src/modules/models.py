@@ -1,6 +1,7 @@
 from beanie import Document
-# Import your new base class instead of Pydantic's BaseModel
+from typing import Optional
 from core.schemas import CamelModel 
+from pydantic import BaseModel
 
 class GenerateKeyInput(CamelModel):
     voter_id: str
@@ -32,16 +33,21 @@ class CandidateVotingResult(CamelModel):
 class ElectionResultResponse(CamelModel):
     candidates: list[CandidateVotingResult]
 
+class CastBallotInput(CamelModel):
+    session_id: str
+    voter_id: str
+    encrypted_vote: str
+
 # MongoDB Schema Below
-class Candidate(CamelModel):
+class Candidate(BaseModel):
     candidate_name: str
     candidate_party: str
     votes: int
 
-class VotingSession(CamelModel):
+class VotingSession(BaseModel):
     session_id: str
     voter_id: str
-    encrypted_vote: str
+    encrypted_vote: Optional[str] = None 
     key_generated: str
     timestamp: float
 
