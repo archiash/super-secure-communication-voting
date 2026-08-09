@@ -6,12 +6,10 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-generate_bitcount = 32
-
 USE_IBM_QUANTUM = True
 IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
 
-def random_binary(number_of_bit: int, use_ibm: bool = USE_IBM_QUANTUM):
+def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
     qc = QuantumCircuit(number_of_bit)
 
     for i in range(number_of_bit):
@@ -52,15 +50,15 @@ def run_quantum_circuit(qc, times = 1, use_ibm: bool = USE_IBM_QUANTUM):
     else:
         return run_simulation(qc, times)
 
-def simulate_bb84_protocal(key_size = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM):
-    sending_key = random_binary(key_size, use_ibm=use_ibm)
-    encryption_basis = random_binary(key_size, use_ibm=use_ibm)
-    decryption_basis = random_binary(key_size, use_ibm=use_ibm)
+def simulate_bb84_protocal(key_size = 64, per_time_bits = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM):
+    sending_key = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
+    encryption_basis = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
+    decryption_basis = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
 
     qc = sending_qubit(sending_key, encryption_basis)
 
     if has_eavesdropping:
-        eavesdropping_basis = random_binary(key_size, use_ibm=use_ibm)
+        eavesdropping_basis = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
         eavesdropping_result = eavesdropping(qc, eavesdropping_basis, use_ibm=use_ibm)
 
         qc = eavesdropping_result["fake_qc"]
@@ -149,3 +147,6 @@ def sifting(key, basis1, basis2):
 
     return sifted_key
 
+key = (random_binary(64, 32))
+print(len(key))
+print(key)
