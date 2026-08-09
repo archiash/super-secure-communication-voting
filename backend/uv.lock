@@ -72,7 +72,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "pymongo", specifier = ">=4.14.0" },
-    { name = "qiskit", specifier = "==1.4.0" },
+    { name = "qiskit", specifier = ">=1.4.0" },
     { name = "qiskit-aer", specifier = ">=0.15.0" },
     { name = "qiskit-ibm-runtime", specifier = ">=0.35.0" },
 ]
