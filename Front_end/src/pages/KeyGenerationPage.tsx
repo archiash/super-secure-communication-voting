@@ -40,7 +40,7 @@ export function KeyGenerationPage() {
       );
 
       dispatch({ type: 'QKD_SUCCESS', payload: result });
-      
+
       setIsTransmitting(true);
       setCurrentPhase('transmission');
       setIsBlurred(true);
@@ -50,7 +50,7 @@ export function KeyGenerationPage() {
         setIsTransmitting(false);
         setCurrentPhase('basisSifting');
       }, 2000);
-      
+
     } catch (err) {
       dispatch({
         type: 'SET_ERROR',
@@ -83,9 +83,9 @@ export function KeyGenerationPage() {
         setIsBlurred(false);
         // If aborted, we jump to QBER right after revealing to show the error
         if (isAborted) {
-           setTimeout(() => {
-             setCurrentPhase('qberEstimation');
-           }, 1000);
+          setTimeout(() => {
+            setCurrentPhase('qberEstimation');
+          }, 1000);
         }
       } else {
         setCurrentPhase('qberEstimation');
@@ -120,23 +120,23 @@ export function KeyGenerationPage() {
 
       <div className={styles.trackerCard}>
         <div className={styles.trackerLine}>
-          <div 
-            className={styles.trackerLineFill} 
-            style={{ width: `${(currentPhaseIndex / (QKD_PHASES.length - 1)) * 100}%` }} 
+          <div
+            className={styles.trackerLineFill}
+            style={{ width: `${(currentPhaseIndex / (QKD_PHASES.length - 1)) * 100}%` }}
           />
         </div>
-        
+
         {QKD_PHASES.map((phase, idx) => {
           const isActive = idx === currentPhaseIndex;
           const isCompleted = idx < currentPhaseIndex;
           const isFailedStep = isAborted && currentPhaseIndex >= 2 && idx >= 3; // Steps after QBER are failed if aborted and we've reached QBER
           const isQberActiveFailed = isAborted && idx === 2 && currentPhase === 'qberEstimation';
-          
+
           let iconClass = styles.pending;
           if (isActive) iconClass = styles.active;
           if (isCompleted && !isFailedStep) iconClass = styles.completed;
           if (isFailedStep || isQberActiveFailed) iconClass = styles.failed; // Keep blue dot for active QBER even if failed? Figma shows QBER is blue active dot, Error Correction and Key Estab are red X.
-          
+
           if (isQberActiveFailed) iconClass = styles.active; // Figma shows QBER is active blue
 
           return (
@@ -216,12 +216,12 @@ export function KeyGenerationPage() {
               {qkdResult.phases.qberEstimation.passed ? 'WITHIN THRESHOLD' : 'EXCEEDS THRESHOLD'}
             </span>
           </div>
-          
+
           <div className={styles.statsRow}>
             <div className={styles.statCol}>
               <span className={styles.statLabel}>Test sample</span>
               <span className={styles.statValue}>
-                {qkdResult.phases.qberEstimation.testBitsUsed} bits 
+                {qkdResult.phases.qberEstimation.testBitsUsed} bits
                 <span className={styles.statSubValue}> ({Math.round((qkdResult.phases.qberEstimation.testBitsUsed / qkdResult.phases.basisSifting.matchingBases) * 100)}% sifted)</span>
               </span>
             </div>
@@ -242,23 +242,23 @@ export function KeyGenerationPage() {
           </div>
 
           <div className={styles.barContainer}>
-             <div 
-               className={styles.barFill} 
-               style={{ 
-                 width: `${Math.min(100, (qkdResult.phases.qberEstimation.qber / 1.0) * 100)}%`,
-                 backgroundColor: !qkdResult.phases.qberEstimation.passed ? 'var(--color-danger)' : 'var(--color-border-light)' 
-               }} 
-             />
-             <div 
-               className={styles.barThresholdTick} 
-               style={{ left: `${(state.config.errorThreshold / 1.0) * 100}%` }}
-             />
-             <div 
-               className={styles.barThresholdLabel}
-               style={{ left: `${(state.config.errorThreshold / 1.0) * 100}%` }}
-             >
-               threshold
-             </div>
+            <div
+              className={styles.barFill}
+              style={{
+                width: `${Math.min(100, (qkdResult.phases.qberEstimation.qber / 1.0) * 100)}%`,
+                backgroundColor: !qkdResult.phases.qberEstimation.passed ? 'var(--color-danger)' : 'var(--color-border-light)'
+              }}
+            />
+            <div
+              className={styles.barThresholdTick}
+              style={{ left: `${(state.config.errorThreshold / 1.0) * 100}%` }}
+            />
+            <div
+              className={styles.barThresholdLabel}
+              style={{ left: `${(state.config.errorThreshold / 1.0) * 100}%` }}
+            >
+              threshold
+            </div>
           </div>
         </div>
       )}
@@ -316,13 +316,19 @@ export function KeyGenerationPage() {
             <span className={`${styles.panelTitle} ${styles.blue}`}>
               FINAL KEY · {qkdResult.phases.keyEstablished.keyLength} BITS · {Math.round((qkdResult.phases.keyEstablished.keyLength / state.config.qubitCount) * 100)}% CHANNEL EFFICIENCY
             </span>
-            <span>🔒</span>
+            {/*<span>🔒</span>*/}
+            <span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
           </div>
-          
+
           <div className={styles.keyText}>
             {qkdResult.phases.keyEstablished.finalKey}
           </div>
-          
+
           <div className={styles.keyBlocks}>
             {qkdResult.phases.keyEstablished.finalKey.split('').map((bit, i) => (
               <div key={i} className={styles.keyBlock}>{bit}</div>
@@ -345,19 +351,19 @@ export function KeyGenerationPage() {
             </button>
           )}
           {currentPhase === 'qberEstimation' && !isAborted && (
-             <button className={styles.primaryButton} onClick={handleNextPhase}>
-               Run Cascade Protocol ›
-             </button>
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Run Cascade Protocol ›
+            </button>
           )}
           {currentPhase === 'errorCorrection' && !isAborted && (
-             <button className={styles.primaryButton} onClick={handleNextPhase}>
-               Establish Key ›
-             </button>
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Establish Key ›
+            </button>
           )}
           {currentPhase === 'keyEstablished' && !isAborted && (
-             <button className={styles.primaryButton} onClick={handleNextPhase}>
-               Proceed to Ballot ›
-             </button>
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Proceed to Ballot ›
+            </button>
           )}
         </div>
       )}
