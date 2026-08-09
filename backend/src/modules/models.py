@@ -23,7 +23,7 @@ class GenerateKeyRespond(CamelModel):
     bob_basis: str
     test_sample: int
     qber_percent: int
-    thresholdPercent: int
+    threshold_percent: int
 
 class CandidateVotingResult(CamelModel):
     candidate_name: str
@@ -37,6 +37,18 @@ class CastBallotInput(CamelModel):
     session_id: str
     voter_id: str
     encrypted_vote: str
+
+class CastBallotRespond(CamelModel):
+    session_id: str
+    voter_id: str
+    encrypted_vote: str
+    created_at: float
+    updated_time: float
+class CandidateData(CamelModel):
+    candidate_name: str
+    candidate_party: str
+class CandidateRespond(CamelModel):
+    candidates: list[CandidateData]
 
 # MongoDB Schema Below
 class Candidate(BaseModel):
