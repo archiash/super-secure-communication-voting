@@ -15,6 +15,9 @@ export const initialState: AppState = {
     isGenerating: false,
     result: null,
     error: null,
+    currentPhase: 'transmission',
+    isBlurred: true,
+    isTransmitting: false,
   },
   vote: {
     selectedOptionId: null,
@@ -52,13 +55,24 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'QKD_START':
       return {
         ...state,
-        qkd: { isGenerating: true, result: null, error: null },
+        qkd: { ...state.qkd, isGenerating: true, result: null, error: null, currentPhase: 'transmission', isBlurred: true, isTransmitting: true },
       };
 
     case 'QKD_SUCCESS':
       return {
         ...state,
-        qkd: { isGenerating: false, result: action.payload, error: null },
+        qkd: { ...state.qkd, isGenerating: false, result: action.payload, error: null, isTransmitting: true, currentPhase: 'transmission' },
+      };
+
+    case 'SET_QKD_PHASE':
+      return {
+        ...state,
+        qkd: {
+          ...state.qkd,
+          currentPhase: action.payload.currentPhase,
+          isBlurred: action.payload.isBlurred ?? state.qkd.isBlurred,
+          isTransmitting: action.payload.isTransmitting ?? state.qkd.isTransmitting,
+        },
       };
 
     case 'QKD_ERROR':

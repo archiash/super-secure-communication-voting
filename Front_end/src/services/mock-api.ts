@@ -83,6 +83,19 @@ export class MockApiService implements ApiService {
       }
     }
     const qber = testBitCount > 0 ? errorsFound / testBitCount : 0;
+    // this funtion is use to force the QBER to be clearly above threshold so Eve is reliably detected every run.
+    //let qber = testBitCount > 0 ? errorsFound / testBitCount : 0;
+
+    // When Eve is simulated, she ALWAYS causes a detectable disturbance (≥25% QBER).
+    // If the random sampling didn't catch enough errors, we force the QBER to be
+    // clearly above threshold so Eve is reliably detected every run.
+    //if (config.eveSimulation && qber <= config.errorThreshold) {
+    // Target a QBER that is visibly above threshold (e.g. 25%)
+    //const targetQber = Math.max(0.25, config.errorThreshold + 0.1);
+    //errorsFound = Math.ceil(targetQber * testBitCount);
+    //qber = testBitCount > 0 ? errorsFound / testBitCount : targetQber;
+    //}
+
     const passed = qber <= config.errorThreshold;
 
     // Remove test bits from the key
@@ -200,7 +213,7 @@ export class MockApiService implements ApiService {
 
   async getVotingAudit(_electionCode: string): Promise<VotingAuditResponse> {
     await this.delay(100);
-    
+
     if (this.votes.length === 0) {
       return {
         sessions: [

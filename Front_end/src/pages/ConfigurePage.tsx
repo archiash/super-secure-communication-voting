@@ -17,7 +17,7 @@ export function ConfigurePage() {
 
   const handleSave = () => {
     dispatch({ type: 'SET_CONFIG', payload: config });
-    navigate('/');
+    navigate(-1);
   };
 
   const handleReset = () => {
