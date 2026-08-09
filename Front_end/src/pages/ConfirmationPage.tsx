@@ -1,20 +1,28 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
 import type { VoteOption } from '../types';
 import styles from './ConfirmationPage.module.css';
 
-// Same candidates array to get the name
-const CANDIDATES: VoteOption[] = [
-  { id: 'candidate-a', name: 'Alexandra Chen', party: 'Progressive Alliance', binaryId: '000', count: 0 },
-  { id: 'candidate-b', name: 'Marcus Webb', party: 'National Coalition', binaryId: '001', count: 0 },
-  { id: 'candidate-c', name: 'Priya Sharma', party: 'Reform Movement', binaryId: '010', count: 0 },
-  { id: 'candidate-d', name: "James O'Brien", party: 'Citizens First', binaryId: '011', count: 0 },
-];
-
 export function ConfirmationPage() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, api } = useApp();
   const navigate = useNavigate();
+  const [candidates, setCandidates] = useState<VoteOption[]>([]);
+
+  useEffect(() => {
+    if (state.auth.electionCode) {
+      api.getCandidates(state.auth.electionCode).then(res => {
+        setCandidates(res.candidates.map((c, i) => ({
+          id: `candidate-${i}`,
+          name: c.candidateName,
+          party: c.candidateParty,
+          binaryId: c.binaryId,
+          count: 0
+        })));
+      }).catch(err => console.error('Failed to load candidates', err));
+    }
+  }, [api, state.auth.electionCode]);
 
   const qkdResult = state.qkd.result;
   const { vote, auth } = state;
@@ -24,8 +32,8 @@ export function ConfirmationPage() {
     return null;
   }
 
-  const selectedCandidate = CANDIDATES.find(c => c.id === vote.selectedOptionId);
-  const voteBinary = selectedCandidate?.binaryId || '';
+  const selectedCandidate = candidates.find(c => c.id === vote.selectedOptionId);
+  const voteBinary = selectedCandidate?.binaryId || vote.otpKey?.substring(0, 3) || '';
 
   const handleVoteAgain = () => {
     dispatch({ type: 'RESET_SESSION' });
