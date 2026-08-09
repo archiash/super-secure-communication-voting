@@ -1,0 +1,41 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments & Virtual Envs
+.venv/
+venv/
+ENV/
+env/
+
+# FastAPI Environment secrets (NEVER commit these)
+.env
+*.env
+.env.local
+.env.*.local
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Database binaries (if running SQLite locally)
+*.db
+*.sqlite3
+
+# Build and distributions
+build/
+dist/
+*.egg-info/

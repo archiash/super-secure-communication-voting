@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    container_name: qkd_voting_api
+    ports:
+      - "8000:8000"
+    # This automatically passes your .env variables (like MONGODB_URI) into the container
+    env_file:
+      - .env
+    # To enable auto-refreshing containers for local development, uncomment the volumes block below:
+    # volumes:
+    #   - .:/app
