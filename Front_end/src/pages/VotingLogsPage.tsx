@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import type { VotingLogEntry } from '../types';
 import styles from './VotingLogsPage.module.css';
 
 export function VotingLogsPage() {
   const { state, api } = useApp();
+  const navigate = useNavigate();
   const [logs, setLogs] = useState<VotingLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -62,9 +64,14 @@ export function VotingLogsPage() {
             Complete audit trail of all quantum key distribution sessions, photon transmission parameters, QBER error rates, and ballot statuses for Election: <strong>{electionCode}</strong>.
           </p>
         </div>
-        <button className={styles.refreshButton} onClick={fetchLogs} disabled={loading}>
-          <span>↻</span> {loading ? 'Refreshing...' : 'Refresh Logs'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className={styles.refreshButton} onClick={() => navigate('/')}>
+            ← Back to Home
+          </button>
+          <button className={styles.refreshButton} onClick={fetchLogs} disabled={loading}>
+            <span>↻</span> {loading ? 'Refreshing...' : 'Refresh Logs'}
+          </button>
+        </div>
       </div>
 
       {/* Summary Statistics */}
