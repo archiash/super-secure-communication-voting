@@ -45,7 +45,7 @@ export function Header() {
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
           </span>
-          Voting Log
+          QKD BB84 Report
         </button>
         <button className={styles.navLink} onClick={() => navigate('/results')}>
           <span className={styles.navLinkIcon}>

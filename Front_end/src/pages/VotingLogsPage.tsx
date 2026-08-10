@@ -58,10 +58,10 @@ export function VotingLogsPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>
-            QKD BB84 Voting Session Logs
+            QKD BB84 Quantum Simulation Report
           </h1>
           <p className={styles.subtitle}>
-            Complete audit trail of all quantum key distribution sessions, photon transmission parameters, QBER error rates, and ballot statuses for Election: <strong>{electionCode}</strong>.
+            Detailed audit report of simulated Quantum Key Distribution (BB84) execution. Displays internal quantum state diagnostics, photon polarization states, measurement bases, quantum bit error rates (QBER), and key exchange results for Election: <strong>{electionCode}</strong>.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
@@ -220,13 +220,17 @@ export function VotingLogsPage() {
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>
-                BB84 QKD Session Details — <span className={styles.sessionId}>{selectedLog.sessionId}</span>
+                BB84 QKD Simulation Trace — <span className={styles.sessionId}>{selectedLog.sessionId}</span>
               </h3>
               <button className={styles.modalClose} onClick={() => setSelectedLog(null)}>
                 ✕
               </button>
             </div>
             <div className={styles.modalBody}>
+              <div style={{ padding: '10px 14px', backgroundColor: 'var(--color-accent-light)', border: '1px solid var(--color-border-light)', borderRadius: 'var(--radius-md)', fontSize: '12px', color: 'var(--color-accent)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span>ℹ</span>
+                <span><strong>Simulation Diagnostic Trace:</strong> In a physical QKD hardware implementation, quantum states collapse upon measurement and cannot be inspected in transit. This report provides internal diagnostic data captured from the QKD simulator.</span>
+              </div>
               <div className={styles.detailGrid}>
                 <div className={styles.detailBlock}>
                   <span className={styles.detailLabel}>Voter ID</span>
