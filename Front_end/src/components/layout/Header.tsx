@@ -21,6 +21,10 @@ export function Header() {
           <span className={styles.navLinkIcon}>⚙</span>
           Configure
         </button>
+        <button className={styles.navLink} onClick={() => navigate('/logs')}>
+          <span className={styles.navLinkIcon}>📜</span>
+          Voting Log
+        </button>
         <button className={styles.navLink} onClick={() => navigate('/results')}>
           {/*<span className={styles.navLinkIcon}>📊</span>*/}
           <span className={styles.navLinkIcon}>

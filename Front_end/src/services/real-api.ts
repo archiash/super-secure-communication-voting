@@ -9,6 +9,7 @@ import type {
   CastVoteResponse,
   ElectionResultResponse,
   VotingAuditResponse,
+  VotingLogResponse,
   TransmissionLogEntry,
   Basis,
 } from '../types';
@@ -205,6 +206,26 @@ export class RealApiService implements ApiService {
       console.warn('[RealApiService] getVotingAudit failed, falling back to mock:', err);
       const mockRes = await mockApi.getVotingAudit(electionCode);
       console.log('[API Call] getVotingAudit fallback mock result:', mockRes);
+      return mockRes;
+    }
+  }
+
+  async getVotingLogs(electionCode: string): Promise<VotingLogResponse> {
+    try {
+      const res = await fetch(`${API_BASE}/vote/logs/${electionCode}`);
+      if (res.status === 404) {
+        const mockRes = await mockApi.getVotingLogs(electionCode);
+        console.log('[API Call] getVotingLogs (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
+      if (!res.ok) throw new Error(`Voting logs failed: ${res.statusText}`);
+      const data = await res.json();
+      console.log('[API Call] getVotingLogs result:', data);
+      return data;
+    } catch (err) {
+      console.warn('[RealApiService] getVotingLogs failed, falling back to mock:', err);
+      const mockRes = await mockApi.getVotingLogs(electionCode);
+      console.log('[API Call] getVotingLogs fallback mock result:', mockRes);
       return mockRes;
     }
   }

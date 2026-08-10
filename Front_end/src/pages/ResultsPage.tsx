@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import type { ElectionResultResponse, VotingAuditResponse, VotingCandidate, SessionData } from '../types';
+import type { ElectionResultResponse, VotingAuditResponse, VotingCandidate } from '../types';
 import styles from './ResultsPage.module.css';
 
 const CANDIDATE_COLORS: Record<string, string> = {
@@ -20,7 +20,6 @@ export function ResultsPage() {
   const [electionResult, setElectionResult] = useState<ElectionResultResponse | null>(null);
   const [auditLog, setAuditLog] = useState<VotingAuditResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAuditLog, setShowAuditLog] = useState(false);
 
   useEffect(() => {
     loadResults();
