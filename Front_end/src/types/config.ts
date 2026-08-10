@@ -28,8 +28,8 @@ export interface ProtocolConfig {
 
 /** Default configuration matching the Figma "ACTIVE CONFIGURATION" card */
 export const DEFAULT_CONFIG: ProtocolConfig = {
-  qubitCount: 40,
-  targetKeyLength: 8,
+  qubitCount: 32,
+  targetKeyLength: 64,
   useRealQuantum: false,
   eveSimulation: false,
   errorCorrectionEnabled: false,

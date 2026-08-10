@@ -122,12 +122,17 @@ export function ConfigurePage() {
                 type="range"
                 className={styles.slider}
                 min={4}
-                max={32}
+                max={256}
                 step={4}
                 value={config.targetKeyLength}
                 onChange={(e) => updateField('targetKeyLength', parseInt(e.target.value))}
               />
-              <span className={styles.sliderLabel}>{config.targetKeyLength} bits</span>
+              <input
+                type="number"
+                className={styles.sliderInput}
+                value={config.targetKeyLength}
+                onChange={(e) => updateField('targetKeyLength', parseInt(e.target.value) || 4)}
+              />
             </div>
           </div>
         </div>

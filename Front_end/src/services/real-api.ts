@@ -14,7 +14,7 @@ import type {
 } from '../types';
 import { MockApiService } from './mock-api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const mockApi = new MockApiService();
 
 function getPhotonSymbol(bit: 0 | 1, basis: Basis) {
@@ -32,7 +32,9 @@ function getPhotonSymbol(bit: 0 | 1, basis: Basis) {
 export class RealApiService implements ApiService {
   async verifyAuth(request: AuthRequest): Promise<AuthResponse> {
     // Auth is handled by the mock — the real backend does not have a /auth endpoint
-    return mockApi.verifyAuth(request);
+    const result = await mockApi.verifyAuth(request);
+    console.log('[API Call] verifyAuth result:', result);
+    return result;
   }
 
   async generateKey(voterId: string, electionCode: string, config: ProtocolConfig): Promise<QKDResponse> {
@@ -50,9 +52,14 @@ export class RealApiService implements ApiService {
           targetKeyLength: config.targetKeyLength
         }),
       });
-      if (res.status === 404) return mockApi.generateKey(voterId, electionCode, config);
+      if (res.status === 404) {
+        const mockRes = await mockApi.generateKey(voterId, electionCode, config);
+        console.log('[API Call] generateKey (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
       if (!res.ok) throw new Error(`Key generation failed: ${res.statusText}`);
       const data = await res.json();
+      console.log('[API Call] generateKey response from backend:', data);
 
       // Map flat response to nested QKDResponse
       const log: TransmissionLogEntry[] = [];
@@ -76,7 +83,7 @@ export class RealApiService implements ApiService {
 
       const kept = log.filter((l) => l.keep);
 
-      return {
+      const result: QKDResponse = {
         sessionId: data.sessionId,
         phases: {
           transmission: { qubitCount: log.length, log },
@@ -101,9 +108,13 @@ export class RealApiService implements ApiService {
           },
         },
       };
+      console.log('[API Call] generateKey mapped result:', result);
+      return result;
     } catch (err) {
       console.warn('[RealApiService] generateKey failed, falling back to mock:', err);
-      return mockApi.generateKey(voterId, electionCode, config);
+      const mockRes = await mockApi.generateKey(voterId, electionCode, config);
+      console.log('[API Call] generateKey fallback mock result:', mockRes);
+      return mockRes;
     }
   }
 
@@ -114,65 +125,104 @@ export class RealApiService implements ApiService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(request),
       });
-      if (res.status === 404) return mockApi.castVote(request);
+      if (res.status === 404) {
+        const mockRes = await mockApi.castVote(request);
+        console.log('[API Call] castVote (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
       if (!res.ok) throw new Error(`Vote failed: ${res.statusText}`);
 
       const data = await res.json();
-      return {
+      console.log('[API Call] castVote response from backend:', data);
+      const result: CastVoteResponse = {
         success: true,
         voteId: data.sessionId || `VOTE-${Date.now().toString(36).toUpperCase()}`,
         timestamp: data.createdAt || new Date().toISOString(),
       };
+      console.log('[API Call] castVote result:', result);
+      return result;
     } catch (err) {
       console.warn('[RealApiService] castVote failed, falling back to mock:', err);
-      return mockApi.castVote(request);
+      const mockRes = await mockApi.castVote(request);
+      console.log('[API Call] castVote fallback mock result:', mockRes);
+      return mockRes;
     }
   }
 
   async getCandidates(electionCode: string): Promise<CandidatesResponse> {
     try {
       const res = await fetch(`${API_BASE}/vote/candidates/${electionCode}`);
-      if (res.status === 404) return mockApi.getCandidates(electionCode);
+      if (res.status === 404) {
+        const mockRes = await mockApi.getCandidates(electionCode);
+        console.log('[API Call] getCandidates (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
       if (!res.ok) throw new Error(`Get candidates failed: ${res.statusText}`);
-      return res.json();
+      const data = await res.json();
+      console.log('[API Call] getCandidates result:', data);
+      return data;
     } catch (err) {
       console.warn('[RealApiService] getCandidates failed, falling back to mock:', err);
-      return mockApi.getCandidates(electionCode);
+      const mockRes = await mockApi.getCandidates(electionCode);
+      console.log('[API Call] getCandidates fallback mock result:', mockRes);
+      return mockRes;
     }
   }
 
   async getElectionResult(electionCode: string): Promise<ElectionResultResponse> {
     try {
       const res = await fetch(`${API_BASE}/vote/election-results/${electionCode}`);
-      if (res.status === 404) return mockApi.getElectionResult(electionCode);
+      if (res.status === 404) {
+        const mockRes = await mockApi.getElectionResult(electionCode);
+        console.log('[API Call] getElectionResult (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
       if (!res.ok) throw new Error(`Election results failed: ${res.statusText}`);
-      return res.json();
+      const data = await res.json();
+      console.log('[API Call] getElectionResult result:', data);
+      return data;
     } catch (err) {
       console.warn('[RealApiService] getElectionResult failed, falling back to mock:', err);
-      return mockApi.getElectionResult(electionCode);
+      const mockRes = await mockApi.getElectionResult(electionCode);
+      console.log('[API Call] getElectionResult fallback mock result:', mockRes);
+      return mockRes;
     }
   }
 
   async getVotingAudit(electionCode: string): Promise<VotingAuditResponse> {
     try {
       const res = await fetch(`${API_BASE}/vote/voting-audits/${electionCode}`);
-      if (res.status === 404) return mockApi.getVotingAudit(electionCode);
+      if (res.status === 404) {
+        const mockRes = await mockApi.getVotingAudit(electionCode);
+        console.log('[API Call] getVotingAudit (404 fallback to mock) result:', mockRes);
+        return mockRes;
+      }
       if (!res.ok) throw new Error(`Voting audit failed: ${res.statusText}`);
-      return res.json();
+      const data = await res.json();
+      console.log('[API Call] getVotingAudit result:', data);
+      return data;
     } catch (err) {
       console.warn('[RealApiService] getVotingAudit failed, falling back to mock:', err);
-      return mockApi.getVotingAudit(electionCode);
+      const mockRes = await mockApi.getVotingAudit(electionCode);
+      console.log('[API Call] getVotingAudit fallback mock result:', mockRes);
+      return mockRes;
     }
   }
 
   async resetVotes(): Promise<void> {
     try {
       const res = await fetch(`${API_BASE}/vote/reset`, { method: 'POST' });
-      if (res.status === 404) return mockApi.resetVotes();
+      if (res.status === 404) {
+        await mockApi.resetVotes();
+        console.log('[API Call] resetVotes (404 fallback to mock) completed');
+        return;
+      }
       if (!res.ok) throw new Error(`Reset failed: ${res.statusText}`);
+      console.log('[API Call] resetVotes result: success');
     } catch (err) {
       console.warn('[RealApiService] resetVotes failed, falling back to mock:', err);
-      return mockApi.resetVotes();
+      await mockApi.resetVotes();
+      console.log('[API Call] resetVotes fallback mock completed');
     }
   }
 }

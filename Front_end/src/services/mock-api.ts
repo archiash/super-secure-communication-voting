@@ -133,7 +133,7 @@ export class MockApiService implements ApiService {
       };
     }
 
-    return {
+    const result: QKDResponse = {
       sessionId,
       phases: {
         transmission: {
@@ -162,6 +162,8 @@ export class MockApiService implements ApiService {
       },
       eveData,
     };
+    console.log('[MockApiService] generateKey result:', result);
+    return result;
   }
 
   async castVote(_request: CastVoteRequest): Promise<CastVoteResponse> {

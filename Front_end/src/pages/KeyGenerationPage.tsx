@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
@@ -27,15 +27,19 @@ export function KeyGenerationPage() {
   const setIsBlurred = (val: boolean) =>
     dispatch({ type: 'SET_QKD_PHASE', payload: { currentPhase, isBlurred: val } });
 
+  // Ref guard to prevent double-call in React StrictMode
+  const hasStartedRef = useRef(false);
+
   // If no auth, go back
   useEffect(() => {
     if (!state.auth.isAuthenticated) {
       navigate('/');
-    } else if (!state.qkd.result && !state.qkd.isGenerating) {
+    } else if (!state.qkd.result && !state.qkd.isGenerating && !hasStartedRef.current) {
+      hasStartedRef.current = true;
       // Only start generation if we don't already have a result
       startKeyGeneration();
     }
-  }, [state.auth.isAuthenticated, navigate]);
+  }, [state.auth.isAuthenticated, navigate, state.qkd.result, state.qkd.isGenerating]);
 
   const startKeyGeneration = async () => {
     dispatch({ type: 'QKD_START' });

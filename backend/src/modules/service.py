@@ -36,6 +36,10 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "timestamp": 0.0
     }
 
+    sifted_server_key = qkd.sifting(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+    sifted_client_key = qkd.sifting(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+    qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
+
     await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
 
     return GenerateKeyRespond(
@@ -49,7 +53,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         bob_basis =simulation_result["client_key"],
         test_sample = 0,
         error_found = 0,
-        qber_percent = 0,
+        qber_percent = qber,
         threshold_percent = 11
     )
 

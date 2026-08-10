@@ -22,7 +22,7 @@ class GenerateKeyRespond(CamelModel):
     bob_read: str
     bob_basis: str
     test_sample: int
-    qber_percent: int
+    qber_percent: float
     threshold_percent: int
 
 class CandidateVotingResult(CamelModel):

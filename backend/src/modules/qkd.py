@@ -1,25 +1,31 @@
 from math import ceil
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
 from qiskit_aer.primitives import SamplerV2 as AerSampler
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-USE_IBM_QUANTUM = True
+USE_IBM_QUANTUM = False
 IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
 
-def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
-    qc = QuantumCircuit(number_of_bit)
+QiskitRuntimeService.save_account(channel="ibm_quantum_platform", token=IBM_TOKEN, overwrite=True)
+service = QiskitRuntimeService()
 
-    for i in range(number_of_bit):
+def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
+    times_to_run = ceil(number_of_bit / per_time_bits)
+
+    qc = QuantumCircuit(per_time_bits)
+
+    for i in range(per_time_bits):
         qc.h(i)
 
     qc.measure_all()
 
-    run_result = run_quantum_circuit(qc, use_ibm=use_ibm)
+    run_result = run_quantum_circuit(qc, times=times_to_run, use_ibm=use_ibm)
 
-    return run_result[0]
+    return ''.join(run_result)
 
 def run_simulation(qc, times = 1):
     sampler = AerSampler()
@@ -27,14 +33,8 @@ def run_simulation(qc, times = 1):
 
     return [b[::-1] for b in job.result()[0].data.meas.get_bitstrings()]
 
-def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN):
-    service = QiskitRuntimeService(
-        channel="ibm_quantum_platform",
-        token=token,
-        instance="CRN",
-    )
-
-    backend = service.least_busy(operational=True, simulator=False)
+def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN, use_simulator = True):
+    backend = service.least_busy(operational=True, simulator=use_simulator)
 
     pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
     isa_qc = pm.run(qc)
@@ -143,7 +143,7 @@ def sifting(key, basis1, basis2):
     match_basis_indexes = get_match_indexes(basis1, basis2)
     sifted_key = ""
 
-    for i in range(len(key)): 
+    for i in match_indexes:
         sifted_key += key[i]
 
     return sifted_key
@@ -154,8 +154,3 @@ def QBER(key1, key2):
     match_count = len(match_indexes)
 
     return (key_length - match_count) / key_length
-
-
-# key = (random_binary(64, 32))
-# print(len(key))
-# print(key)
