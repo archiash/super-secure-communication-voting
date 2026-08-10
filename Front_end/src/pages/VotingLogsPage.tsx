@@ -277,7 +277,7 @@ export function VotingLogsPage() {
                 <div className={styles.sectionHeader}>
                   BB84 Qubit Basis & Bit Sequence
                 </div>
-                <div style={{ maxHeight: '220px', overflowY: 'auto', border: '1px solid var(--color-border-light)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ maxHeight: '280px', overflowY: 'auto', border: '1px solid var(--color-border-light)', borderRadius: 'var(--radius-md)' }}>
                   <table className={styles.photonTable}>
                     <thead>
                       <tr>
@@ -290,21 +290,36 @@ export function VotingLogsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.from({ length: Math.min(32, selectedLog.aliceBit?.length || 0) }).map((_, i) => {
+                      {Array.from({ length: selectedLog.aliceBit?.length || 0 }).map((_, i) => {
                         const aBit = selectedLog.aliceBit[i] || '0';
                         const aBasis = selectedLog.aliceBasis[i] === '0' ? '+' : '×';
                         const bBasis = selectedLog.bobBasis[i] === '0' ? '+' : '×';
                         const bRead = selectedLog.bobRead[i] || '0';
-                        const isMatch = aBasis === bBasis;
+
+                        const sameBasis = aBasis === bBasis;
+                        const bitMatch = aBit === bRead;
+                        const isError = sameBasis && !bitMatch;
+                        const isKept = sameBasis && bitMatch;
+
+                        let rowClass = styles.mismatchRow;
+                        let statusText = '✕ Discarded';
+
+                        if (isKept) {
+                          rowClass = styles.matchingRow;
+                          statusText = '✓ Kept (Match)';
+                        } else if (isError) {
+                          rowClass = styles.errorRow;
+                          statusText = '⚠ QBER Error (Mismatch)';
+                        }
 
                         return (
-                          <tr key={i} className={isMatch ? styles.matchingRow : styles.mismatchRow}>
+                          <tr key={i} className={rowClass}>
                             <td>{i + 1}</td>
                             <td>{aBit}</td>
                             <td>{aBasis}</td>
                             <td>{bBasis}</td>
                             <td>{bRead}</td>
-                            <td>{isMatch ? '✓ Kept' : '✕ Discarded'}</td>
+                            <td>{statusText}</td>
                           </tr>
                         );
                       })}
