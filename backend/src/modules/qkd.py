@@ -7,7 +7,7 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-USE_IBM_QUANTUM = False
+USE_IBM_QUANTUM = True
 IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
 
 QiskitRuntimeService.save_account(channel="ibm_quantum_platform", token=IBM_TOKEN, overwrite=True)
@@ -33,8 +33,8 @@ def run_simulation(qc, times = 1):
 
     return [b[::-1] for b in job.result()[0].data.meas.get_bitstrings()]
 
-def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN, use_simulator = True):
-    backend = service.least_busy(operational=True, simulator=use_simulator)
+def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN):
+    backend = service.least_busy(operational=True, simulator=False)
 
     pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
     isa_qc = pm.run(qc)
@@ -47,9 +47,9 @@ def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN, use_simulator = True):
 
 def run_quantum_circuit(qc, times = 1, use_ibm: bool = USE_IBM_QUANTUM):
     if use_ibm:
-        return run_ibm_hardware(qc, times)
+        return run_ibm_hardware(qc, times = times)
     else:
-        return run_simulation(qc, times)
+        return run_simulation(qc, times = times)
 
 def simulate_bb84_protocal(key_size = 64, per_time_bits = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM):
     sending_key = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
@@ -143,7 +143,7 @@ def sifting(key, basis1, basis2):
     match_basis_indexes = get_match_indexes(basis1, basis2)
     sifted_key = ""
 
-    for i in match_indexes:
+    for i in match_basis_indexes:
         sifted_key += key[i]
 
     return sifted_key
