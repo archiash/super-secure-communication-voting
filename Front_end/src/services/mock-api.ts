@@ -9,6 +9,8 @@ import type {
   CandidatesResponse,
   ElectionResultResponse,
   VotingAuditResponse,
+  VotingLogResponse,
+  VotingLogEntry,
   TransmissionLogEntry,
   Basis,
   PhotonSymbol,
@@ -252,6 +254,59 @@ export class MockApiService implements ApiService {
         keyBits: v.otpKey,
         timeStamp: v.timestamp
       }))
+    };
+  }
+
+  async getVotingLogs(electionCode: string): Promise<VotingLogResponse> {
+    await this.delay(200);
+    const mockLogs: VotingLogEntry[] = [
+      {
+        sessionId: 'QS-A8F2K91L',
+        voterId: 'VOTER-1001',
+        encryptedVote: '01',
+        keyGenerated: '101100101101',
+        aliceBit: '0100101101001101011001011010',
+        aliceBasis: '+×++×+××++××+×++×+×+××++××+×',
+        bobRead: '0100101101001101011001011010',
+        bobBasis: '+×++×+××++××+×++×+×+××++××+×',
+        qberPercent: 5.6,
+        thresholdPercent: 11.0,
+        status: 'VOTE_CAST',
+        timestamp: Date.now() / 1000 - 3600,
+      },
+      {
+        sessionId: 'QS-B3M9P42R',
+        voterId: 'VOTER-1002',
+        encryptedVote: '',
+        keyGenerated: '110010110110',
+        aliceBit: '1100101101101001110010110110',
+        aliceBasis: '×+×++××++×+×+××+×++××++×+×+×',
+        bobRead: '1100101101101001110010110110',
+        bobBasis: '×+×++××++×+×+××+×++××++×+×+×',
+        qberPercent: 4.2,
+        thresholdPercent: 11.0,
+        status: 'KEY_GENERATED',
+        timestamp: Date.now() / 1000 - 1800,
+      },
+      {
+        sessionId: 'QS-C7X1Y98T',
+        voterId: 'VOTER-1003',
+        encryptedVote: '',
+        keyGenerated: '001101011001',
+        aliceBit: '0011010110010110001101011001',
+        aliceBasis: '+×+×+×+×+×+×+×+×+×+×+×+×+×+×',
+        bobRead: '1011010010110100101101001011',
+        bobBasis: '×+×+×+×+×+×+×+×+×+×+×+×+×+×+',
+        qberPercent: 18.4,
+        thresholdPercent: 11.0,
+        status: 'ABORTED',
+        timestamp: Date.now() / 1000 - 600,
+      },
+    ];
+
+    return {
+      electionCode,
+      logs: mockLogs,
     };
   }
 

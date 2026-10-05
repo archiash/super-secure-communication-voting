@@ -1,3 +1,4 @@
+import os
 from math import ceil
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
@@ -7,11 +8,39 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit_ibm_runtime.exceptions import IBMInputValueError, IBMError
 from qiskit.transpiler import generate_preset_pass_manager
 
-USE_IBM_QUANTUM = False
-IBM_TOKEN = "PUAAdh3bP7hCvVG6fQnGvF3pEv3Ti6PutxwsFKMG1CDI"
+try:
+    from core.config import settings
+    DEFAULT_IBM_TOKEN = getattr(settings, "ibm_token", "")
+except Exception:
+    DEFAULT_IBM_TOKEN = os.getenv("IBM_TOKEN", "")
 
-QiskitRuntimeService.save_account(channel="ibm_quantum_platform", token=IBM_TOKEN, overwrite=True)
-service = QiskitRuntimeService()
+USE_IBM_QUANTUM = os.getenv("USE_IBM_QUANTUM", "false").lower() in ("true", "1", "yes")
+IBM_TOKEN = DEFAULT_IBM_TOKEN
+
+_service = None
+
+def get_ibm_service(token: str | None = None) -> QiskitRuntimeService:
+    global _service
+    if _service is None:
+        auth_token = token or IBM_TOKEN
+        if not auth_token:
+            raise RuntimeError("No IBM Quantum token provided in .env or arguments.")
+        try:
+            QiskitRuntimeService.save_account(
+                channel="ibm_quantum_platform",
+                token=auth_token,
+                overwrite=True
+            )
+            _service = QiskitRuntimeService()
+        except Exception as err:
+            raise RuntimeError(
+                f"Failed to authenticate with IBM Quantum: {err}. "
+                "Please verify your IBM_TOKEN or set use_ibm=False to use the local Aer simulator."
+            ) from err
+    return _service
+
+# Alias for backward-compatibility if accessed externally
+service = None
 
 def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IBM_QUANTUM):
     times_to_run = ceil(number_of_bit / per_time_bits)
@@ -33,8 +62,9 @@ def run_simulation(qc, times = 1):
 
     return [b[::-1] for b in job.result()[0].data.meas.get_bitstrings()]
 
-def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN, use_simulator = True):
-    backend = service.least_busy(operational=True, simulator=use_simulator)
+def run_ibm_hardware(qc, times = 1, token = None):
+    runtime_service = get_ibm_service(token)
+    backend = runtime_service.least_busy(operational=True, simulator=False)
 
     pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
     isa_qc = pm.run(qc)
@@ -47,9 +77,9 @@ def run_ibm_hardware(qc, times = 1, token = IBM_TOKEN, use_simulator = True):
 
 def run_quantum_circuit(qc, times = 1, use_ibm: bool = USE_IBM_QUANTUM):
     if use_ibm:
-        return run_ibm_hardware(qc, times)
+        return run_ibm_hardware(qc, times = times)
     else:
-        return run_simulation(qc, times)
+        return run_simulation(qc, times = times)
 
 def simulate_bb84_protocal(key_size = 64, per_time_bits = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM):
     sending_key = random_binary(key_size, per_time_bits, use_ibm=use_ibm)
@@ -143,7 +173,7 @@ def sifting(key, basis1, basis2):
     match_basis_indexes = get_match_indexes(basis1, basis2)
     sifted_key = ""
 
-    for i in match_indexes:
+    for i in match_basis_indexes:
         sifted_key += key[i]
 
     return sifted_key

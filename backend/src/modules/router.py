@@ -20,3 +20,7 @@ async def election_candidates(election_code: str):
 @router.get("/election-results/{election_code}", status_code=200)
 async def election_result(election_code: str):
     return await service.get_election_results(election_code)
+
+@router.get("/logs/{election_code}", status_code=200)
+async def voting_logs(election_code: str):
+    return await service.get_voting_logs(election_code)

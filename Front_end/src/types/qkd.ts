@@ -103,3 +103,23 @@ export interface QKDResponse {
   /** Only present when eveSimulation config is enabled */
   eveData?: EveResult;
 }
+
+export interface VotingLogEntry {
+  sessionId: string;
+  voterId: string;
+  encryptedVote: string;
+  keyGenerated: string;
+  aliceBit: string;
+  aliceBasis: string;
+  bobRead: string;
+  bobBasis: string;
+  qberPercent: number;
+  thresholdPercent: number;
+  status: 'KEY_GENERATED' | 'VOTE_CAST' | 'ABORTED';
+  timestamp: number;
+}
+
+export interface VotingLogResponse {
+  electionCode: string;
+  logs: VotingLogEntry[];
+}

@@ -8,6 +8,7 @@ import type {
   CandidatesResponse,
   ElectionResultResponse,
   VotingAuditResponse,
+  VotingLogResponse,
 } from '../types';
 
 /**
@@ -33,6 +34,9 @@ export interface ApiService {
 
   /** Get quantum audit log */
   getVotingAudit(electionCode: string): Promise<VotingAuditResponse>;
+
+  /** Get QKD BB84 voting session logs */
+  getVotingLogs(electionCode: string): Promise<VotingLogResponse>;
 
   /** Reset all votes (for demo purposes) */
   resetVotes(): Promise<void>;

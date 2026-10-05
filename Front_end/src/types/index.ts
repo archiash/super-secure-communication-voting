@@ -13,6 +13,8 @@ export type {
   EveResult,
   QKDPhase,
   QKDResponse,
+  VotingLogEntry,
+  VotingLogResponse,
 } from './qkd';
 
 export type {

@@ -8,6 +8,7 @@ import { CastVotePage } from './pages/CastVotePage';
 import { ConfirmationPage } from './pages/ConfirmationPage';
 import { ConfigurePage } from './pages/ConfigurePage';
 import { ResultsPage } from './pages/ResultsPage';
+import { VotingLogsPage } from './pages/VotingLogsPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/confirmation" element={<ConfirmationPage />} />
             <Route path="/configure" element={<ConfigurePage />} />
             <Route path="/results" element={<ResultsPage />} />
+            <Route path="/logs" element={<VotingLogsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
