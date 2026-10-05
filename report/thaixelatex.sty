@@ -1,0 +1,112 @@
+\ProvidesPackage{thaixelatex}
+
+\DeclareOption{english}{\englishtrue}
+
+% Package options:
+%
+%   english: set English as primary language
+%
+\newif\ifenglish\englishfalse
+
+\ProcessOptions
+
+%% font setup
+\RequirePackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}
+
+%% Thai language setup
+\XeTeXlinebreaklocale 'th_TH'
+\XeTeXlinebreakskip = 0pt plus 0.2pt minus 0.2pt
+
+\newfontfamily\thaifont[
+  Script=Thai,
+  Scale=MatchLowercase,
+  Extension=.otf,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic,
+]{Laksaman}
+\newfontfamily\thaifontsf[
+  Script=Thai,
+  Scale=MatchLowercase,
+  Extension=.otf,
+  ItalicFont=*-Oblique,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldOblique,
+]{Garuda}
+\newfontfamily\thaifonttt[
+  % Script=Thai,
+  Scale=MatchLowercase,
+]{TlwgTypist}
+% ]{Arundina Sans Mono}  % doesn't work for now
+\setmainfont[Scale=MatchLowercase]{TeX Gyre Termes}
+\setsansfont[Scale=MatchLowercase]{TeX Gyre Heros}
+\setmonofont[
+  Mapping=,
+  Scale=MatchLowercase,
+  Extension=.otf,
+  UprightFont=*zi4-Regular,
+  BoldFont=*zi4-Bold,
+  AutoFakeSlant,
+  BoldItalicFont={*zi4-Bold},
+  BoldItalicFeatures={FakeSlant=0.2},
+]{Inconsolata}
+
+%% math setup
+\RequirePackage{amsmath}
+\RequirePackage{unicode-math}
+\setmathfont{TeX Gyre Termes Math}
+\setmathfontface\mathrm{TeX Gyre Termes}
+\setmathfontface\mathbf{TeX Gyre Termes Bold}
+\setmathfontface\mathit{TeX Gyre Termes Italic}
+
+\def\th@fam{0}
+\let\th@thaifont=\thaifont
+\let\th@thaifontsf=\thaifontsf
+\let\th@thaifonttt=\thaifonttt
+\def\thaifont{\def\th@fam{0}\th@thaifont}
+\def\thaifontsf{\def\th@fam{1}\th@thaifontsf}
+\def\thaifonttt{\def\th@fam{2}\th@thaifonttt}
+
+\newcommand\th@englishfont{%
+\ifcase\th@fam
+  \rmfamilylatin
+\or
+  \sffamilylatin
+\or
+  \ttfamilylatin
+\fi
+}
+
+\RequirePackage[Latin,Thai]{ucharclasses}
+\ifenglish
+  \def\thaifontrm{\thaifont}
+  \setTransitionsFor{Thai}{\begingroup\hyphenrules{thai}\csname thaifont\familytype\endcsname}{\endgroup}
+  % \setTransitionsFor{Thai}{\textthai\bgroup}{\egroup}
+\else
+  \setTransitionsForLatin{\begingroup\hyphenrules{english}\th@englishfont}{\endgroup}
+  % \setTransitionsForLatin{\begingroup\hyphenrules{english}\csname\familytype familylatin\endcsname}{\endgroup}
+\fi
+
+\RequirePackage{polyglossia}
+\ifenglish
+  \setdefaultlanguage{english}
+  \setotherlanguage{thai}
+\else
+  \setdefaultlanguage{thai}
+  \setotherlanguage{english}
+  \frenchspacing
+\fi
+
+%% spacing
+\RequirePackage{setspace}
+\let\@xfloat=\latex@xfloat % revert setspace patch of floating environments
+\ifenglish
+\else
+\setstretch{1.35}
+\AtBeginDocument{
+  \setlength\abovedisplayskip{7.5pt plus 2.0pt minus 5.0pt}
+  \setlength\belowdisplayskip{7.5pt plus 2.0pt minus 5.0pt}
+  \setlength\belowdisplayshortskip{4.5pt plus 3.0pt minus 3.0pt}
+}
+\fi
