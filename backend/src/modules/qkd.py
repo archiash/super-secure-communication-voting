@@ -145,11 +145,11 @@ def sending_qubit(data, basis):
 
     return qc
 
-def get_match_indexes(encrypt_basis, decrypt_basis):
+def sift_bases(alice_basis, bob_basis):
     match_indexes = []
 
-    for i in range(len(encrypt_basis)):
-        if encrypt_basis[i] == decrypt_basis[i]:
+    for i in range(len(alice_basis)):
+        if alice_basis[i] == bob_basis[i]:
             match_indexes.append(i)
 
     return match_indexes
@@ -169,8 +169,8 @@ def bitstring_from_index(bitstring, index):
 
     return result_bitstring
 
-def sifting(key, basis1, basis2):
-    match_basis_indexes = get_match_indexes(basis1, basis2)
+def filter_key_by_basis(key, basis1, basis2):
+    match_basis_indexes = sift_bases(basis1, basis2)
     sifted_key = ""
 
     for i in match_basis_indexes:
@@ -180,7 +180,7 @@ def sifting(key, basis1, basis2):
 
 def QBER(key1, key2):
     key_length = len(key1)
-    match_indexes = get_match_indexes(key1, key2)
+    match_indexes = sift_bases(key1, key2)
     match_count = len(match_indexes)
 
     return (key_length - match_count) / key_length

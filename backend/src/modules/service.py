@@ -27,10 +27,10 @@ async def create_qkd_key(payload : GenerateKeyInput):
     simulation_result = qkd.simulate_bb84_protocal(key_size= payload.target_key_length, per_time_bits= payload.qubit_per_session, has_eavesdropping= payload.enable_eavesdropper, use_ibm= payload.is_using_quantum_computer)
 
     session_id = generate_session_id()
-    key_generated = qkd.sifting(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+    key_generated = qkd.filter_key_by_basis(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
 
-    sifted_server_key = qkd.sifting(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
-    sifted_client_key = qkd.sifting(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+    sifted_server_key = qkd.filter_key_by_basis(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+    sifted_client_key = qkd.filter_key_by_basis(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
     qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
 
     current_time = time.time()
