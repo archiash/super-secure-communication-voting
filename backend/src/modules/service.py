@@ -46,7 +46,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "bob_read": simulation_result["client_key"],
         "bob_basis": simulation_result["client_decryption_basis"],
         "qber_percent": qber,
-        "threshold_percent": 11.0,
+        "threshold_percent": payload.error_tolerance,
         "status": status,
         "timestamp": current_time
     }

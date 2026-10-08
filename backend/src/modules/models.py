@@ -11,6 +11,7 @@ class GenerateKeyInput(CamelModel):
     enable_eavesdropper: bool
     qubit_per_session: int
     target_key_length: int
+    error_tolerance: float
 
 class GenerateKeyRespond(CamelModel):
     voter_id: str
