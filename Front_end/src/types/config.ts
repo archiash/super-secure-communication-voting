@@ -24,6 +24,9 @@ export interface ProtocolConfig {
 
   /** Number of sifted key bits sacrificed for QBER estimation. e.g., 4 */
   testBitCount: number;
+
+  /** Error tolerance (δ) — acceptable error margin in the range [0, 1]. e.g., 0.05 */
+  errorTolerance: number;
 }
 
 /** Default configuration matching the Figma "ACTIVE CONFIGURATION" card */
@@ -35,4 +38,5 @@ export const DEFAULT_CONFIG: ProtocolConfig = {
   errorCorrectionEnabled: false,
   errorThreshold: 0.11,
   testBitCount: 4,
+  errorTolerance: 0.05,
 };

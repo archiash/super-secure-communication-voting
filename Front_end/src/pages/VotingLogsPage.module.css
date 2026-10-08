@@ -420,3 +420,198 @@
   background-color: var(--color-bg);
   color: var(--color-text-muted);
 }
+
+/* ── View Toggle ─────────────────────────────────────────────── */
+
+.viewToggleWrap {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.viewToggleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 8px 16px;
+  background: var(--color-bg);
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-right: 1px solid var(--color-border);
+}
+
+.viewToggleBtn:last-child {
+  border-right: none;
+}
+
+.viewToggleBtn:hover {
+  background: var(--color-bg-secondary);
+}
+
+.viewToggleActive {
+  background: var(--color-bg-secondary) !important;
+}
+
+.viewToggleLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.viewToggleSub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* ── Transmission Table ──────────────────────────────────────── */
+
+.txTableWrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-card);
+}
+
+.txTableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.txTableTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.txTableStats {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+.txActorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.txActorLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}
+
+.txActorBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.txActorDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.txScrollWrap {
+  overflow-x: auto;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.txTable {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: 100%;
+}
+
+.txTable thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.txColNum {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 8px;
+  text-align: center;
+  border: 1px solid var(--color-border-light);
+  min-width: 32px;
+}
+
+.txRowLabel {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--color-bg-card);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-light);
+  white-space: nowrap;
+  min-width: 160px;
+  text-align: left;
+}
+
+.txCell {
+  padding: 5px 8px;
+  text-align: center;
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.txBit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  border: 1px solid var(--color-border-light);
+}
+
+.txDim {
+  opacity: 0.65;
+}
+
+.txLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: var(--color-bg-secondary);
+}
+

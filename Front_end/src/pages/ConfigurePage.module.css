@@ -42,10 +42,25 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px 32px;
+  display: flex;
+  gap: 32px;
   max-width: 900px;
+  align-items: flex-start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0;
+}
+
+.column .sectionTitle:not(:first-child) {
+  margin-top: 40px;
+}
+
+.column .card {
+  margin-bottom: 12px;
 }
 
 .section {
@@ -101,6 +116,15 @@
   background: var(--color-danger-light);
   color: var(--color-danger);
   letter-spacing: 0.5px;
+}
+
+.deltaSymbol {
+  font-size: 16px;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  color: var(--color-accent, #7c6af7);
+  margin-left: 2px;
+  vertical-align: baseline;
 }
 
 .cardDesc {

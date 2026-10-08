@@ -50,7 +50,8 @@ export class RealApiService implements ApiService {
           errorCorrectionEnabled: config.errorCorrectionEnabled,
           enableEavesdropper: config.eveSimulation,
           qubitPerSession: config.qubitCount,
-          targetKeyLength: config.targetKeyLength
+          targetKeyLength: config.targetKeyLength,
+          errorTolerance: config.errorTolerance,
         }),
       });
       if (res.status === 404) {
