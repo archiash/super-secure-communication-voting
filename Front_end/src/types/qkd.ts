@@ -104,22 +104,44 @@ export interface QKDResponse {
   eveData?: EveResult;
 }
 
+/**
+ * A single session entry returned by GET /vote/voting-audits/{electionCode}.
+ * Fields map 1-to-1 to the new backend VotingSchema.
+ */
 export interface VotingLogEntry {
   sessionId: string;
   voterId: string;
-  encryptedVote: string;
   keyGenerated: string;
+  /** Indices of bits selected for QBER check */
+  selectedBits: number[];
+  // ── Qubit Transmission Log ────────────────────────────────
+  /** Alice's sent bits as a binary string, e.g. "0110..." */
   aliceBit: string;
+  /** Alice's bases as a binary string (0=+, 1=×) */
   aliceBasis: string;
+  /** Bob's measured bits as a binary string */
   bobRead: string;
+  /** Bob's measurement bases as a binary string (0=+, 1=×) */
   bobBasis: string;
-  qberPercent: number;
+  /** Eve's measured bits (binary string) — present if eavesdropper active */
+  eveRead?: string;
+  /** Eve's measurement bases (binary string, 0=+, 1=×) — present if eavesdropper active */
+  eveBasis?: string;
+  // ── QBER Estimation ──────────────────────────────────────
+  testSample: number;
+  errorFound: number;
+  /** QBER as seen from Alice & Bob's perspective (0-100) */
+  qberPractical: number;
+  /** True system QBER including Eve's impact (0-100) */
+  qberSystem: number;
   thresholdPercent: number;
-  status: 'KEY_GENERATED' | 'VOTE_CAST' | 'ABORTED';
-  timestamp: number;
+  // ── Session metadata ─────────────────────────────────────
+  /** Raw status string from backend, e.g. "KEY READY", "VOTE_CAST", "ABORTED" */
+  status: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface VotingLogResponse {
-  electionCode: string;
-  logs: VotingLogEntry[];
+  sessions: VotingLogEntry[];
 }

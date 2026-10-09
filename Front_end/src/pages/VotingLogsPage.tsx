@@ -16,6 +16,11 @@ function parseBasis(ch: string): '+' | '×' {
   return ch === '0' ? '+' : '×';
 }
 
+/** Strip the "0b" prefix that the backend adds to binary strings */
+function stripBinPrefix(s: string): string {
+  return s && s.startsWith('0b') ? s.slice(2) : (s || '');
+}
+
 function getPhotonSymbol(bit: 0 | 1, basis: '+' | '×'): string {
   if (basis === '+') return bit === 1 ? '↑' : '→';
   return bit === 1 ? '↖' : '↗';
@@ -89,40 +94,50 @@ function TransmissionTable({
     });
   };
 
-  const len = log.aliceBit?.length || 0;
+  // Strip "0b" prefix the real API adds to all binary strings
+  const rawAliceBit    = stripBinPrefix(log.aliceBit);
+  const rawAliceBasis  = stripBinPrefix(log.aliceBasis);
+  const rawBobBasis    = stripBinPrefix(log.bobBasis);
+  const rawBobRead     = stripBinPrefix(log.bobRead);
+  const rawEveRead     = log.eveRead  ? stripBinPrefix(log.eveRead)  : '';
+  const rawEveBasis    = log.eveBasis ? stripBinPrefix(log.eveBasis) : '';
+
+  const len = rawAliceBit.length || 0;
+
+  // Use real Eve data from API when available, otherwise no Eve rows
+  const hasEveData = !!(rawEveRead && rawEveBasis && rawEveRead.length > 0);
 
   // Build per-qubit data
   const qubits = Array.from({ length: len }, (_, i) => {
-    const aBit = parseBit(log.aliceBit[i] || '0');
-    const aBasis = parseBasis(log.aliceBasis[i] || '0');
-    const bBasis = parseBasis(log.bobBasis[i] || '0');
-    const bRead = parseBit(log.bobRead[i] || '0');
+    const aBit   = parseBit(rawAliceBit[i]   || '0');
+    const aBasis = parseBasis(rawAliceBasis[i] || '0');
+    const bBasis = parseBasis(rawBobBasis[i]   || '0');
+    const bRead  = parseBit(rawBobRead[i]     || '0');
 
-    // Simulate Eve: same basis as Alice, bit = aliceBit (perfect intercept),
-    // re-sends with her basis (which may differ from Bob's).
-    // If Eve basis matches Alice and Bob reads different → error injected.
-    const eveBasis = aBasis; // Eve always measures in Alice's basis (intercept)
-    const eveBit = aBit;      // Eve reads the same bit (perfect intercept)
-    // Eve resends in eveBasis. Bob sees noise if Bob basis ≠ Eve basis.
+    // Eve data: use real API values when present
+    const eveBasisChar = hasEveData ? parseBasis(rawEveBasis[i] || '0') : aBasis;
+    const eveBit       = hasEveData ? parseBit(rawEveRead[i]   || '0') : aBit;
 
     const sameBasis = aBasis === bBasis;
-    const bitMatch = aBit === bRead;
-    const isKept = sameBasis && bitMatch;
-    const isError = sameBasis && !bitMatch;
+    const bitMatch  = aBit === bRead;
+    const isTest    = log.selectedBits?.includes(i) || false;
+    const isKept    = sameBasis && !isTest;
+    const isError   = sameBasis && !bitMatch;
 
     return {
       aBit, aBasis,
       photon: getPhotonSymbol(aBit, aBasis),
-      eveBasis, eveBit,
-      evePhoton: getPhotonSymbol(eveBit, eveBasis),
+      eveBasis: eveBasisChar, eveBit,
+      evePhoton: getPhotonSymbol(eveBit, eveBasisChar),
       bBasis, bRead,
-      sameBasis, isKept, isError,
+      sameBasis, isKept, isError, isTest,
     };
   });
 
-  const matchingBases = qubits.filter(q => q.sameBasis).length;
-  const errorsInSifted = qubits.filter(q => q.isError).length;
-  const eveIntercepted = len; // In system view, Eve intercepts all
+  const matchingBases   = qubits.filter(q => q.sameBasis).length;
+  const errorsInSifted  = qubits.filter(q => q.isError).length;
+  // Count Eve-intercepted qubits: length of eveRead (stripped) if present
+  const eveIntercepted  = hasEveData ? rawEveRead.length : 0;
 
   const actorColor: Record<Actor, string> = {
     alice: '#2563eb',
@@ -230,8 +245,8 @@ function TransmissionTable({
               </>
             )}
 
-            {/* ── Eve rows (system view only) ── */}
-            {view === 'system' && shown.has('eve') && (
+            {/* ── Eve rows (system view only, only when real Eve data exists) ── */}
+            {view === 'system' && shown.has('eve') && hasEveData && (
               <>
                 <tr>
                   <td className={styles.txRowLabel}>
@@ -320,7 +335,15 @@ function TransmissionTable({
                 <td className={styles.txRowLabel}>Public check</td>
                 {qubits.map((q, i) => (
                   <td key={i} className={`${styles.txCell} ${styles.txDim}`} style={{ fontSize: '11px' }}>
-                    {q.isKept ? 'key' : q.isError ? <span style={{ color: '#d97706' }}>⚡</span> : '–'}
+                    {q.sameBasis ? (
+                      q.isTest ? (
+                        <span style={{ color: q.isError ? '#dc2626' : '#d97706' }}>
+                          {q.isError ? 'err' : 'chk'}
+                        </span>
+                      ) : (
+                        'key'
+                      )
+                    ) : '–'}
                   </td>
                 ))}
               </tr>
@@ -333,7 +356,7 @@ function TransmissionTable({
       <div className={styles.txLegend}>
         <span>+ rectilinear · × diagonal basis</span>
         <span>→ ↑ ↖ ↗ photon polarization</span>
-        {view === 'system' && (
+        {view === 'system' && hasEveData && (
           <span>
             Eve intercepted <strong>{eveIntercepted}/{len}</strong>
           </span>
@@ -357,7 +380,7 @@ export function VotingLogsPage() {
   const [logs, setLogs] = useState<VotingLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'VOTE_CAST' | 'KEY_GENERATED' | 'ABORTED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'VOTE_CAST' | 'KEY_GENERATED' | 'KEY_READY' | 'ABORTED'>('ALL');
   const [selectedLog, setSelectedLog] = useState<VotingLogEntry | null>(null);
 
   // View modes
@@ -370,7 +393,7 @@ export function VotingLogsPage() {
     setLoading(true);
     try {
       const res = await api.getVotingLogs(electionCode);
-      setLogs(res.logs || []);
+      setLogs(res.sessions || []);
     } catch (err) {
       console.error('Failed to fetch voting logs:', err);
     } finally {
@@ -387,55 +410,64 @@ export function VotingLogsPage() {
     if (selectedLog) setModalView('practical');
   }, [selectedLog]);
 
+  // Normalize status: API may return "VOTE_CAST", "KEY READY", "KEY_GENERATED", "ABORTED", etc.
+  const normalizeStatus = (status: string) => status.replace(/\s+/g, '_').toUpperCase();
+
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
       log.sessionId.toLowerCase().includes(search.toLowerCase()) ||
       log.voterId.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'ALL' || log.status === statusFilter;
+    const matchesStatus = statusFilter === 'ALL' || normalizeStatus(log.status) === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const totalSessions = logs.length;
-  const votesCastCount = logs.filter((l) => l.status === 'VOTE_CAST').length;
-  const keysCount = logs.filter((l) => l.status === 'KEY_GENERATED' || l.status === 'VOTE_CAST').length;
-  const abortedCount = logs.filter((l) => l.status === 'ABORTED').length;
+  const votesCastCount = logs.filter((l) => normalizeStatus(l.status) === 'VOTE_CAST').length;
+  const keysCount = logs.filter((l) => {
+    const s = normalizeStatus(l.status);
+    return s === 'KEY_GENERATED' || s === 'KEY_READY' || s === 'VOTE_CAST';
+  }).length;
+  const abortedCount = logs.filter((l) => normalizeStatus(l.status) === 'ABORTED').length;
+  // Average QBER: use practical or system depending on report view
   const avgQber = logs.length
-    ? (logs.reduce((acc, l) => acc + l.qberPercent, 0) / logs.length).toFixed(1)
+    ? (logs.reduce((acc, l) => acc + (reportView === 'practical' ? l.qberPractical : l.qberSystem), 0) / logs.length).toFixed(1)
     : '0.0';
 
   const formatTimestamp = (ts: number) => {
     if (!ts) return 'N/A';
+    // Handle cases where the backend just sends a year number (like 2026)
+    if (ts < 10000) return ts.toString();
     const date = new Date(ts * 1000);
     return date.toLocaleString();
   };
 
-  // Both views now show the real QBER value.
-  // Practical view appends "(Practical)" label — backend will differentiate later.
+  // Render QBER badge: practical uses qberPractical, system uses qberSystem
   const renderQberCell = (log: VotingLogEntry) => {
-    const isHighQber = log.qberPercent > log.thresholdPercent;
-    const pct = log.qberPercent.toFixed(1);
+    const qber = reportView === 'practical' ? log.qberPractical : log.qberSystem;
+    const isHighQber = qber > log.thresholdPercent;
+    const pct = qber.toFixed(0);
     return (
       <span className={`${styles.qberBadge} ${isHighQber ? styles.qberHigh : styles.qberGood}`}>
-        {reportView === 'practical'
-          ? `${pct}% (Practical)`
-          : `${pct}%`}
+        {reportView === 'practical' ? `${pct}% (Practical)` : `${pct}%`}
       </span>
     );
   };
 
+  // Status: normalize API status strings before matching
   const renderStatusCell = (log: VotingLogEntry) => {
+    const ns = log.status.replace(/\s+/g, '_').toUpperCase();
     if (reportView === 'practical') {
-      // Friendly labels
-      if (log.status === 'VOTE_CAST') return <span className={`${styles.statusBadge} ${styles.statusVoteCast}`}>✓ Vote Cast</span>;
-      if (log.status === 'KEY_GENERATED') return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>🔑 Key Ready</span>;
-      if (log.status === 'ABORTED') return <span className={`${styles.statusBadge} ${styles.statusAborted}`}>⚠ Aborted</span>;
+      if (ns === 'VOTE_CAST') return <span className={`${styles.statusBadge} ${styles.statusVoteCast}`}>✓ Vote Cast</span>;
+      if (ns === 'KEY_GENERATED' || ns === 'KEY_READY') return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>🔑 Key Ready</span>;
+      if (ns === 'ABORTED') return <span className={`${styles.statusBadge} ${styles.statusAborted}`}>⚠ Aborted</span>;
+      // Fallback for unknown statuses
+      return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>{log.status}</span>;
     } else {
-      // Raw system codes with emojis
-      if (log.status === 'VOTE_CAST') return <span className={`${styles.statusBadge} ${styles.statusVoteCast}`}>✓ VOTE_CAST</span>;
-      if (log.status === 'KEY_GENERATED') return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>🔑 KEY_GENERATED</span>;
-      if (log.status === 'ABORTED') return <span className={`${styles.statusBadge} ${styles.statusAborted}`}>⚠ ABORTED</span>;
+      if (ns === 'VOTE_CAST') return <span className={`${styles.statusBadge} ${styles.statusVoteCast}`}>✓ VOTE_CAST</span>;
+      if (ns === 'KEY_GENERATED' || ns === 'KEY_READY') return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>🔑 KEY_GENERATED</span>;
+      if (ns === 'ABORTED') return <span className={`${styles.statusBadge} ${styles.statusAborted}`}>⚠ ABORTED</span>;
+      return <span className={`${styles.statusBadge} ${styles.statusKeyGenerated}`}>{log.status}</span>;
     }
-    return null;
   };
 
   return (
@@ -549,10 +581,10 @@ export function VotingLogsPage() {
                     <td>{renderStatusCell(log)}</td>
                     <td>
                       <span className={styles.keyBits}>
-                        {log.keyGenerated ? log.keyGenerated : '—'}
+                        {log.keyGenerated ? stripBinPrefix(log.keyGenerated) : '—'}
                       </span>
                     </td>
-                    <td>{formatTimestamp(log.timestamp)}</td>
+                    <td>{formatTimestamp(log.createdAt)}</td>
                     <td>
                       <button className={styles.inspectButton} onClick={() => setSelectedLog(log)}>
                         Inspect BB84
@@ -604,13 +636,19 @@ export function VotingLogsPage() {
                 </div>
                 <div className={styles.detailBlock}>
                   <span className={styles.detailLabel}>QBER Error Rate</span>
-                  <span className={styles.detailValue} style={{ color: selectedLog.qberPercent > selectedLog.thresholdPercent ? 'var(--color-danger)' : 'var(--color-success)' }}>
-                    {selectedLog.qberPercent.toFixed(1)}% (Limit: {selectedLog.thresholdPercent}%)
-                  </span>
+                  {(() => {
+                    const qber = modalView === 'practical' ? selectedLog.qberPractical : selectedLog.qberSystem;
+                    const isHigh = qber > selectedLog.thresholdPercent;
+                    return (
+                      <span className={styles.detailValue} style={{ color: isHigh ? 'var(--color-danger)' : 'var(--color-success)' }}>
+                        {qber.toFixed(0)}%{modalView === 'practical' ? ' (Practical)' : ' (System)'} · Limit: {selectedLog.thresholdPercent}%
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className={styles.detailBlock}>
-                  <span className={styles.detailLabel}>Timestamp</span>
-                  <span className={styles.detailValue}>{formatTimestamp(selectedLog.timestamp)}</span>
+                  <span className={styles.detailLabel}>Created At</span>
+                  <span className={styles.detailValue}>{formatTimestamp(selectedLog.createdAt)}</span>
                 </div>
               </div>
 
@@ -618,18 +656,11 @@ export function VotingLogsPage() {
               <div>
                 <div className={styles.sectionHeader}>Generated OTP Key</div>
                 <div className={styles.keyBits} style={{ width: '100%', maxWidth: 'none', padding: '10px 14px', fontSize: '13px' }}>
-                  {selectedLog.keyGenerated || 'Key Generation Aborted'}
+                  {stripBinPrefix(selectedLog.keyGenerated) || 'Key Generation Aborted'}
                 </div>
               </div>
 
-              {selectedLog.encryptedVote && (
-                <div>
-                  <div className={styles.sectionHeader}>Encrypted Ballot Ciphertext</div>
-                  <div className={styles.keyBits} style={{ width: '100%', maxWidth: 'none', padding: '10px 14px', fontSize: '13px', color: 'var(--color-accent)', background: 'var(--color-accent-light)' }}>
-                    {selectedLog.encryptedVote}
-                  </div>
-                </div>
-              )}
+              {/* No encryptedVote in new schema */}
 
               {/* ── New Transmission Table ── */}
               <div>
