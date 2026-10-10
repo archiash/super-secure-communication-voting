@@ -56,15 +56,19 @@ class CandidateRespond(CamelModel):
 class VotingLogItem(CamelModel):
     session_id: str
     voter_id: str
-    encrypted_vote: Optional[str] = ""
     key_generated: str
-    alice_bit: str
-    alice_basis: str
-    bob_read: str
-    bob_basis: str
-    qber_percent: float
-    threshold_percent: float
-    status: str
+    selected_bits: List[int]
+    alice_bit: Optional[str] = ""
+    alice_basis: Optional[str] = ""
+    bob_read: Optional[str] = ""
+    bob_basis: Optional[str] = ""
+    eve_read: Optional[str] = ""
+    eve_basis: Optional[str] = ""
+    error_found: Optional[float] = 0.0
+    qber_practical: Optional[float] = 0.0
+    qber_system: Optional[float] = 0.0
+    threshold_percent: Optional[float] = 11.0
+    status: Optional[str] = "KEY_GENERATED"
     timestamp: float
 
 class VotingLogResponse(CamelModel):
