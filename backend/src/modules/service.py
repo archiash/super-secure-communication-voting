@@ -4,6 +4,8 @@ from . import qkd
 import secrets
 import string
 import time
+import math
+import random
 
 def generate_session_id():
     alphabet = string.ascii_uppercase + string.digits
@@ -31,7 +33,13 @@ async def create_qkd_key(payload : GenerateKeyInput):
 
     sifted_server_key = qkd.filter_key_by_basis(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
     sifted_client_key = qkd.filter_key_by_basis(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
+
+    random_picked_positions = get_unique_random_indices(len(sifted_client_key),payload.target_key_length)
+    server_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_server_key)
+    client_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_client_key)
+    
     qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
+    qber_practical = 100 * qkd.QBER(server_random_picked_bits, client_random_picked_bits)
 
     current_time = time.time()
     status = "ABORTED" if qber > 11.0 else "KEY_GENERATED"
@@ -39,14 +47,18 @@ async def create_qkd_key(payload : GenerateKeyInput):
     session_data = {
         "session_id" : session_id,
         "voter_id": payload.voter_id,
-        "encrypted_vote": "",
         "key_generated": key_generated,
+        "selected_bits": random_picked_positions,
         "alice_bit": simulation_result["server_key"],
         "alice_basis": simulation_result["server_encryption_basis"],
         "bob_read": simulation_result["client_key"],
         "bob_basis": simulation_result["client_decryption_basis"],
-        "qber_percent": qber,
-        "threshold_percent": payload.error_tolerance,
+        "eve_read": "",
+        "eve_basis": "",
+        "error_found": 0,
+        "qber_practical": qber_practical,
+        "qber_system": qber,
+        "threshold_percent": 11.0,
         "status": status,
         "timestamp": current_time
     }
@@ -178,3 +190,16 @@ async def get_voting_logs(election_code: str):
     ]
 
     return VotingLogResponse(election_code=election_code, logs=logs)
+
+def calculate_key_length(error_tolerance, key_bits):
+    return math.ceil((4 + error_tolerance ) * key_bits)
+
+def get_unique_random_indices(max_value, count):
+        
+    return random.sample(range(0, max_value), count)
+
+def extract_chars_by_index(indices, text):
+
+    extracted_chars = [text[i] for i in indices if i < len(text)]
+    
+    return "".join(extracted_chars)
