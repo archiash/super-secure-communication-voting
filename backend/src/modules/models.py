@@ -1,5 +1,5 @@
 from beanie import Document
-from typing import Optional
+from typing import Optional, List
 from core.schemas import CamelModel 
 from pydantic import BaseModel
 
@@ -80,13 +80,17 @@ class Candidate(BaseModel):
 class VotingSession(BaseModel):
     session_id: str
     voter_id: str
-    encrypted_vote: Optional[str] = None 
     key_generated: str
+    selected_bits: List[int]
     alice_bit: Optional[str] = ""
     alice_basis: Optional[str] = ""
     bob_read: Optional[str] = ""
     bob_basis: Optional[str] = ""
-    qber_percent: Optional[float] = 0.0
+    eve_read: Optional[str] = ""
+    eve_basis: Optional[str] = ""
+    error_found: Optional[float] = 0.0
+    qber_practical: Optional[float] = 0.0
+    qber_system: Optional[float] = 0.0
     threshold_percent: Optional[float] = 11.0
     status: Optional[str] = "KEY_GENERATED"
     timestamp: float
