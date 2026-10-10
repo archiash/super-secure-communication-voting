@@ -265,10 +265,10 @@ export class MockApiService implements ApiService {
         voterId: "i_L_UzCaUkTYwKR2WoRXI",
         keyGenerated: "0b00101110",
         selectedBits: [
-            1,
-            5,
-            2,
-            0
+          1,
+          5,
+          2,
+          0
         ],
         aliceBit: "0b1011110011010011010101100110010110010100",
         aliceBasis: "0b1011001110000010000001100011001011000110",
