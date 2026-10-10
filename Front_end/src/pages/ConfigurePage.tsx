@@ -39,8 +39,11 @@ export function ConfigurePage() {
       </div>
 
       <div className={styles.grid}>
-        {/* Left Column */}
-        <div className={styles.section}>
+
+        {/* ── Left Column ── */}
+        <div className={styles.column}>
+
+          {/* TYPE OF SIMULATION */}
           <div className={styles.sectionTitle}>TYPE OF SIMULATION</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -56,29 +59,8 @@ export function ConfigurePage() {
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Right Column */}
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>POST-PROCESSING</div>
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Error Correction</span>
-                <span className={styles.cardDesc}>Cascade protocol — finds and corrects bit errors in the sifted key</span>
-              </div>
-              <button
-                className={`${styles.toggle} ${config.errorCorrectionEnabled ? styles.active : ''}`}
-                onClick={() => updateField('errorCorrectionEnabled', !config.errorCorrectionEnabled)}
-              >
-                <div className={styles.toggleDot} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Left Column */}
-        <div className={styles.section}>
+          {/* QUANTUM CHANNEL */}
           <div className={styles.sectionTitle}>QUANTUM CHANNEL</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -105,10 +87,49 @@ export function ConfigurePage() {
               />
             </div>
           </div>
+
+          {/* EAVESDROPPER SIMULATION */}
+          <div className={styles.sectionTitle}>EAVESDROPPER SIMULATION</div>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardTitle}>
+                  Simulate Eve <span className={styles.badge}>ATTACK SIM</span>
+                </span>
+                <span className={styles.cardDesc}>Inject intercept-resend attack on the quantum channel</span>
+              </div>
+              <button
+                className={`${styles.toggle} ${config.eveSimulation ? styles.active : ''}`}
+                onClick={() => updateField('eveSimulation', !config.eveSimulation)}
+              >
+                <div className={styles.toggleDot} />
+              </button>
+            </div>
+          </div>
+
         </div>
 
-        {/* Right Column */}
-        <div className={styles.section}>
+        {/* ── Right Column ── */}
+        <div className={styles.column}>
+
+          {/* POST-PROCESSING */}
+          <div className={styles.sectionTitle}>POST-PROCESSING</div>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardTitle}>Error Correction</span>
+                <span className={styles.cardDesc}>Cascade protocol — finds and corrects bit errors in the sifted key</span>
+              </div>
+              <button
+                className={`${styles.toggle} ${config.errorCorrectionEnabled ? styles.active : ''}`}
+                onClick={() => updateField('errorCorrectionEnabled', !config.errorCorrectionEnabled)}
+              >
+                <div className={styles.toggleDot} />
+              </button>
+            </div>
+          </div>
+
+          {/* KEY REQUIREMENTS */}
           <div className={styles.sectionTitle}>KEY REQUIREMENTS</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -135,31 +156,48 @@ export function ConfigurePage() {
               />
             </div>
           </div>
-        </div>
 
-        {/* Left Column */}
-        <div className={styles.section}>
-          <div className={styles.sectionTitle}>EAVESDROPPER SIMULATION</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
                 <span className={styles.cardTitle}>
-                  Simulate Eve <span className={styles.badge}>ATTACK SIM</span>
+                  Error Tolerance <span className={styles.deltaSymbol}>δ</span>
                 </span>
-                <span className={styles.cardDesc}>Inject intercept-resend attack on the quantum channel</span>
+                <span className={styles.cardDesc}>Acceptable error margin for the protocol (0 to 2)</span>
               </div>
-              <button
-                className={`${styles.toggle} ${config.eveSimulation ? styles.active : ''}`}
-                onClick={() => updateField('eveSimulation', !config.eveSimulation)}
-              >
-                <div className={styles.toggleDot} />
-              </button>
+            </div>
+            <div className={styles.sliderContainer}>
+              <input
+                type="range"
+                className={styles.slider}
+                min={0}
+                max={2}
+                step={0.01}
+                value={config.errorTolerance}
+                onChange={(e) => updateField('errorTolerance', parseFloat(e.target.value))}
+              />
+              <input
+                type="number"
+                className={styles.sliderInput}
+                min={0}
+                max={2}
+                step={0.01}
+                value={config.errorTolerance.toFixed(2)}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (!isNaN(val)) updateField('errorTolerance', val);
+                }}
+                onBlur={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (isNaN(val) || val < 0) updateField('errorTolerance', 0);
+                  else if (val > 2) updateField('errorTolerance', 2);
+                  else updateField('errorTolerance', parseFloat(val.toFixed(2)));
+                }}
+              />
             </div>
           </div>
-        </div>
 
-        {/* Right Column */}
-        <div className={styles.section}>
+          {/* VISUALIZATION */}
           <div className={styles.sectionTitle}>VISUALIZATION</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -169,12 +207,13 @@ export function ConfigurePage() {
               </div>
               <button
                 className={`${styles.toggle} ${true ? styles.active : ''}`}
-                // This is UI only for the mock, assuming true for now
+              // This is UI only for the mock, assuming true for now
               >
                 <div className={styles.toggleDot} />
               </button>
             </div>
           </div>
+
         </div>
       </div>
 

@@ -50,7 +50,8 @@ export class RealApiService implements ApiService {
           errorCorrectionEnabled: config.errorCorrectionEnabled,
           enableEavesdropper: config.eveSimulation,
           qubitPerSession: config.qubitCount,
-          targetKeyLength: config.targetKeyLength
+          targetKeyLength: config.targetKeyLength,
+          errorTolerance: config.errorTolerance,
         }),
       });
       if (res.status === 404) {
@@ -212,20 +213,15 @@ export class RealApiService implements ApiService {
 
   async getVotingLogs(electionCode: string): Promise<VotingLogResponse> {
     try {
-      const res = await fetch(`${API_BASE}/vote/logs/${electionCode}`);
-      if (res.status === 404) {
-        const mockRes = await mockApi.getVotingLogs(electionCode);
-        console.log('[API Call] getVotingLogs (404 fallback to mock) result:', mockRes);
-        return mockRes;
-      }
-      if (!res.ok) throw new Error(`Voting logs failed: ${res.statusText}`);
+      const res = await fetch(`${API_BASE}/vote/voting-audits/${electionCode}`);
+      if (!res.ok) throw new Error(`Voting audit failed: ${res.status} ${res.statusText}`);
       const data = await res.json();
-      console.log('[API Call] getVotingLogs result:', data);
-      return data;
+      console.log('[API Call] getVotingLogs (audit) result:', data);
+      return data as VotingLogResponse;
     } catch (err) {
       console.warn('[RealApiService] getVotingLogs failed, falling back to mock:', err);
+      // Fallback to local mock data (which now contains the user's exact JSON)
       const mockRes = await mockApi.getVotingLogs(electionCode);
-      console.log('[API Call] getVotingLogs fallback mock result:', mockRes);
       return mockRes;
     }
   }

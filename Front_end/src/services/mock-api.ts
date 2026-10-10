@@ -261,53 +261,33 @@ export class MockApiService implements ApiService {
     await this.delay(200);
     const mockLogs: VotingLogEntry[] = [
       {
-        sessionId: 'QS-A8F2K91L',
-        voterId: 'VOTER-1001',
-        encryptedVote: '01',
-        keyGenerated: '101100101101',
-        aliceBit: '0100101101001101011001011010',
-        aliceBasis: '+×++×+××++××+×++×+×+××++××+×',
-        bobRead: '0100101101001101011001011010',
-        bobBasis: '+×++×+××++××+×++×+×+××++××+×',
-        qberPercent: 5.6,
-        thresholdPercent: 11.0,
-        status: 'VOTE_CAST',
-        timestamp: Date.now() / 1000 - 3600,
-      },
-      {
-        sessionId: 'QS-B3M9P42R',
-        voterId: 'VOTER-1002',
-        encryptedVote: '',
-        keyGenerated: '110010110110',
-        aliceBit: '1100101101101001110010110110',
-        aliceBasis: '×+×++××++×+×+××+×++××++×+×+×',
-        bobRead: '1100101101101001110010110110',
-        bobBasis: '×+×++××++×+×+××+×++××++×+×+×',
-        qberPercent: 4.2,
-        thresholdPercent: 11.0,
-        status: 'KEY_GENERATED',
-        timestamp: Date.now() / 1000 - 1800,
-      },
-      {
-        sessionId: 'QS-C7X1Y98T',
-        voterId: 'VOTER-1003',
-        encryptedVote: '',
-        keyGenerated: '001101011001',
-        aliceBit: '0011010110010110001101011001',
-        aliceBasis: '+×+×+×+×+×+×+×+×+×+×+×+×+×+×',
-        bobRead: '1011010010110100101101001011',
-        bobBasis: '×+×+×+×+×+×+×+×+×+×+×+×+×+×+',
-        qberPercent: 18.4,
-        thresholdPercent: 11.0,
-        status: 'ABORTED',
-        timestamp: Date.now() / 1000 - 600,
-      },
+        sessionId: "IQ0cXT2bI4-ZJDo3mnBIy",
+        voterId: "i_L_UzCaUkTYwKR2WoRXI",
+        keyGenerated: "0b00101110",
+        selectedBits: [
+            1,
+            5,
+            2,
+            0
+        ],
+        aliceBit: "0b1011110011010011010101100110010110010100",
+        aliceBasis: "0b1011001110000010000001100011001011000110",
+        bobRead: "0b1111100011111111101110011101101101110010",
+        bobBasis: "0b1010101111101000001110101101010110010011",
+        eveRead: "0b0101111001111010100110001010110000100111",
+        eveBasis: "0b1111010011010011101100011110101010011111",
+        testSample: 1,
+        errorFound: 0,
+        qberPractical: 0,
+        qberSystem: 0,
+        thresholdPercent: 11,
+        status: "KEY READY",
+        createdAt: 2026,
+        updatedAt: 2026
+      }
     ];
 
-    return {
-      electionCode,
-      logs: mockLogs,
-    };
+    return { sessions: mockLogs };
   }
 
   async resetVotes(): Promise<void> {
