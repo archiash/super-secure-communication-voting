@@ -165,11 +165,21 @@ export class RealApiService implements ApiService {
 
   async getVotingAudit(electionCode: string): Promise<VotingAuditResponse> {
     try {
-      const res = await fetch(`${API_BASE}/vote/voting-audits/${electionCode}`);
+      const res = await fetch(`${API_BASE}/vote/logs/${electionCode}`);
       if (!res.ok) throw new Error(`Voting audit failed: ${res.statusText}`);
       const data = await res.json();
       console.log('[API Call] getVotingAudit result:', data);
-      return data;
+      
+      // Map the backend's `logs` array to the `sessions` array expected by ResultsPage
+      return {
+        sessions: (data.logs || []).map((log: any) => ({
+          sessionId: log.sessionId,
+          voterId: log.voterId,
+          encryptedVote: log.encryptedVote || '',
+          keyBits: log.keyGenerated || '',
+          timeStamp: log.timestamp || log.createdAt
+        }))
+      };
     } catch (err) {
       console.warn('[RealApiService] getVotingAudit failed:', err);
       throw err;
@@ -178,11 +188,19 @@ export class RealApiService implements ApiService {
 
   async getVotingLogs(electionCode: string): Promise<VotingLogResponse> {
     try {
-      const res = await fetch(`${API_BASE}/vote/voting-audits/${electionCode}`);
+      const res = await fetch(`${API_BASE}/vote/logs/${electionCode}`);
       if (!res.ok) throw new Error(`Voting audit failed: ${res.status} ${res.statusText}`);
       const data = await res.json();
       console.log('[API Call] getVotingLogs (audit) result:', data);
-      return data as VotingLogResponse;
+      
+      // Map the backend's `logs` array to the `sessions` array expected by VotingLogsPage
+      return {
+        sessions: (data.logs || []).map((log: any) => ({
+          ...log,
+          createdAt: log.timestamp || log.createdAt,
+          updatedAt: log.timestamp || log.updatedAt,
+        }))
+      };
     } catch (err) {
       console.warn('[RealApiService] getVotingLogs failed:', err);
       throw err;
