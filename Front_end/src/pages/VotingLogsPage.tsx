@@ -167,24 +167,27 @@ function TransmissionTable({
       <div className={styles.txActorRow}>
         <span className={styles.txActorLabel}>SHOW</span>
         {(['alice', ...(view === 'system' ? ['eve'] : []), 'bob'] as Actor[]).map((actor) => {
-          const active = shown.has(actor);
+          const isEveAndEmpty = actor === 'eve' && !hasEveData;
+          const active = shown.has(actor) && !isEveAndEmpty;
           // Last remaining actor — cannot be deselected
           const isLastActive = active && shown.size === 1;
+          
           return (
             <button
               key={actor}
               className={styles.txActorBtn}
               style={{
                 borderColor: actorColor[actor],
-                // Active: slightly transparent background so text stays readable
                 backgroundColor: active
                   ? `color-mix(in srgb, ${actorColor[actor]} 75%, transparent)`
                   : 'transparent',
                 color: active ? '#fff' : actorColor[actor],
-                // Last actor: not-allowed cursor
-                cursor: isLastActive ? 'not-allowed' : 'pointer',
+                opacity: isEveAndEmpty ? 0.4 : 1,
+                cursor: isEveAndEmpty ? 'not-allowed' : (isLastActive ? 'not-allowed' : 'pointer'),
               }}
-              onClick={() => toggleActor(actor)}
+              onClick={() => {
+                if (!isEveAndEmpty) toggleActor(actor);
+              }}
             >
               <span
                 className={styles.txActorDot}
