@@ -54,7 +54,7 @@ def random_binary(number_of_bit: int, per_time_bits: int, use_ibm: bool = USE_IB
 
     run_result = run_quantum_circuit(qc, times=times_to_run, use_ibm=use_ibm)
 
-    return ''.join(run_result)
+    return ''.join(run_result)[:number_of_bit]
 
 def run_simulation(qc, times = 1):
     sampler = AerSampler()
