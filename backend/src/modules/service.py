@@ -34,6 +34,48 @@ async def create_qkd_key(payload : GenerateKeyInput):
     sifted_server_key = qkd.filter_key_by_basis(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
     sifted_client_key = qkd.filter_key_by_basis(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
 
+    w = len(sifted_server_key)
+    n = payload.target_key_length
+
+    if w < 2 * n:
+        current_time = time.time()
+        status = "ABORTED"
+        qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key) if w > 0 else 0.0
+        session_data = {
+            "session_id": session_id,
+            "voter_id": payload.voter_id,
+            "key_generated": "",
+            "selected_bits": [],
+            "alice_bit": simulation_result["server_key"],
+            "alice_basis": simulation_result["server_encryption_basis"],
+            "bob_read": simulation_result["client_key"],
+            "bob_basis": simulation_result["client_decryption_basis"],
+            "eve_read": simulation_result.get("eavesdropping_key", ""),
+            "eve_basis": simulation_result.get("eavesdropping_basis", ""),
+            "error_found": 0,
+            "qber_practical": 0.0,
+            "qber_system": qber,
+            "threshold_percent": 11.0,
+            "status": status,
+            "timestamp": current_time
+        }
+        await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
+
+        return GenerateKeyRespond(
+            elction_code=payload.election_code,
+            voter_id=payload.voter_id,
+            session_id=session_id,
+            key_generated="",
+            alice_bit=simulation_result["server_key"],
+            alice_basis=simulation_result["server_encryption_basis"],
+            bob_read=simulation_result["client_key"],
+            bob_basis=simulation_result["client_decryption_basis"],
+            test_sample=0,
+            error_found=0,
+            qber_percent=qber,
+            threshold_percent=11
+        )
+
     random_picked_positions = get_unique_random_indices(len(sifted_client_key),payload.target_key_length)
     server_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_server_key)
     client_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_client_key)
