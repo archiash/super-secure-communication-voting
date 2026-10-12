@@ -76,9 +76,13 @@ async def create_qkd_key(payload : GenerateKeyInput):
             threshold_percent=11
         )
 
-    random_picked_positions = get_unique_random_indices(len(sifted_client_key),payload.target_key_length)
-    server_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_server_key)
-    client_random_picked_bits = extract_chars_by_index(random_picked_positions, sifted_client_key)
+    all_indices = list(range(w))
+    test_indices = sorted(random.sample(all_indices, w - n))
+    test_indices_set = set(test_indices)
+    secret_key_indices = [i for i in all_indices if i not in test_indices_set]
+
+    server_random_picked_bits = extract_chars_by_index(test_indices, sifted_server_key)
+    client_random_picked_bits = extract_chars_by_index(test_indices, sifted_client_key)
     
     qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
     qber_practical = 100 * qkd.QBER(server_random_picked_bits, client_random_picked_bits)
@@ -90,7 +94,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "session_id" : session_id,
         "voter_id": payload.voter_id,
         "key_generated": key_generated,
-        "selected_bits": random_picked_positions,
+        "selected_bits": test_indices,
         "alice_bit": simulation_result["server_key"],
         "alice_basis": simulation_result["server_encryption_basis"],
         "bob_read": simulation_result["client_key"],
