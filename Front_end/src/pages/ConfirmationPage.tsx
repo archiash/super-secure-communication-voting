@@ -33,7 +33,8 @@ export function ConfirmationPage() {
   }
 
   const selectedCandidate = candidates.find(c => c.id === vote.selectedOptionId);
-  const voteBinary = selectedCandidate?.binaryId || vote.otpKey?.substring(0, 3) || '';
+  const rawBinary = selectedCandidate?.binaryId || '0';
+  const voteBinary = vote.otpKey ? rawBinary.padStart(vote.otpKey.length, '0') : rawBinary;
 
   const handleVoteAgain = () => {
     dispatch({ type: 'RESET_SESSION' });

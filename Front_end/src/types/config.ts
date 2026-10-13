@@ -4,10 +4,10 @@
  * in the ACTIVE CONFIGURATION sidebar card.
  */
 export interface ProtocolConfig {
-  /** Number of qubits transmitted in the BB84 protocol (before sifting). e.g., 40 */
+  /** Number of physical qubits allocated per quantum circuit execution batch on quantum computer/simulator (e.g. 4, 16, 32, 64) */
   qubitCount: number;
 
-  /** Desired final key length in bits after sifting + error correction. e.g., 8 */
+  /** Desired final key length in bits after sifting + error correction (n). e.g., 64 */
   targetKeyLength: number;
 
   /** Whether to use a real IBM Quantum computer or simulated backend */
@@ -25,14 +25,22 @@ export interface ProtocolConfig {
   /** Number of sifted key bits sacrificed for QBER estimation. e.g., 4 */
   testBitCount: number;
 
-  /** Error tolerance (δ) — acceptable error margin in the range [0, 1]. e.g., 0.05 */
+  /** Error tolerance (δ) — acceptable error margin buffer in the range [0, 2]. e.g., 0.05 */
   errorTolerance: number;
 }
 
-/** Default configuration matching the Figma "ACTIVE CONFIGURATION" card */
+/**
+ * Calculate the total number of polarized photons to transmit in the channel:
+ * N_photons = ceil((4 + delta) * targetKeyLength)
+ */
+export function calculatePhotonCount(targetKeyLength: number, errorTolerance: number): number {
+  return Math.ceil((4 + errorTolerance) * targetKeyLength);
+}
+
+/** Default configuration */
 export const DEFAULT_CONFIG: ProtocolConfig = {
-  qubitCount: 32,
-  targetKeyLength: 64,
+  qubitCount: 4, // physical QPU qubits per run
+  targetKeyLength: 64, // target final secret key length n
   useRealQuantum: false,
   eveSimulation: false,
   errorCorrectionEnabled: false,

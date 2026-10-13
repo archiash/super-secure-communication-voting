@@ -42,7 +42,7 @@ function ViewToggle({
         onClick={() => onChange('practical')}
       >
         <span className={styles.viewToggleLabel}>Practical view</span>
-        <span className={styles.viewToggleSub}>Alice &amp; Bob</span>
+        <span className={styles.viewToggleSub}>Server &amp; Voter</span>
       </button>
       <button
         className={`${styles.viewToggleBtn} ${view === 'system' ? styles.viewToggleActive : ''}`}
@@ -150,9 +150,9 @@ function TransmissionTable({
   };
 
   const actorLabel: Record<Actor, string> = {
-    alice: 'Alice',
-    eve: 'Eve',
-    bob: 'Bob',
+    alice: 'Server (Sender)',
+    eve: 'Eve (Interception)',
+    bob: 'Voter (Receiver)',
   };
 
   return (
@@ -215,12 +215,12 @@ function TransmissionTable({
             </tr>
           </thead>
           <tbody>
-            {/* ── Alice rows ── */}
+            {/* ── Server (Sender) rows ── */}
             {shown.has('alice') && (
               <>
                 <tr>
                   <td className={styles.txRowLabel}>
-                    <span style={{ color: actorColor.alice }}>● Alice</span> Bit sent
+                    <span style={{ color: actorColor.alice }}>● Server</span> Bit sent
                   </td>
                   {qubits.map((q, i) => (
                     <td key={i} className={styles.txCell}>
@@ -235,7 +235,7 @@ function TransmissionTable({
                 </tr>
                 <tr>
                   <td className={styles.txRowLabel}>
-                    <span className={styles.txDim}>●</span> Basis
+                    <span className={styles.txDim}>●</span> Server Basis
                   </td>
                   {qubits.map((q, i) => (
                     <td key={i} className={`${styles.txCell} ${styles.txDim}`}>{q.aBasis}</td>
@@ -289,12 +289,12 @@ function TransmissionTable({
               </>
             )}
 
-            {/* ── Bob rows ── */}
+            {/* ── Voter (Receiver) rows ── */}
             {shown.has('bob') && (
               <>
                 <tr>
                   <td className={styles.txRowLabel}>
-                    <span style={{ color: actorColor.bob }}>● Bob</span> Basis
+                    <span style={{ color: actorColor.bob }}>● Voter</span> Basis
                   </td>
                   {qubits.map((q, i) => (
                     <td key={i} className={`${styles.txCell} ${styles.txDim}`}>{q.bBasis}</td>
@@ -626,7 +626,7 @@ export function VotingLogsPage() {
                 <span>
                   <strong>Simulation Diagnostic Trace:</strong>{' '}
                   {modalView === 'practical'
-                    ? 'Practical view shows Alice &amp; Bob&apos;s perspective — as seen in a real QKD channel.'
+                    ? 'Practical view shows Election Server &amp; Voter&apos;s perspective — as seen in a real QKD channel.'
                     : 'System view reveals ground truth including Eve&apos;s interception data — only visible in simulation.'}
                 </span>
               </div>

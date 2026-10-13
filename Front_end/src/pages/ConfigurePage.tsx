@@ -77,22 +77,22 @@ export function ConfigurePage() {
             </div>
           </div>
 
-          {/* QUANTUM CHANNEL */}
-          <div className={styles.sectionTitle}>QUANTUM CHANNEL</div>
+          {/* QUANTUM HARDWARE */}
+          <div className={styles.sectionTitle}>QUANTUM HARDWARE</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Qubit Count</span>
-                <span className={styles.cardDesc}>Number of photons transmitted per session</span>
+                <span className={styles.cardTitle}>QPU Qubit Capacity</span>
+                <span className={styles.cardDesc}>Physical qubits used per circuit run on quantum computer (4 to 64)</span>
               </div>
             </div>
             <div className={styles.sliderContainer}>
               <input
                 type="range"
                 className={styles.slider}
-                min={8}
-                max={128}
-                step={8}
+                min={4}
+                max={64}
+                step={4}
                 value={config.qubitCount}
                 onChange={(e) => updateField('qubitCount', parseInt(e.target.value))}
               />
@@ -100,7 +100,7 @@ export function ConfigurePage() {
                 type="number"
                 className={styles.sliderInput}
                 value={config.qubitCount}
-                onChange={(e) => updateField('qubitCount', parseInt(e.target.value) || 8)}
+                onChange={(e) => updateField('qubitCount', parseInt(e.target.value) || 4)}
               />
             </div>
           </div>

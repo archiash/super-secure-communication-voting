@@ -9,7 +9,7 @@ class GenerateKeyInput(CamelModel):
     is_using_quantum_computer: bool
     error_correction_enabled: bool
     enable_eavesdropper: bool
-    qubit_per_session: int
+    qubit_per_session: int = 4
     target_key_length: int
     error_tolerance: float
 

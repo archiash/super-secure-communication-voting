@@ -140,7 +140,8 @@
 
 .encryptionRow {
   display: grid;
-  grid-template-columns: 140px 120px 1fr;
+  grid-template-columns: 140px 1fr auto;
+  gap: 16px;
   align-items: center;
   padding: 8px 0;
   font-size: 13px;
