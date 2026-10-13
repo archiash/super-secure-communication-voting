@@ -48,12 +48,29 @@ export function ConfigurePage() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Use Real Quantum Computer</span>
+                <span className={styles.cardTitle}>Use Quantum Computer</span>
                 <span className={styles.cardDesc}>This voting simulation will sent data to process on quantum computer</span>
               </div>
               <button
                 className={`${styles.toggle} ${config.useRealQuantum ? styles.active : ''}`}
                 onClick={() => updateField('useRealQuantum', !config.useRealQuantum)}
+              >
+                <div className={styles.toggleDot} />
+              </button>
+            </div>
+          </div>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardTitle}>
+                  Simulate Eve 
+                  {/* <span className={styles.badge}>ATTACK SIM</span> */}
+                </span>
+                <span className={styles.cardDesc}>Inject intercept-resend attack on the quantum channel</span>
+              </div>
+              <button
+                className={`${styles.toggle} ${config.eveSimulation ? styles.active : ''}`}
+                onClick={() => updateField('eveSimulation', !config.eveSimulation)}
               >
                 <div className={styles.toggleDot} />
               </button>
@@ -88,53 +105,17 @@ export function ConfigurePage() {
             </div>
           </div>
 
-          {/* EAVESDROPPER SIMULATION */}
-          <div className={styles.sectionTitle}>EAVESDROPPER SIMULATION</div>
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>
-                  Simulate Eve <span className={styles.badge}>ATTACK SIM</span>
-                </span>
-                <span className={styles.cardDesc}>Inject intercept-resend attack on the quantum channel</span>
-              </div>
-              <button
-                className={`${styles.toggle} ${config.eveSimulation ? styles.active : ''}`}
-                onClick={() => updateField('eveSimulation', !config.eveSimulation)}
-              >
-                <div className={styles.toggleDot} />
-              </button>
-            </div>
-          </div>
-
         </div>
 
         {/* ── Right Column ── */}
         <div className={styles.column}>
-
-          {/* POST-PROCESSING */}
-          <div className={styles.sectionTitle}>POST-PROCESSING</div>
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Error Correction</span>
-                <span className={styles.cardDesc}>Cascade protocol — finds and corrects bit errors in the sifted key</span>
-              </div>
-              <button
-                className={`${styles.toggle} ${config.errorCorrectionEnabled ? styles.active : ''}`}
-                onClick={() => updateField('errorCorrectionEnabled', !config.errorCorrectionEnabled)}
-              >
-                <div className={styles.toggleDot} />
-              </button>
-            </div>
-          </div>
 
           {/* KEY REQUIREMENTS */}
           <div className={styles.sectionTitle}>KEY REQUIREMENTS</div>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Target Key Length</span>
+                <span className={styles.cardTitle}>Target Key Size</span>
                 <span className={styles.cardDesc}>Minimum key bits needed for OTP ballot encryption</span>
               </div>
             </div>
@@ -161,9 +142,9 @@ export function ConfigurePage() {
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
                 <span className={styles.cardTitle}>
-                  Error Tolerance <span className={styles.deltaSymbol}>δ</span>
+                  Safety Margin <span className={styles.deltaSymbol}>δ</span>
                 </span>
-                <span className={styles.cardDesc}>Acceptable error margin for the protocol (0 to 2)</span>
+                <span className={styles.cardDesc}>Extra qubits to send as a safety buffer. A bigger number is safer, but it uses more qubits. (0 to 2)</span>
               </div>
             </div>
             <div className={styles.sliderContainer}>
@@ -194,6 +175,17 @@ export function ConfigurePage() {
                   else updateField('errorTolerance', parseFloat(val.toFixed(2)));
                 }}
               />
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardTitle}>Estimated Photons Needed</span>
+                <span className={styles.cardDesc}>
+                  N = ⌈(4 + δ) × Target Key Size⌉ = {Math.ceil((4 + config.errorTolerance) * config.targetKeyLength)} photons
+                </span>
+              </div>
             </div>
           </div>
 
