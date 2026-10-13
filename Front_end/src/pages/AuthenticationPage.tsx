@@ -141,11 +141,6 @@ export function AuthenticationPage() {
               <span className={styles.configLabel}>Safety margin (δ)</span>
               <span className={styles.configValue}>{state.config.errorTolerance.toFixed(2)}</span>
             </div>
-
-            <div className={styles.configRow}>
-              <span className={styles.configLabel}>Error threshold</span>
-              <span className={styles.configValue}>{(state.config.errorThreshold * 100).toFixed(0)}%</span>
-            </div>
             
             <div className={styles.configRow}>
               <span className={styles.configLabel}>Use quantum computer</span>
