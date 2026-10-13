@@ -92,10 +92,10 @@ export class RealApiService implements ApiService {
             testBitsUsed: data.testSample,
             errorsFound: data.errorFound,
             qber: data.qberPercent / 100,
-            passed: data.qberPercent <= data.thresholdPercent,
+            passed: data.qberPercent <= data.thresholdPercent && Boolean(data.keyGenerated && data.keyGenerated.length > 0),
           },
           errorCorrection: {
-            applied: config.errorCorrectionEnabled && data.qberPercent <= data.thresholdPercent,
+            applied: config.errorCorrectionEnabled && data.qberPercent <= data.thresholdPercent && Boolean(data.keyGenerated && data.keyGenerated.length > 0),
             correctedBits: data.errorFound,
             method: config.errorCorrectionEnabled ? 'cascade' : 'none',
           },
