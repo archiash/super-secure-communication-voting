@@ -1,5 +1,5 @@
 export type { ProtocolConfig } from './config';
-export { DEFAULT_CONFIG } from './config';
+export { DEFAULT_CONFIG, calculatePhotonCount } from './config';
 
 export type {
   Basis,

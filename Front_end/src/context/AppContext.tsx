@@ -13,7 +13,6 @@ function loadSavedConfig(): ProtocolConfig {
     const saved = localStorage.getItem(CONFIG_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Merge with defaults so new fields added in future are picked up
       return { ...DEFAULT_CONFIG, ...parsed };
     }
   } catch {

@@ -18,6 +18,7 @@ import type {
   VoteOption,
 } from '../types';
 import { generateSessionId } from '../utils/session';
+import { calculatePhotonCount } from '../types';
 
 /** Valid demo election code */
 const DEMO_ELECTION_CODE = 'ELECT2026';
@@ -66,7 +67,9 @@ export class MockApiService implements ApiService {
     const sessionId = generateSessionId();
 
     // --- Phase 1: Transmission ---
-    const log = this.simulateTransmission(config.qubitCount, config.eveSimulation);
+    // Calculate raw photons transmitted in the optical channel: (4 + δ) × n
+    const photonsToTransmit = calculatePhotonCount(config.targetKeyLength, config.errorTolerance);
+    const log = this.simulateTransmission(photonsToTransmit, config.eveSimulation);
 
     // --- Phase 2: Basis Sifting ---
     const keptEntries = log.filter((e) => e.keep);
@@ -130,7 +133,7 @@ export class MockApiService implements ApiService {
       eveData = {
         eveBasis,
         eveReadBits,
-        interceptedCount: config.qubitCount,
+        interceptedCount: photonsToTransmit,
         detectable: qber > config.errorThreshold,
       };
     }
@@ -139,7 +142,7 @@ export class MockApiService implements ApiService {
       sessionId,
       phases: {
         transmission: {
-          qubitCount: config.qubitCount,
+          qubitCount: photonsToTransmit,
           log,
         },
         basisSifting: {

@@ -121,18 +121,18 @@ export function AuthenticationPage() {
             </div>
 
             <div className={styles.configRow}>
-              <span className={styles.configLabel}>Qubit count</span>
-              <span className={styles.configValue}>{state.config.qubitCount}</span>
-            </div>
-            
-            <div className={styles.configRow}>
-              <span className={styles.configLabel}>Target key length</span>
+              <span className={styles.configLabel}>Target key length (n)</span>
               <span className={styles.configValue}>{state.config.targetKeyLength} bits</span>
             </div>
 
             <div className={styles.configRow}>
               <span className={styles.configLabel}>Safety margin (δ)</span>
               <span className={styles.configValue}>{state.config.errorTolerance.toFixed(2)}</span>
+            </div>
+
+            <div className={styles.configRow}>
+              <span className={styles.configLabel}>QPU Qubit capacity</span>
+              <span className={styles.configValue}>{state.config.qubitCount} qubits</span>
             </div>
             
             <div className={styles.configRow}>

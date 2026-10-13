@@ -162,10 +162,23 @@ async def cast_ballot(payload: CastBallotInput):
         )
 
     encrypted_vote = payload.encrypted_vote    
-    key_bit = (target_session.bob_key or target_session.key_generated)[:len(encrypted_vote)] 
+    full_key = target_session.key_generated or target_session.bob_key
+    if not full_key:
+        raise HTTPException(
+            status_code=400,
+            detail="Session does not have a valid secret key"
+        )
+    key_bit = full_key[:len(encrypted_vote)]
 
     res_binary = bin(int(encrypted_vote, 2) ^ int(key_bit, 2))
     voted_candidate_index = int(res_binary, 2)
+
+    if voted_candidate_index < 0 or voted_candidate_index >= len(election.candidates):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ballot decryption failed: decrypted candidate index ({voted_candidate_index}) is invalid. Quantum key mismatch or transmission error."
+        )
+
     current_time = time.time()
 
     await ElectionSchema.find_one(

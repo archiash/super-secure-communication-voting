@@ -32,14 +32,13 @@ export function CastVotePage() {
   const qkdResult = state.qkd.result;
   const otpKey = qkdResult?.phases.keyEstablished.finalKey || '';
 
-  // Get the key portion to use for encryption. We need as many bits as the candidate's binaryId.
-  // Figma shows binaryId is 3 bits ("000", "010").
+  // Pad the candidate binary ID to the full OTP key length so the entire key is used for encryption (Option A)
   const getEncryptedVote = () => {
     if (!selectedCandidate || !otpKey) return null;
-    const voteBinary = selectedCandidate.binaryId;
-    if (!voteBinary) return null;
-    // Just grab the first N bits of the OTP key (where N = voteBinary.length)
-    const keyToUse = otpKey.substring(0, voteBinary.length).padEnd(voteBinary.length, '0');
+    const rawBinary = selectedCandidate.binaryId || '0';
+    // Pad to the full key length (e.g. 16, 32 bits)
+    const voteBinary = rawBinary.padStart(otpKey.length, '0');
+    const keyToUse = otpKey;
     const encrypted = xorEncrypt(voteBinary, keyToUse);
     return { voteBinary, keyToUse, encrypted };
   };
