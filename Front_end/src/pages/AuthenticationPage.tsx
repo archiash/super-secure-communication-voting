@@ -136,9 +136,19 @@ export function AuthenticationPage() {
               <span className={styles.configLabel}>Target key length</span>
               <span className={styles.configValue}>{state.config.targetKeyLength} bits</span>
             </div>
+
+            <div className={styles.configRow}>
+              <span className={styles.configLabel}>Safety margin (δ)</span>
+              <span className={styles.configValue}>{state.config.errorTolerance.toFixed(2)}</span>
+            </div>
+
+            <div className={styles.configRow}>
+              <span className={styles.configLabel}>Error threshold</span>
+              <span className={styles.configValue}>{(state.config.errorThreshold * 100).toFixed(0)}%</span>
+            </div>
             
             <div className={styles.configRow}>
-              <span className={styles.configLabel}>Use real quantum computer</span>
+              <span className={styles.configLabel}>Use quantum computer</span>
               <span className={styles.configValue}>
                 {state.config.useRealQuantum ? 'enabled' : 'disabled'}
               </span>
