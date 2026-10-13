@@ -103,13 +103,6 @@ export function AuthenticationPage() {
           >
             {isLoading ? 'Authenticating...' : 'Authenticate & Generate Quantum Key ›'}
           </button>
-
-          <button
-            className={styles.secondaryButton}
-            onClick={() => navigate('/configure')}
-          >
-            ⚙ Configure Protocol
-          </button>
         </div>
 
         {/* ACTIVE CONFIGURATION Card */}
