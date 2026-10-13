@@ -86,6 +86,7 @@ class VotingSession(BaseModel):
     session_id: str
     voter_id: str
     key_generated: str
+    bob_key: Optional[str] = ""
     selected_bits: List[int]
     alice_bit: Optional[str] = ""
     alice_basis: Optional[str] = ""

@@ -43,6 +43,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
             "session_id": session_id,
             "voter_id": payload.voter_id,
             "key_generated": "",
+            "bob_key": "",
             "selected_bits": [],
             "alice_bit": simulation_result["server_key"],
             "alice_basis": simulation_result["server_encryption_basis"],
@@ -91,12 +92,15 @@ async def create_qkd_key(payload : GenerateKeyInput):
     status = "ABORTED" if qber_practical > 11.0 else "KEY_GENERATED"
 
     alice_secret_key = "".join(sifted_server_key[i] for i in secret_key_indices)
+    bob_secret_key = "".join(sifted_client_key[i] for i in secret_key_indices)
     key_generated = "" if status == "ABORTED" else alice_secret_key
+    bob_key = "" if status == "ABORTED" else bob_secret_key
 
     session_data = {
         "session_id" : session_id,
         "voter_id": payload.voter_id,
         "key_generated": key_generated,
+        "bob_key": bob_key,
         "selected_bits": test_indices,
         "alice_bit": simulation_result["server_key"],
         "alice_basis": simulation_result["server_encryption_basis"],
@@ -146,7 +150,7 @@ async def cast_ballot(payload: CastBallotInput):
     )
 
     encrypted_vote = payload.encrypted_vote    
-    key_bit = target_session.key_generated[:len(encrypted_vote)] 
+    key_bit = (target_session.bob_key or target_session.key_generated)[:len(encrypted_vote)] 
 
     res_binary = bin(int(encrypted_vote, 2) ^ int(key_bit, 2))
     voted_candidate_index = int(res_binary, 2)
