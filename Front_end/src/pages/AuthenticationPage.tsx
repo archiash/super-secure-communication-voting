@@ -133,13 +133,6 @@ export function AuthenticationPage() {
             </div>
             
             <div className={styles.configRow}>
-              <span className={styles.configLabel}>Error correction</span>
-              <span className={styles.configValue}>
-                Cascade ({state.config.errorCorrectionEnabled ? 'enabled' : 'disabled'})
-              </span>
-            </div>
-            
-            <div className={styles.configRow}>
               <span className={styles.configLabel}>Target key length</span>
               <span className={styles.configValue}>{state.config.targetKeyLength} bits</span>
             </div>
