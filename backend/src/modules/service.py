@@ -149,6 +149,18 @@ async def cast_ballot(payload: CastBallotInput):
         None
     )
 
+    if not target_session:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Election with session id '{payload.session_id}' not found"
+        )
+
+    if target_session.status == "ABORTED":
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot cast ballot for aborted session"
+        )
+
     encrypted_vote = payload.encrypted_vote    
     key_bit = (target_session.bob_key or target_session.key_generated)[:len(encrypted_vote)] 
 
