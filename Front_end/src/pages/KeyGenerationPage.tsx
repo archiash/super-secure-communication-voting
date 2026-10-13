@@ -80,7 +80,16 @@ export function KeyGenerationPage() {
   };
 
   const qkdResult = state.qkd.result;
-  const isAborted = qkdResult && !qkdResult.phases.qberEstimation.passed;
+  const isAborted = Boolean(
+    qkdResult && (
+      !qkdResult.phases.qberEstimation.passed ||
+      !qkdResult.phases.keyEstablished.finalKey ||
+      qkdResult.phases.keyEstablished.keyLength === 0
+    )
+  );
+  const isEveAbort = Boolean(
+    qkdResult && (qkdResult.phases.qberEstimation.qber > state.config.errorThreshold)
+  );
   const errorCorrectionEnabled = state.config.errorCorrectionEnabled;
   const QKD_PHASES = errorCorrectionEnabled
     ? ALL_QKD_PHASES
@@ -275,14 +284,25 @@ export function KeyGenerationPage() {
       )}
 
       {/* Abort State */}
-      {!isTransmitting && qkdResult && currentPhaseIndex >= 2 && !qkdResult.phases.qberEstimation.passed && (
+      {!isTransmitting && qkdResult && currentPhaseIndex >= 2 && isAborted && (
         <div className={styles.alertBox}>
           <div className={styles.alertIcon}>⚠</div>
           <div className={styles.alertContent}>
-            <div className={styles.alertTitle}>Session Aborted — Possible Eavesdropper Detected</div>
-            <div className={styles.alertText}>
-              The measured QBER ({(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}%) exceeds the security threshold ({(state.config.errorThreshold * 100).toFixed(0)}%). This is consistent with an intercept-resend attack. The session key has been discarded and no vote can be cast.
-            </div>
+            {isEveAbort ? (
+              <>
+                <div className={styles.alertTitle}>Session Aborted: Possible Eavesdropper Detected</div>
+                <div className={styles.alertText}>
+                  The measured QBER ({(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}%) exceeds the security threshold ({(state.config.errorThreshold * 100).toFixed(0)}%). This is consistent with an intercept-resend attack. The session key has been discarded and no vote can be cast.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.alertTitle}>Session Aborted: Insufficient Sifted Bits</div>
+                <div className={styles.alertText}>
+                  Basis reconciliation yielded fewer matching bits than the required 2n threshold ({qkdResult.phases.basisSifting.matchingBases} sifted bits vs {state.config.targetKeyLength * 2} required). Increase the photon transmission count or safety margin in configuration.
+                </div>
+              </>
+            )}
             <button className={styles.retryButton} onClick={handleRetry}>
               ↻ Retry Session
             </button>
