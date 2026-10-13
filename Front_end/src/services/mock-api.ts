@@ -257,7 +257,7 @@ export class MockApiService implements ApiService {
     };
   }
 
-  async getVotingLogs(electionCode: string): Promise<VotingLogResponse> {
+  async getVotingLogs(_electionCode: string): Promise<VotingLogResponse> {
     await this.delay(200);
     const mockLogs: VotingLogEntry[] = [
       {
