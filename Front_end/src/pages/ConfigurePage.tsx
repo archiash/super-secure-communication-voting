@@ -178,23 +178,6 @@ export function ConfigurePage() {
             </div>
           </div>
 
-          {/* VISUALIZATION */}
-          <div className={styles.sectionTitle}>VISUALIZATION</div>
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Sifting Table</span>
-                <span className={styles.cardDesc}>Show full qubit-by-qubit transmission log during QKD</span>
-              </div>
-              <button
-                className={`${styles.toggle} ${true ? styles.active : ''}`}
-              // This is UI only for the mock, assuming true for now
-              >
-                <div className={styles.toggleDot} />
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
 
