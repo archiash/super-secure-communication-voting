@@ -178,17 +178,6 @@ export function ConfigurePage() {
             </div>
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Estimated Photons Needed</span>
-                <span className={styles.cardDesc}>
-                  N = ⌈(4 + δ) × Target Key Size⌉ = {Math.ceil((4 + config.errorTolerance) * config.targetKeyLength)} photons
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* VISUALIZATION */}
           <div className={styles.sectionTitle}>VISUALIZATION</div>
           <div className={styles.card}>
