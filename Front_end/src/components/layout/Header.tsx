@@ -10,9 +10,6 @@ export function Header() {
         <div className={styles.logoIcon}>◇</div>
         <div className={styles.logoText}>
           <span className={styles.logoTitle}>Quantum Cryptographic Voting System</span>
-          <span className={styles.logoSubtitle}>
-            BB84 Protocol Simulation & Verifiable Balloting
-          </span>
         </div>
       </div>
 
