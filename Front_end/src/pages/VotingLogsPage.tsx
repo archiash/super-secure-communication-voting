@@ -108,6 +108,7 @@ function TransmissionTable({
   const hasEveData = !!(rawEveRead && rawEveBasis && rawEveRead.length > 0);
 
   // Build per-qubit data
+  let siftedCounter = -1;
   const qubits = Array.from({ length: len }, (_, i) => {
     const aBit   = parseBit(rawAliceBit[i]   || '0');
     const aBasis = parseBasis(rawAliceBasis[i] || '0');
@@ -119,8 +120,11 @@ function TransmissionTable({
     const eveBit       = hasEveData ? parseBit(rawEveRead[i]   || '0') : aBit;
 
     const sameBasis = aBasis === bBasis;
+    if (sameBasis) {
+      siftedCounter += 1;
+    }
     const bitMatch  = aBit === bRead;
-    const isTest    = log.selectedBits?.includes(i) || false;
+    const isTest    = sameBasis && (log.selectedBits?.includes(siftedCounter) || false);
     const isKept    = sameBasis && !isTest;
     const isError   = sameBasis && !bitMatch;
 
