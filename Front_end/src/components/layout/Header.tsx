@@ -9,9 +9,9 @@ export function Header() {
       <div className={styles.logo} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
         <div className={styles.logoIcon}>◇</div>
         <div className={styles.logoText}>
-          <span className={styles.logoTitle}>Quantum Secured Voting System</span>
+          <span className={styles.logoTitle}>Quantum Cryptographic Voting System</span>
           <span className={styles.logoSubtitle}>
-            IBM Quantum Simulation · QKD BB84 · One-Time Pad
+            BB84 Protocol Simulation & Verifiable Balloting
           </span>
         </div>
       </div>
@@ -45,7 +45,7 @@ export function Header() {
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
           </span>
-          QKD BB84 Report
+          Transmission Logs
         </button>
         <button className={styles.navLink} onClick={() => navigate('/results')}>
           <span className={styles.navLinkIcon}>
@@ -57,7 +57,7 @@ export function Header() {
           </span>
           Results
         </button>
-        <span className={styles.prototypeBadge}>PROTOTYPE</span>
+        <span className={styles.prototypeBadge}>SIMULATION ENGINE</span>
       </nav>
     </header>
   );
