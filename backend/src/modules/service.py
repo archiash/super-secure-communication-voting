@@ -84,11 +84,13 @@ async def create_qkd_key(payload : GenerateKeyInput):
     server_random_picked_bits = extract_chars_by_index(test_indices, sifted_server_key)
     client_random_picked_bits = extract_chars_by_index(test_indices, sifted_client_key)
     
+    test_sample_size = len(test_indices)
+    test_errors = sum(1 for a, b in zip(server_random_picked_bits, client_random_picked_bits) if a != b)
+    qber_practical = (test_errors / test_sample_size) * 100.0 if test_sample_size > 0 else 0.0
     qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
-    qber_practical = 100 * qkd.QBER(server_random_picked_bits, client_random_picked_bits)
 
     current_time = time.time()
-    status = "ABORTED" if qber > 11.0 else "KEY_GENERATED"
+    status = "ABORTED" if qber_practical > 11.0 else "KEY_GENERATED"
 
     session_data = {
         "session_id" : session_id,
@@ -101,7 +103,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "bob_basis": simulation_result["client_decryption_basis"],
         "eve_read" : simulation_result.get("eavesdropping_key", ""), 
         "eve_basis" : simulation_result.get("eavesdropping_basis", ""),
-        "error_found": 0,
+        "error_found": test_errors,
         "qber_practical": qber_practical,
         "qber_system": qber,
         "threshold_percent": 11.0,
@@ -120,9 +122,9 @@ async def create_qkd_key(payload : GenerateKeyInput):
         alice_basis = simulation_result["server_encryption_basis"],
         bob_read = simulation_result["client_key"],
         bob_basis = simulation_result["client_decryption_basis"],
-        test_sample = 0,
-        error_found = 0,
-        qber_percent = qber,
+        test_sample = test_sample_size,
+        error_found = test_errors,
+        qber_percent = qber_practical,
         threshold_percent = 11
     )
 
