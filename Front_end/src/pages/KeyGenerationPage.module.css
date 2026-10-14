@@ -643,3 +643,235 @@
   line-height: 1.5;
 }
 
+.viewModeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 18px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.viewModeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viewModeTag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+}
+
+.viewModeDesc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.viewToggleWrap {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.viewToggleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 8px 16px;
+  background: var(--color-bg);
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  border-right: 1px solid var(--color-border);
+}
+
+.viewToggleBtn:last-child {
+  border-right: none;
+}
+
+.viewToggleBtn:hover {
+  background: var(--color-bg-secondary);
+}
+
+.viewToggleActive {
+  background: rgba(59, 130, 246, 0.08) !important;
+  box-shadow: inset 0 -2px 0 var(--color-primary);
+}
+
+.viewToggleActive .viewToggleLabel {
+  color: var(--color-primary);
+}
+
+.viewToggleLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.viewToggleSub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.indicesBox {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-primary);
+  max-height: 80px;
+  overflow-y: auto;
+  word-break: break-all;
+  padding: 8px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  margin-top: 6px;
+}
+
+.quantumStatePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Horizontal Grid / Matrix for Voter View */
+.hGridContainer {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  margin-top: 12px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.hGridTable {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.hGridTable th,
+.hGridTable td {
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--color-border-light);
+  border-right: 1px solid var(--color-border-light);
+  white-space: nowrap;
+}
+
+.hGridTable tr:last-child td,
+.hGridTable tr:last-child th {
+  border-bottom: none;
+}
+
+.hGridTable td:last-child,
+.hGridTable th:last-child {
+  border-right: none;
+}
+
+.hGridStickyLabel {
+  position: sticky;
+  left: 0;
+  background: var(--color-bg-secondary);
+  font-weight: 700;
+  text-align: left !important;
+  color: var(--color-text-secondary);
+  border-right: 2px solid var(--color-border) !important;
+  z-index: 2;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  min-width: 120px;
+}
+
+.hGridHeaderCell {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  min-width: 44px;
+}
+
+.hGridCell {
+  color: var(--color-text-primary);
+  min-width: 44px;
+}
+
+.hGridCellBasis {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-size: 14px;
+}
+
+.hGridCellBit {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.hGridResultO {
+  color: var(--color-success);
+  font-weight: 800;
+  font-size: 15px;
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.hGridResultX {
+  color: var(--color-danger);
+  font-weight: 800;
+  font-size: 15px;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.hIndexMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.hIndexLabel {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.hIndexValues {
+  font-family: var(--font-mono);
+  color: var(--color-primary);
+  font-weight: 600;
+  background: rgba(59, 130, 246, 0.08);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.hIndexSub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+
