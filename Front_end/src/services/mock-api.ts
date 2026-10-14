@@ -313,9 +313,16 @@ export class MockApiService implements ApiService {
 
       // Determine what Bob reads
       let bobRead: 0 | 1;
+      let eveBasis: Basis | undefined = undefined;
+      let eveBit: 0 | 1 | undefined = undefined;
+      let evePhotonSymbol: PhotonSymbol | undefined = undefined;
+
       if (evePresent) {
         // Eve intercepts with a random basis, potentially disturbing the qubit
-        const eveBasis = this.randomBasis();
+        eveBasis = this.randomBasis();
+        eveBit = eveBasis === aliceBasis ? aliceBit : this.randomBit();
+        evePhotonSymbol = this.getPhotonSymbol(eveBit, eveBasis);
+
         if (eveBasis === aliceBasis) {
           // Eve measures correctly, qubit undisturbed for Eve's part
           if (bobBasis === aliceBasis) {
@@ -350,6 +357,9 @@ export class MockApiService implements ApiService {
         aliceBit,
         aliceBasis,
         photonSymbol,
+        eveBasis,
+        eveBit,
+        evePhotonSymbol,
         bobBasis,
         bobRead,
         keep,

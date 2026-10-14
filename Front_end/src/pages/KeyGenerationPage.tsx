@@ -6,7 +6,7 @@ import styles from './KeyGenerationPage.module.css';
 import { calculatePhotonCount } from '../types';
 import type { QKDPhase, TransmissionLogEntry, Basis } from '../types';
 
-type ViewMode = 'voter' | 'system';
+type ViewMode = 'voter' | 'practical' | 'system';
 
 const ALL_QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
   { id: 'transmission', title: 'Transmission', subtitle: '40 photons' },
@@ -108,6 +108,9 @@ export function KeyGenerationPage() {
   const siftingEfficiency = totalPhotons > 0 ? ((matchingBases / totalPhotons) * 100).toFixed(1) : '0.0';
   const discardedPct = totalPhotons > 0 ? ((discardedCount / totalPhotons) * 100).toFixed(1) : '0.0';
   const siftedBitstring = qkdResult?.phases.basisSifting.siftedKeyBits.join('') || '';
+
+  const hasEveData = Boolean(qkdResult?.phases.transmission.log.some(e => e.eveBasis !== undefined));
+  const eveInterceptedCount = hasEveData ? (qkdResult?.phases.transmission.log.filter(e => e.eveBasis !== undefined).length || 0) : 0;
 
   const matchingEntries = (qkdResult?.phases.transmission.log || [])
     .map((entry, idx) => ({ ...entry, photonNumber: idx + 1 }))
@@ -226,9 +229,9 @@ export function KeyGenerationPage() {
           <div className={styles.viewModeInfo}>
             <div className={styles.viewModeTag}>Visualization Perspective</div>
             <div className={styles.viewModeDesc}>
-              {viewMode === 'voter'
-                ? 'Displaying real Voter Terminal (Bob) perspective — horizontal measurement grid & phased verification cards.'
-                : 'Displaying omniscient System Diagnostic view — showing Server quantum states, preparation bases, and full channel ground truth.'}
+              {viewMode === 'voter' && 'Voter Terminal View — displays only local detector measurements & public announcements.'}
+              {viewMode === 'practical' && 'Practical Channel View — reveals Election Server & Voter Terminal channel states (Eve is a hidden physical interceptor).'}
+              {viewMode === 'system' && `System View (Ground Truth) — reveals full physical trace including Eve's interception process (${hasEveData ? `Eve intercepted ${eveInterceptedCount}/${totalPhotons} photons` : 'Eavesdropping inactive'}).`}
             </div>
           </div>
           <div className={styles.viewToggleWrap}>
@@ -242,11 +245,19 @@ export function KeyGenerationPage() {
             </button>
             <button
               type="button"
+              className={`${styles.viewToggleBtn} ${viewMode === 'practical' ? styles.viewToggleActive : ''}`}
+              onClick={() => setViewMode('practical')}
+            >
+              <span className={styles.viewToggleLabel}>Practical View</span>
+              <span className={styles.viewToggleSub}>Server &amp; Voter</span>
+            </button>
+            <button
+              type="button"
               className={`${styles.viewToggleBtn} ${viewMode === 'system' ? styles.viewToggleActive : ''}`}
               onClick={() => setViewMode('system')}
             >
               <span className={styles.viewToggleLabel}>System View</span>
-              <span className={styles.viewToggleSub}>Omniscient physical trace</span>
+              <span className={styles.viewToggleSub}>Eve process &amp; ground truth</span>
             </button>
           </div>
         </div>
@@ -258,14 +269,14 @@ export function KeyGenerationPage() {
           <div className={styles.tableHeader}>
             <div>
               <span className={styles.tableTitle}>
-                {viewMode === 'voter'
-                  ? 'VOTER TERMINAL QUBIT MEASUREMENT LOG'
-                  : 'SYSTEM QUANTUM TRANSMISSION LOG'}
+                {viewMode === 'voter' && 'VOTER TERMINAL QUBIT MEASUREMENT LOG'}
+                {viewMode === 'practical' && 'PRACTICAL QUBIT TRANSMISSION LOG (SERVER &amp; VOTER)'}
+                {viewMode === 'system' && 'SYSTEM QUANTUM TRANSMISSION LOG (EVE PROCESS VISIBLE)'}
               </span>
               <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                {viewMode === 'voter'
-                  ? 'Photons received by Voter Terminal detector · Basis choice & measurement outcome'
-                  : 'Channel: Election Server (Sender) ──[ Quantum Channel ]──▸ Voter Terminal (Receiver)'}
+                {viewMode === 'voter' && 'Photons received by Voter Terminal detector · Basis choice & measurement outcome'}
+                {viewMode === 'practical' && 'Channel: Election Server (Sender) ──[ Quantum Channel ]──▸ Voter Terminal (Receiver)'}
+                {viewMode === 'system' && 'Ground Truth: Election Server ──▸ [ Eve Interception ] ──▸ Voter Terminal'}
               </div>
             </div>
             <span className={styles.tableStats}>
@@ -303,8 +314,8 @@ export function KeyGenerationPage() {
                 </tbody>
               </table>
             </div>
-          ) : (
-            /* Omniscient Trace Table for System View */
+          ) : viewMode === 'practical' ? (
+            /* Practical Channel Table (Server & Voter) */
             <div className={styles.logTableWrapper}>
               <table className={styles.logTable}>
                 <thead>
@@ -330,6 +341,68 @@ export function KeyGenerationPage() {
                       <td className={!isSifted ? styles.blurredArea : ''}>{getKeepStatus(entry)}</td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* System Omniscient Trace Table (Eve Process Included) */
+            <div className={styles.logTableWrapper}>
+              <table className={styles.logTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Server Bit</th>
+                    <th>Server Basis</th>
+                    <th>Server Photon</th>
+                    {hasEveData && (
+                      <>
+                        <th className={styles.eveHeader}>Eve Basis</th>
+                        <th className={styles.eveHeader}>Eve Read</th>
+                        <th className={styles.eveHeader}>Eve Resent</th>
+                      </>
+                    )}
+                    <th className={!isMeasured ? styles.blurredArea : ''}>Voter Basis</th>
+                    <th className={!isMeasured ? styles.blurredArea : ''}>Voter Read</th>
+                    <th className={!isSifted ? styles.blurredArea : ''}>Basis Match</th>
+                    {hasEveData && <th className={styles.eveHeader}>Eve Impact</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {qkdResult.phases.transmission.log.map((entry, idx) => {
+                    const isDisturbed = entry.eveBasis !== undefined && entry.eveBasis !== entry.aliceBasis;
+                    const hasFlipError = entry.keep && entry.aliceBit !== entry.bobRead;
+                    return (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>{entry.aliceBit}</td>
+                        <td>{entry.aliceBasis}</td>
+                        <td className={styles.photonArrow}>{getPhotonSymbol(entry.aliceBit, entry.aliceBasis)}</td>
+                        {hasEveData && (
+                          <>
+                            <td className={styles.eveCell}>{entry.eveBasis || '—'}</td>
+                            <td className={styles.eveCell}>{entry.eveBit !== undefined ? entry.eveBit : '—'}</td>
+                            <td className={`${styles.photonArrow} ${styles.eveCell}`}>
+                              {entry.eveBit !== undefined && entry.eveBasis ? getPhotonSymbol(entry.eveBit, entry.eveBasis) : '—'}
+                            </td>
+                          </>
+                        )}
+                        <td className={!isMeasured ? styles.blurredArea : ''}>{entry.bobBasis}</td>
+                        <td className={!isMeasured ? styles.blurredArea : ''}>{entry.bobRead}</td>
+                        <td className={!isSifted ? styles.blurredArea : ''}>{getKeepStatus(entry)}</td>
+                        {hasEveData && (
+                          <td>
+                            {hasFlipError ? (
+                              <span className={styles.eveBadgeDisturbed}>⚡ Bit Flip</span>
+                            ) : isDisturbed ? (
+                              <span className={styles.eveBadgeDisturbed}>⚠ Disturbed</span>
+                            ) : (
+                              <span className={styles.eveBadgeClean}>✓ Undisturbed</span>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
