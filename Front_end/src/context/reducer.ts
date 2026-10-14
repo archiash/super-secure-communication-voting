@@ -10,6 +10,7 @@ export const initialState: AppState = {
     electionCode: '',
     sessionId: '',
     isAuthenticated: false,
+    isReplay: false,
   },
   qkd: {
     isGenerating: false,
@@ -45,6 +46,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           electionCode: action.payload.electionCode,
           sessionId: action.payload.sessionId,
           isAuthenticated: true,
+          isReplay: Boolean(action.payload.isReplay),
         },
         wizardStep: 'keyGeneration',
       };
