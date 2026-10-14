@@ -176,14 +176,27 @@ export function KeyGenerationPage() {
         })}
       </div>
 
+      {/* Active Transmission State with Quantum Channel Visualizer */}
       {isTransmitting && (
-        <div className={styles.transmittingBox}>
-          <div className={styles.chipIcon}>▣</div>
-          <div className={styles.transmittingText}>
-            Transmitting {state.config.qubitCount} polarized photons...
+        <div className={styles.transmissionStage}>
+          <div className={styles.nodeCard}>
+            <div className={styles.nodeBadge}>TRANSMITTER</div>
+            <div className={styles.nodeTitle}>Alice (Voter Terminal)</div>
+            <div className={styles.nodeState}>Encoding {state.config.qubitCount} single photons into |0⟩, |1⟩, |+⟩, |-⟩</div>
           </div>
-          <div className={styles.transmittingSub}>
-            {state.config.useRealQuantum ? 'ibmq_qasm_simulator · shots=1024' : 'local_simulator · instant'}
+
+          <div className={styles.beamTrack}>
+            <div className={styles.beamPulse}>
+              <span className={styles.photonParticle}>hv</span>
+            </div>
+            <div className={styles.beamLine}></div>
+            <span className={styles.channelLabel}>Quantum Fiber Channel</span>
+          </div>
+
+          <div className={styles.nodeCard}>
+            <div className={styles.nodeBadge}>RECEIVER</div>
+            <div className={styles.nodeTitle}>Bob (Election Server)</div>
+            <div className={styles.nodeState}>Random rectilinear/diagonal basis measurement</div>
           </div>
         </div>
       )}

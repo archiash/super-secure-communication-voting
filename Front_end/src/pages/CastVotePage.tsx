@@ -105,75 +105,131 @@ export function CastVotePage() {
     <div className={styles.page}>
       <Stepper currentStep="castVote" />
 
-      <h1 className={styles.title}>Cast Your Ballot</h1>
-      <p className={styles.subtitle}>
-        Select one candidate. Your choice is encrypted with the quantum-derived key before transmission.
-      </p>
-
-      <div className={styles.candidatesGrid}>
-        {candidates.map((candidate) => (
-          <div
-            key={candidate.id}
-            className={`${styles.candidateCard} ${selectedId === candidate.id ? styles.selected : ''
-              }`}
-            onClick={() => dispatch({ type: 'SELECT_VOTE_OPTION', payload: candidate.id })}
-          >
-            <div className={styles.candidateInfo}>
-              <span className={styles.candidateName}>{candidate.name}</span>
-              <span className={styles.candidateParty}>{candidate.party}</span>
-              <span className={styles.candidateBinaryId}>Binary ID: {candidate.binaryId}</span>
-            </div>
-            <div className={`${styles.radio} ${selectedId === candidate.id ? styles.selected : ''}`}>
-            </div>
-          </div>
-        ))}
+      <div className={styles.headerSection}>
+        <div className={styles.badgeRow}>
+          <span className="quantum-badge" style={{ background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}>
+            <span className="quantum-pulse"></span> KEY DERIVED VIA BB84: READY
+          </span>
+        </div>
+        <h1 className={styles.title}>Cast Your Secret Ballot</h1>
+        <p className={styles.subtitle}>
+          Select one candidate. Your vote is encrypted client-side with your single-use Quantum One-Time Pad key before network broadcast.
+        </p>
       </div>
 
-      {/* Encryption preview */}
-      {encryption && selectedCandidate && (
-        <div className={styles.encryptionPreview}>
-          <div className={styles.encryptionPreviewTitle}>ONE-TIME PAD ENCRYPTION</div>
+      <div className={styles.votingContainer}>
+        <div className={styles.candidatesGrid}>
+          {candidates.map((candidate) => {
+            const isSelected = selectedId === candidate.id;
+            const initials = candidate.name
+              .split(' ')
+              .map(n => n[0])
+              .join('')
+              .slice(0, 2);
 
-          <div className={styles.encryptionRow}>
-            <span className={styles.encryptionLabel}>Vote (plaintext)</span>
-            <span className={styles.encryptionValue}>{spaceBinary(encryption.voteBinary)}</span>
-            <span className={styles.encryptionDesc}>Candidate {parseInt(encryption.voteBinary, 2)}</span>
-          </div>
+            return (
+              <div
+                key={candidate.id}
+                className={`${styles.candidateCard} ${isSelected ? styles.selected : ''}`}
+                onClick={() => dispatch({ type: 'SELECT_VOTE_OPTION', payload: candidate.id })}
+              >
+                <div className={styles.candidateHeader}>
+                  <div className={`${styles.avatar} ${isSelected ? styles.avatarSelected : ''}`}>
+                    {initials}
+                  </div>
+                  <div className={`${styles.radio} ${isSelected ? styles.radioSelected : ''}`}>
+                    {isSelected && <span className={styles.radioDot} />}
+                  </div>
+                </div>
 
-          <div className={styles.encryptionRow}>
-            <span className={styles.encryptionLabel}>Key (QKD)</span>
-            <span className={`${styles.encryptionValue} ${styles.qkd}`}>{spaceBinary(encryption.keyToUse)}</span>
-            <span className={styles.encryptionDesc}>Quantum-derived</span>
-          </div>
+                <div className={styles.candidateInfo}>
+                  <span className={styles.candidateName}>{candidate.name}</span>
+                  <span className={styles.candidateParty}>{candidate.party}</span>
+                </div>
 
-          <div className={styles.encryptionDivider} />
-
-          <div className={styles.encryptionRow}>
-            <span className={styles.encryptionLabel}>Encrypted vote</span>
-            <span className={`${styles.encryptionValue} ${styles.encrypted}`}>{spaceBinary(encryption.encrypted)}</span>
-            <span className={styles.encryptionDesc}>XOR result</span>
-          </div>
-
-          <div className={styles.encryptionFooter}>
-            Only the encrypted value is transmitted. Decryption requires the matching quantum key.
-          </div>
+                <div className={styles.candidateFooter}>
+                  <span className={styles.candidateBinaryLabel}>BALLOT CODE:</span>
+                  <span className={styles.candidateBinaryValue}>{candidate.binaryId}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      )}
 
-      <div className={styles.actions}>
-        <button
-          className={styles.primaryButton}
-          onClick={handleSubmitVote}
-          disabled={!selectedId || state.vote.isSubmitting}
-        >
-          <span className={styles.lockIcon}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
-            </svg>
-          </span>
-          {state.vote.isSubmitting ? 'Submitting...' : 'Submit Encrypted Ballot'}
-        </button>
+        {/* Interactive One-Time Pad XOR Encryption Visualizer */}
+        {encryption && selectedCandidate ? (
+          <div className={styles.encryptionCard}>
+            <div className={styles.encryptionCardHeader}>
+              <div className={styles.encryptionHeaderLeft}>
+                <span className={styles.encryptionIcon}>🔐</span>
+                <span className={styles.encryptionTitle}>CLIENT-SIDE ONE-TIME PAD (OTP) ENCRYPTION</span>
+              </div>
+              <span className={styles.encryptionBadge}>UNBREAKABLE (SHANNON 1949)</span>
+            </div>
+
+            <div className={styles.mathGrid}>
+              <div className={styles.mathBlock}>
+                <span className={styles.mathLabel}>1. Ballot Message (m)</span>
+                <div className={styles.mathBits}>{spaceBinary(encryption.voteBinary)}</div>
+                <span className={styles.mathSub}>"{selectedCandidate.name}"</span>
+              </div>
+
+              <div className={styles.mathOperator}>⊕</div>
+
+              <div className={styles.mathBlock}>
+                <span className={styles.mathLabel}>2. Quantum Key (k)</span>
+                <div className={`${styles.mathBits} ${styles.keyBits}`}>{spaceBinary(encryption.keyToUse)}</div>
+                <span className={styles.mathSub}>From BB84 Sifting</span>
+              </div>
+
+              <div className={styles.mathOperator}>=</div>
+
+              <div className={styles.mathBlock}>
+                <span className={styles.mathLabel}>3. Ciphertext (c)</span>
+                <div className={`${styles.mathBits} ${styles.cipherBits}`}>{spaceBinary(encryption.encrypted)}</div>
+                <span className={styles.mathSub}>Broadcasted to Ledger</span>
+              </div>
+            </div>
+
+            <div className={styles.encryptionNote}>
+              <span className={styles.noteIcon}>ℹ️</span>
+              <span>
+                Even with infinite computing power, an attacker cannot decipher the ballot because the key is truly random and used exactly once.
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.placeholderCard}>
+            <span className={styles.placeholderIcon}>👆</span>
+            <span>Select a candidate card above to preview the real-time OTP XOR encryption.</span>
+          </div>
+        )}
+
+        <div className={styles.submitBar}>
+          <button
+            className={styles.primaryButton}
+            onClick={handleSubmitVote}
+            disabled={!selectedId || state.vote.isSubmitting}
+          >
+            {state.vote.isSubmitting ? (
+              <>
+                <span className={styles.spinner}></span>
+                <span>Recording Encrypted Ballot on Ledger...</span>
+              </>
+            ) : (
+              <>
+                <span className={styles.lockIcon}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                  </svg>
+                </span>
+                <span>Submit Encrypted Ballot to Ledger</span>
+                <span className={styles.btnArrow}>→</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

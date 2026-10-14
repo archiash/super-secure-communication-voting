@@ -5,27 +5,37 @@
   height: var(--header-height);
   padding: 0 32px;
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: var(--shadow-xs);
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 12px;
+  user-select: none;
 }
 
 .logoIcon {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--color-text-primary);
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  background: var(--color-primary);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+  transition: transform var(--transition-fast);
+}
+
+.logo:hover .logoIcon {
+  transform: scale(1.05);
 }
 
 .logoText {
@@ -34,55 +44,81 @@
 }
 
 .logoTitle {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
-  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
-}
-
-.logoSubtitle {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  line-height: 1.2;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 8px;
 }
 
 .navLink {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--color-text-secondary);
-  transition: color var(--transition-fast);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
   background: none;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   font-family: var(--font-family);
 }
 
 .navLink:hover {
   color: var(--color-text-primary);
+  background: var(--color-border-light);
+}
+
+.navLinkActive {
+  color: var(--color-accent);
+  background: var(--color-accent-light);
+  font-weight: 600;
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
 .navLinkIcon {
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.prototypeBadge {
+.statusPill {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  gap: 7px;
+  padding: 5px 12px;
+  background: #f0fdf4;
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-full);
+  margin-left: 12px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 6px var(--color-success);
+  animation: pulse 2s infinite;
+}
+
+.statusLabel {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  border-radius: var(--radius-sm);
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-success);
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
 }

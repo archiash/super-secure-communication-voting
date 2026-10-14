@@ -1,150 +1,246 @@
 .page {
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 0 var(--page-padding);
+  padding: 16px var(--page-padding) 64px;
   width: 100%;
+}
+
+.receiptContainer {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .successBanner {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
-  margin-bottom: 32px;
+  padding: 20px 24px;
+  background: #f0fdf4;
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-md);
 }
 
 .successIcon {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: var(--color-success-light);
-  color: var(--color-success);
+  background: var(--color-success);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 800;
   flex-shrink: 0;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.successText {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
 }
 
 .successText h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-size: 19px;
+  font-weight: 800;
+  color: #065f46;
+  margin-bottom: 4px;
 }
 
 .successText p {
-  font-size: 14px;
-  color: var(--color-text-secondary);
+  font-size: 13.5px;
+  color: #047857;
+  line-height: 1.5;
 }
 
-.receiptCard {
-  border: 1px solid var(--color-border);
+/* Certificate */
+.certificate {
+  background: #ffffff;
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  margin-bottom: 24px;
-  max-width: 600px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  position: relative;
 }
 
-.receiptHeader {
+.certificateHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  gap: 14px;
+  padding: 22px 24px;
+  background: #f8fafc;
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-.receiptTitle {
-  font-size: 12px;
+.certSeal {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.certTitleGroup {
+  flex: 1;
+}
+
+.certSuper {
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: 2px;
 }
 
-.receiptTime {
+.certTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.copyBtn {
   font-size: 12px;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
-.receiptRow {
+.copyBtn:hover {
+  background: var(--color-border-light);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.certBody {
+  padding: 8px 24px;
+}
+
+.certRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 14px 0;
   border-bottom: 1px solid var(--color-border-light);
 }
 
-.receiptRow:last-child {
-  border-bottom: none;
+.certRowHighlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin: 12px 0;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
-.receiptLabel {
+.highlightLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.certHint {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+}
+
+.cipherTag {
+  font-family: var(--font-mono);
   font-size: 14px;
+  font-weight: 800;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-success-border);
+  letter-spacing: 0.05em;
+}
+
+.certLabel {
+  font-size: 13.5px;
   color: var(--color-text-secondary);
 }
 
-.receiptValue {
-  font-size: 14px;
+.certValue {
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.receiptValue.mono {
+.mono {
   font-family: var(--font-mono);
 }
 
-.warningBox {
-  background: var(--color-warning-light);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: var(--radius-md);
-  padding: 16px 20px;
-  margin-bottom: 32px;
-  font-size: 13px;
-  color: #b45309; /* dark orange */
-  max-width: 600px;
+.certFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid var(--color-border);
+}
+
+.watermark {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.disclaimer {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
 }
 
 .actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
 }
 
 .primaryButton {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: var(--color-text-primary);
-  color: white;
+  padding: 14px 20px;
+  background: var(--color-primary);
+  color: #ffffff;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .primaryButton:hover {
-  background: #000;
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .secondaryButton {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: var(--color-bg);
+  padding: 14px 20px;
+  background: #ffffff;
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -152,9 +248,8 @@
 }
 
 .secondaryButton:hover {
-  background: var(--color-bg-secondary);
+  background: var(--color-border-light);
+  border-color: var(--color-text-secondary);
+  transform: translateY(-1px);
 }
 
-.icon {
-  font-size: 16px;
-}
