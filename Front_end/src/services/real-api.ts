@@ -102,6 +102,7 @@ export class RealApiService implements ApiService {
             errorsFound: data.errorFound,
             qber: data.qberPercent / 100,
             systemQber: data.qberSystem !== undefined ? data.qberSystem / 100 : undefined,
+            selectedBits: data.selectedBits || [],
             passed: data.qberPercent <= data.thresholdPercent && Boolean(data.keyGenerated && data.keyGenerated.length > 0),
           },
           errorCorrection: {

@@ -122,7 +122,24 @@ export function KeyGenerationPage() {
   const matchingIndices = matchingEntries.map(e => e.photonNumber);
 
   const testSampleCount = qkdResult?.phases.qberEstimation.testBitsUsed || state.config.testBitCount || 4;
-  const testSamples = matchingEntries.slice(0, testSampleCount);
+  const selectedIndices = qkdResult?.phases.qberEstimation.selectedBits;
+  let testSamples: typeof matchingEntries = [];
+  if (selectedIndices && selectedIndices.length > 0) {
+    testSamples = selectedIndices
+      .map((idx: number) => matchingEntries[idx])
+      .filter((e): e is (typeof matchingEntries)[number] => Boolean(e));
+  } else {
+    // Fallback: if selectedBits was omitted, pick sample entries that align with errorsFound
+    const targetErrors = qkdResult?.phases.qberEstimation.errorsFound || 0;
+    const errorEntries = matchingEntries.filter(e => e.aliceBit !== e.bobRead);
+    const cleanEntries = matchingEntries.filter(e => e.aliceBit === e.bobRead);
+
+    const pickedErrors = errorEntries.slice(0, targetErrors);
+    const neededClean = Math.max(0, testSampleCount - pickedErrors.length);
+    const pickedClean = cleanEntries.slice(0, neededClean);
+
+    testSamples = [...pickedErrors, ...pickedClean].sort((a, b) => a.photonNumber - b.photonNumber);
+  }
 
   // Ground Truth QBER across all matching/sifted qubits (omniscient system view)
   const totalSiftedErrors = matchingEntries.filter(e => e.aliceBit !== e.bobRead).length;

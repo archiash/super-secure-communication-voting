@@ -153,6 +153,7 @@ export class MockApiService implements ApiService {
           testBitsUsed: testBitCount,
           errorsFound,
           qber,
+          selectedBits: Array.from({ length: testBitCount }, (_, i) => i),
           passed,
         },
         errorCorrection: {

@@ -53,6 +53,8 @@ export interface QBERResult {
   qber: number;
   /** Ground truth QBER across all sifted bits (0.0 to 1.0) - omniscient system view */
   systemQber?: number;
+  /** Indices into sifted bits chosen for parity testing */
+  selectedBits?: number[];
   /** Whether the QBER is below the error threshold (key accepted) */
   passed: boolean;
 }
