@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import type { VotingLogEntry } from '../types';
 import styles from './VotingLogsPage.module.css';
 
-type ViewMode = 'practical' | 'system';
+type ViewMode = 'voter' | 'practical' | 'system';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -38,6 +38,13 @@ function ViewToggle({
   return (
     <div className={styles.viewToggleWrap}>
       <button
+        className={`${styles.viewToggleBtn} ${view === 'voter' ? styles.viewToggleActive : ''}`}
+        onClick={() => onChange('voter')}
+      >
+        <span className={styles.viewToggleLabel}>Voter view</span>
+        <span className={styles.viewToggleSub}>Client terminal</span>
+      </button>
+      <button
         className={`${styles.viewToggleBtn} ${view === 'practical' ? styles.viewToggleActive : ''}`}
         onClick={() => onChange('practical')}
       >
@@ -49,8 +56,183 @@ function ViewToggle({
         onClick={() => onChange('system')}
       >
         <span className={styles.viewToggleLabel}>System view</span>
-        <span className={styles.viewToggleSub}>Ground truth</span>
+        <span className={styles.viewToggleSub}>Ground truth (Eve)</span>
       </button>
+    </div>
+  );
+}
+
+// ── VoterLogDetailView component (Cards for Voter View) ───────────────────
+
+function VoterLogDetailView({ log }: { log: VotingLogEntry }) {
+  const rawAliceBit   = stripBinPrefix(log.aliceBit);
+  const rawAliceBasis = stripBinPrefix(log.aliceBasis);
+  const rawBobBasis   = stripBinPrefix(log.bobBasis);
+  const rawBobRead    = stripBinPrefix(log.bobRead);
+
+  const len = rawAliceBit.length || rawBobBasis.length || 0;
+
+  const qubits = Array.from({ length: len }, (_, i) => {
+    const aBit   = parseBit(rawAliceBit[i]   || '0');
+    const aBasis = parseBasis(rawAliceBasis[i] || '0');
+    const bBasis = parseBasis(rawBobBasis[i]   || '0');
+    const bRead  = parseBit(rawBobRead[i]     || '0');
+    return {
+      index: i + 1,
+      aBit,
+      aBasis,
+      bBasis,
+      bRead,
+      sameBasis: aBasis === bBasis,
+    };
+  });
+
+  const matchingEntries = qubits.filter(q => q.sameBasis);
+  const matchingIndices = matchingEntries.map(q => q.index);
+
+  const testSamples = (log.selectedBits || []).map((siftedIdx) => {
+    const q = matchingEntries[siftedIdx];
+    return q ? {
+      photonNumber: q.index,
+      bBasis: q.bBasis,
+      aliceBit: q.aBit,
+      bobRead: q.bRead,
+      isMatch: q.aBit === q.bRead,
+    } : null;
+  }).filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+  const yieldPct = len > 0 ? ((matchingEntries.length / len) * 100).toFixed(1) : '0.0';
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* ── CARD 1: Voter Terminal Measurement Log ── */}
+      <div className={styles.voterCard}>
+        <div className={styles.voterCardHeader}>
+          <span className={styles.voterCardTitle}>1. Voter Terminal Qubit Measurement Log</span>
+          <span className={styles.voterCardStats}>{len} photons received</span>
+        </div>
+        <div className={styles.hGridContainer}>
+          <table className={styles.hGridTable}>
+            <tbody>
+              <tr>
+                <th className={styles.hGridStickyLabel}>Photon #</th>
+                {qubits.map((q) => (
+                  <th key={q.index} className={styles.hGridHeaderCell}>#{q.index}</th>
+                ))}
+              </tr>
+              <tr>
+                <th className={styles.hGridStickyLabel}>Basis</th>
+                {qubits.map((q) => (
+                  <td key={q.index} className={`${styles.hGridCell} ${styles.hGridCellBasis}`}>
+                    {q.bBasis}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th className={styles.hGridStickyLabel}>Measure</th>
+                {qubits.map((q) => (
+                  <td key={q.index} className={`${styles.hGridCell} ${styles.hGridCellBit}`}>
+                    {q.bRead}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── CARD 2: Basis Sifting Result ── */}
+      <div className={styles.voterCard}>
+        <div className={styles.voterCardHeader}>
+          <span className={styles.voterCardTitle}>2. Basis Sifting (Reconciliation) Result</span>
+          <span className={styles.voterCardStats}>{matchingEntries.length} matching bits ({yieldPct}% yield)</span>
+        </div>
+
+        <div className={styles.hIndexMeta}>
+          <span className={styles.hIndexLabel}>Match Index:</span>
+          <span className={styles.hIndexValues}>
+            {matchingIndices.length > 0 ? matchingIndices.join(', ') : 'None'}
+          </span>
+        </div>
+
+        <div className={styles.hGridContainer}>
+          <table className={styles.hGridTable}>
+            <tbody>
+              <tr>
+                <th className={styles.hGridStickyLabel}>Kept</th>
+                {matchingEntries.map((entry) => (
+                  <th key={entry.index} className={styles.hGridHeaderCell}>#{entry.index}</th>
+                ))}
+              </tr>
+              <tr>
+                <th className={styles.hGridStickyLabel}>Result</th>
+                {matchingEntries.map((entry) => (
+                  <td key={entry.index} className={`${styles.hGridCell} ${styles.hGridCellBit}`} style={{ color: 'var(--color-primary)' }}>
+                    {entry.bRead}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── CARD 3: QBER Test Parity Check ── */}
+      <div className={styles.voterCard}>
+        <div className={styles.voterCardHeader}>
+          <span className={styles.voterCardTitle}>3. QBER Estimation &amp; Channel Integrity Verification</span>
+          <span className={styles.voterCardStats}>QBER: {log.qberPractical.toFixed(1)}% (Threshold: {log.thresholdPercent}%)</span>
+        </div>
+
+        <div className={styles.hIndexMeta}>
+          <span className={styles.hIndexLabel}>Test Bits Index:</span>
+          <span className={styles.hIndexValues}>
+            {testSamples.length > 0 ? testSamples.map(s => s.photonNumber).join(', ') : 'None'}
+          </span>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+            ({testSamples.length} sample bits sacrificed)
+          </span>
+        </div>
+
+        {testSamples.length > 0 && (
+          <div className={styles.hGridContainer}>
+            <table className={styles.hGridTable}>
+              <tbody>
+                <tr>
+                  <th className={styles.hGridStickyLabel}>Test Photon #</th>
+                  {testSamples.map((sample) => (
+                    <th key={sample.photonNumber} className={styles.hGridHeaderCell}>#{sample.photonNumber}</th>
+                  ))}
+                </tr>
+                <tr>
+                  <th className={styles.hGridStickyLabel}>Server Disclosed</th>
+                  {testSamples.map((sample) => (
+                    <td key={sample.photonNumber} className={`${styles.hGridCell} ${styles.hGridCellBit}`} style={{ color: 'var(--color-primary)' }}>
+                      {sample.aliceBit}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <th className={styles.hGridStickyLabel}>Voter Measured</th>
+                  {testSamples.map((sample) => (
+                    <td key={sample.photonNumber} className={`${styles.hGridCell} ${styles.hGridCellBit}`}>
+                      {sample.bobRead}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <th className={styles.hGridStickyLabel}>Result</th>
+                  {testSamples.map((sample) => (
+                    <td key={sample.photonNumber} className={`${styles.hGridCell} ${sample.isMatch ? styles.hGridResultO : styles.hGridResultX}`}>
+                      {sample.isMatch ? 'O' : 'X'}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -390,9 +572,9 @@ export function VotingLogsPage() {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'VOTE_CAST' | 'KEY_GENERATED' | 'KEY_READY' | 'ABORTED'>('ALL');
   const [selectedLog, setSelectedLog] = useState<VotingLogEntry | null>(null);
 
-  // View modes
-  const [reportView, setReportView] = useState<ViewMode>('practical');
-  const [modalView, setModalView] = useState<ViewMode>('practical');
+  // View modes - default to voter view
+  const [reportView, setReportView] = useState<ViewMode>('voter');
+  const [modalView, setModalView] = useState<ViewMode>('voter');
 
   const electionCode = state.auth.electionCode || 'ELECT2026';
 
@@ -412,9 +594,9 @@ export function VotingLogsPage() {
     fetchLogs();
   }, [electionCode]);
 
-  // Reset modal view to practical when a new log is selected
+  // Reset modal view to voter when a new log is selected
   useEffect(() => {
-    if (selectedLog) setModalView('practical');
+    if (selectedLog) setModalView('voter');
   }, [selectedLog]);
 
   // Normalize status: API may return "VOTE_CAST", "KEY READY", "KEY_GENERATED", "ABORTED", etc.
@@ -435,9 +617,9 @@ export function VotingLogsPage() {
     return s === 'KEY_GENERATED' || s === 'KEY_READY' || s === 'VOTE_CAST';
   }).length;
   const abortedCount = logs.filter((l) => normalizeStatus(l.status) === 'ABORTED').length;
-  // Average QBER: use practical or system depending on report view
+  // Average QBER: use practical/voter or system depending on report view
   const avgQber = logs.length
-    ? (logs.reduce((acc, l) => acc + (reportView === 'practical' ? l.qberPractical : l.qberSystem), 0) / logs.length).toFixed(1)
+    ? (logs.reduce((acc, l) => acc + (reportView === 'system' ? l.qberSystem : l.qberPractical), 0) / logs.length).toFixed(1)
     : '0.0';
 
   const formatTimestamp = (ts: number) => {
@@ -448,14 +630,14 @@ export function VotingLogsPage() {
     return date.toLocaleString();
   };
 
-  // Render QBER badge: practical uses qberPractical, system uses qberSystem
+  // Render QBER badge: practical/voter uses qberPractical, system uses qberSystem
   const renderQberCell = (log: VotingLogEntry) => {
-    const qber = reportView === 'practical' ? log.qberPractical : log.qberSystem;
+    const qber = reportView === 'system' ? log.qberSystem : log.qberPractical;
     const isHighQber = qber > log.thresholdPercent;
     const pct = qber.toFixed(0);
     return (
       <span className={`${styles.qberBadge} ${isHighQber ? styles.qberHigh : styles.qberGood}`}>
-        {reportView === 'practical' ? `${pct}% (Practical)` : `${pct}%`}
+        {reportView === 'system' ? `${pct}%` : `${pct}% (${reportView === 'voter' ? 'Voter' : 'Practical'})`}
       </span>
     );
   };
@@ -617,7 +799,7 @@ export function VotingLogsPage() {
             </div>
 
             <div className={styles.modalBody}>
-              {/* Practical / System toggle above the diagnostic trace */}
+              {/* Voter / Practical / System toggle above the diagnostic trace */}
               <ViewToggle view={modalView} onChange={setModalView} />
 
               {/* Diagnostic note */}
@@ -625,9 +807,11 @@ export function VotingLogsPage() {
                 <span>ℹ</span>
                 <span>
                   <strong>Simulation Diagnostic Trace:</strong>{' '}
-                  {modalView === 'practical'
-                    ? 'Practical view shows Election Server &amp; Voter&apos;s perspective — as seen in a real QKD channel.'
-                    : 'System view reveals ground truth including Eve&apos;s interception data — only visible in simulation.'}
+                  {modalView === 'voter'
+                    ? 'Voter view displays the voter terminal perspective (local measurement log, sifting kept bits, and disclosed test parity).'
+                    : modalView === 'practical'
+                    ? 'Practical view shows Election Server & Voter perspective — as seen in a real QKD channel.'
+                    : 'System view reveals ground truth including Eve\'s interception data — only visible in simulation.'}
                 </span>
               </div>
 
@@ -644,11 +828,11 @@ export function VotingLogsPage() {
                 <div className={styles.detailBlock}>
                   <span className={styles.detailLabel}>QBER Error Rate</span>
                   {(() => {
-                    const qber = modalView === 'practical' ? selectedLog.qberPractical : selectedLog.qberSystem;
+                    const qber = modalView === 'system' ? selectedLog.qberSystem : selectedLog.qberPractical;
                     const isHigh = qber > selectedLog.thresholdPercent;
                     return (
                       <span className={styles.detailValue} style={{ color: isHigh ? 'var(--color-danger)' : 'var(--color-success)' }}>
-                        {qber.toFixed(0)}%{modalView === 'practical' ? ' (Practical)' : ' (System)'} · Limit: {selectedLog.thresholdPercent}%
+                        {qber.toFixed(0)}%{modalView === 'system' ? ' (System)' : modalView === 'voter' ? ' (Voter)' : ' (Practical)'} · Limit: {selectedLog.thresholdPercent}%
                       </span>
                     );
                   })()}
@@ -667,12 +851,16 @@ export function VotingLogsPage() {
                 </div>
               </div>
 
-              {/* No encryptedVote in new schema */}
-
-              {/* ── New Transmission Table ── */}
+              {/* ── Transmission or Voter View ── */}
               <div>
-                <div className={styles.sectionHeader}>BB84 Qubit Basis &amp; Bit Sequence</div>
-                <TransmissionTable log={selectedLog} view={modalView} />
+                <div className={styles.sectionHeader}>
+                  {modalView === 'voter' ? 'Voter Terminal Verification & Sifting Trace' : 'BB84 Qubit Basis & Bit Sequence'}
+                </div>
+                {modalView === 'voter' ? (
+                  <VoterLogDetailView log={selectedLog} />
+                ) : (
+                  <TransmissionTable log={selectedLog} view={modalView} />
+                )}
               </div>
             </div>
           </div>
