@@ -98,6 +98,7 @@ function buildQkdResponseFromLog(log: VotingLogEntry): QKDResponse {
         testBitsUsed: selectedBits.length || 4,
         errorsFound,
         qber: qberDecimal,
+        systemQber: (log.qberSystem || 0) / 100,
         passed,
       },
       errorCorrection: {

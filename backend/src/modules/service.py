@@ -134,6 +134,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         test_sample = test_sample_size,
         error_found = test_errors,
         qber_percent = qber_practical,
+        qber_system = qber,
         threshold_percent = 11
     )
 

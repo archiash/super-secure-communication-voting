@@ -51,6 +51,8 @@ export interface QBERResult {
   errorsFound: number;
   /** Calculated QBER (0.0 to 1.0) */
   qber: number;
+  /** Ground truth QBER across all sifted bits (0.0 to 1.0) - omniscient system view */
+  systemQber?: number;
   /** Whether the QBER is below the error threshold (key accepted) */
   passed: boolean;
 }
