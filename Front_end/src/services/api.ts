@@ -38,6 +38,9 @@ export interface ApiService {
   /** Get QKD BB84 voting session logs */
   getVotingLogs(electionCode: string): Promise<VotingLogResponse>;
 
+  /** Abort an active voting session */
+  abortSession(sessionId: string, electionCode: string): Promise<void>;
+
   /** Reset all votes (for demo purposes) */
   resetVotes(): Promise<void>;
 }

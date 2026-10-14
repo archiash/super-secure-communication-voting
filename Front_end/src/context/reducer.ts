@@ -48,6 +48,22 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           isAuthenticated: true,
           isReplay: Boolean(action.payload.isReplay),
         },
+        qkd: {
+          isGenerating: false,
+          result: null,
+          error: null,
+          currentPhase: 'transmission',
+          isBlurred: true,
+          isTransmitting: false,
+        },
+        vote: {
+          selectedOptionId: null,
+          encryptedVote: null,
+          otpKey: null,
+          voteId: null,
+          timestamp: null,
+          isSubmitting: false,
+        },
         wizardStep: 'keyGeneration',
       };
 
@@ -63,6 +79,10 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'QKD_SUCCESS':
       return {
         ...state,
+        auth: {
+          ...state.auth,
+          sessionId: action.payload.sessionId || state.auth.sessionId,
+        },
         qkd: { ...state.qkd, isGenerating: false, result: action.payload, error: null, isTransmitting: true, currentPhase: 'transmission' },
       };
 
