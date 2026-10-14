@@ -27,6 +27,7 @@ class GenerateKeyRespond(CamelModel):
     test_sample: int
     error_found: int = 0
     qber_percent: float
+    qber_system: Optional[float] = 0.0
     threshold_percent: int
 
 class CandidateVotingResult(CamelModel):

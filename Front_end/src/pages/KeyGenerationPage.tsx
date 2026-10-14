@@ -124,6 +124,17 @@ export function KeyGenerationPage() {
   const testSampleCount = qkdResult?.phases.qberEstimation.testBitsUsed || state.config.testBitCount || 4;
   const testSamples = matchingEntries.slice(0, testSampleCount);
 
+  // Ground Truth QBER across all matching/sifted qubits (omniscient system view)
+  const totalSiftedErrors = matchingEntries.filter(e => e.aliceBit !== e.bobRead).length;
+  const groundTruthQberPercent = qkdResult?.phases.qberEstimation.systemQber !== undefined
+    ? qkdResult.phases.qberEstimation.systemQber * 100
+    : matchingEntries.length > 0
+    ? (totalSiftedErrors / matchingEntries.length) * 100
+    : 0.0;
+  const estQberPercent = qkdResult?.phases.qberEstimation.qber !== undefined
+    ? qkdResult.phases.qberEstimation.qber * 100
+    : 0.0;
+
   // Separate stages: 1) Measure qubits, 2) Sift bases, 3) Calculate QBER
   const [isSiftedLocal, setIsSiftedLocal] = useState(false);
   const isMeasured = !isBlurred || currentPhaseIndex >= 2;
@@ -305,7 +316,7 @@ export function KeyGenerationPage() {
               </div>
             </div>
             <span className={styles.tableStats}>
-              {totalPhotons} photons {viewMode === 'voter' ? (!isMeasured ? 'received · measurement pending' : !isSifted ? 'measured · basis sifting pending' : `· ${matchingBases} matching bases`) : `· ${matchingBases} matching bases`}
+              {totalPhotons} photons {viewMode === 'voter' ? (!isMeasured ? 'received · measurement pending' : !isSifted ? 'measured · basis sifting pending' : `· ${matchingBases} matching bases`) : viewMode === 'system' ? `· ${matchingBases} sifted (${totalSiftedErrors} bit flips · ${groundTruthQberPercent.toFixed(1)}% true QBER)` : `· ${matchingBases} matching bases`}
             </span>
           </div>
 
@@ -717,11 +728,26 @@ export function KeyGenerationPage() {
               </span>
             </div>
             <div className={styles.statCol}>
-              <span className={styles.statLabel}>Measured QBER Error Rate</span>
+              <span className={styles.statLabel}>
+                {viewMode === 'system' ? 'Estimated QBER (Sample)' : 'Measured QBER Error Rate'}
+              </span>
               <span className={`${styles.statValue} ${!qkdResult.phases.qberEstimation.passed ? styles.danger : ''}`}>
-                {(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}%
+                {estQberPercent.toFixed(1)}%
               </span>
             </div>
+            {viewMode === 'system' && (
+              <div className={styles.statCol} style={{ background: 'rgba(239, 68, 68, 0.04)', borderRadius: 'var(--radius-sm)', padding: '6px 10px' }}>
+                <span className={styles.statLabel} style={{ color: 'var(--color-danger)', fontWeight: 700 }}>
+                  Ground Truth QBER (System)
+                </span>
+                <span className={`${styles.statValue} ${groundTruthQberPercent > (state.config.errorThreshold * 100) ? styles.danger : ''}`} style={{ color: groundTruthQberPercent > (state.config.errorThreshold * 100) ? 'var(--color-danger)' : 'var(--color-text-primary)' }}>
+                  {groundTruthQberPercent.toFixed(1)}%
+                  <span className={styles.statSubValue} style={{ display: 'block', fontSize: '11px', marginTop: '2px' }}>
+                    ({totalSiftedErrors}/{matchingEntries.length} all sifted bits)
+                  </span>
+                </span>
+              </div>
+            )}
             <div className={styles.statCol}>
               <span className={styles.statLabel}>Security Threshold Limit</span>
               <span className={styles.statValue}>{(state.config.errorThreshold * 100).toFixed(0)}% (Max Acceptable)</span>
@@ -731,7 +757,17 @@ export function KeyGenerationPage() {
           {/* Visual Security Gauge Bar */}
           <div style={{ marginTop: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-              <span>Measured QBER: <strong>{(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}%</strong></span>
+              <span>
+                {viewMode === 'system' ? (
+                  <>
+                    Estimated QBER: <strong>{estQberPercent.toFixed(1)}%</strong>
+                    <span style={{ margin: '0 8px', color: 'var(--color-border)' }}>|</span>
+                    <span style={{ color: 'var(--color-danger)', fontWeight: 600 }}>Ground Truth QBER: <strong>{groundTruthQberPercent.toFixed(1)}%</strong></span>
+                  </>
+                ) : (
+                  <>Measured QBER: <strong>{estQberPercent.toFixed(1)}%</strong></>
+                )}
+              </span>
               <span>Security Limit: <strong>{(state.config.errorThreshold * 100).toFixed(0)}%</strong></span>
             </div>
             <div className={styles.barContainer}>
@@ -742,6 +778,15 @@ export function KeyGenerationPage() {
                   backgroundColor: !qkdResult.phases.qberEstimation.passed ? 'var(--color-danger)' : 'var(--color-success)'
                 }}
               />
+              {viewMode === 'system' && (
+                <div
+                  className={styles.barTruthMarker}
+                  style={{
+                    left: `${Math.min(100, (groundTruthQberPercent / 50) * 100)}%`,
+                  }}
+                  title={`Ground Truth QBER: ${groundTruthQberPercent.toFixed(1)}%`}
+                />
+              )}
               <div
                 className={styles.barThresholdTick}
                 style={{ left: `${(state.config.errorThreshold / 0.5) * 100}%` }}
@@ -783,6 +828,23 @@ export function KeyGenerationPage() {
                 </>
               )}
             </div>
+
+            {viewMode === 'system' && (
+              <div className={styles.systemTruthCard}>
+                <div className={styles.systemTruthTitle}>
+                  <span>👁</span> Omniscient Ground Truth Verification
+                </div>
+                <div className={styles.systemTruthText}>
+                  Public sample parity yielded an estimated QBER of <strong>{estQberPercent.toFixed(1)}%</strong> ({qkdResult.phases.qberEstimation.errorsFound}/{qkdResult.phases.qberEstimation.testBitsUsed} sample bits).
+                  Full system measurement across <strong>all {matchingEntries.length} sifted bits</strong> confirms the actual Ground Truth QBER is <strong>{groundTruthQberPercent.toFixed(1)}%</strong> ({totalSiftedErrors} total bit flips).
+                  {eveInterceptedCount > 0 ? (
+                    <span> Eve intercepted <strong>{eveInterceptedCount}</strong> of <strong>{totalPhotons}</strong> transmitted photons, inducing detectable state disturbance.</span>
+                  ) : (
+                    <span> No eavesdropper was active on the channel.</span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

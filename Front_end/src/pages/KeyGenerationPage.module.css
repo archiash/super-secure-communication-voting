@@ -224,11 +224,12 @@
   font-size: 11px;
   font-weight: 600;
   color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border-light);
-  background: var(--color-bg);
+  border-bottom: 2px solid var(--color-border);
+  background-color: #ffffff !important;
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .logTable td {
@@ -751,7 +752,46 @@
 /* Eve Interception Process styles */
 .eveHeader {
   color: var(--color-danger) !important;
-  background-color: rgba(239, 68, 68, 0.06) !important;
+  background-color: #fee2e2 !important; /* Solid opaque light red - no transparency */
+  border-bottom: 2px solid #fca5a5 !important;
+  position: sticky;
+  top: 0;
+  z-index: 11;
+}
+
+.barTruthMarker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 3px;
+  background-color: #ef4444;
+  z-index: 3;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.7);
+  border-radius: 1px;
+}
+
+.systemTruthCard {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.systemTruthTitle {
+  font-weight: 700;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.systemTruthText {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 
 .eveCell {
