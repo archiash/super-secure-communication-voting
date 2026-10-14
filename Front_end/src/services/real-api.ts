@@ -67,11 +67,20 @@ export class RealApiService implements ApiService {
         const aliceBasis = data.aliceBasis[i] === '0' ? '+' : '×';
         const bobBasis = data.bobBasis[i] === '0' ? '+' : '×';
         const bobRead = parseInt(data.bobRead[i]) as 0 | 1;
+
+        const hasEve = Boolean(data.eveRead && data.eveBasis && data.eveRead.length > i && data.eveBasis.length > i);
+        const eveBit = hasEve ? (parseInt(data.eveRead[i]) as 0 | 1) : undefined;
+        const eveBasis = hasEve ? (data.eveBasis[i] === '0' ? '+' : '×') : undefined;
+        const evePhotonSymbol = (hasEve && eveBit !== undefined && eveBasis) ? (getPhotonSymbol(eveBit, eveBasis) as any) : undefined;
+
         log.push({
           index: i + 1,
           aliceBit,
           aliceBasis,
           photonSymbol: getPhotonSymbol(aliceBit, aliceBasis) as any,
+          eveBit,
+          eveBasis,
+          evePhotonSymbol,
           bobBasis,
           bobRead,
           keep: aliceBasis === bobBasis,

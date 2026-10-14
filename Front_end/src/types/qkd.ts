@@ -20,6 +20,9 @@ export interface TransmissionLogEntry {
   aliceBit: 0 | 1;
   aliceBasis: Basis;
   photonSymbol: PhotonSymbol;
+  eveBasis?: Basis;
+  eveBit?: 0 | 1;
+  evePhotonSymbol?: PhotonSymbol;
   bobBasis: Basis;
   bobRead: 0 | 1;
   /** true when Alice's basis matches Bob's basis */
