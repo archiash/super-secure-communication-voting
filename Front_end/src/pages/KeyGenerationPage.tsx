@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
 import styles from './KeyGenerationPage.module.css';
 import { calculatePhotonCount } from '../types';
 import type { QKDPhase, TransmissionLogEntry, Basis } from '../types';
+
+type ViewMode = 'voter' | 'system';
 
 const ALL_QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
   { id: 'transmission', title: 'Transmission', subtitle: '40 photons' },
@@ -97,6 +99,8 @@ export function KeyGenerationPage() {
     : ALL_QKD_PHASES.filter(p => p.id !== 'errorCorrection');
   const currentPhaseIndex = QKD_PHASES.findIndex(p => p.id === currentPhase);
 
+  const [viewMode, setViewMode] = useState<ViewMode>('voter');
+
   // Derived metrics for detailed visualization
   const totalPhotons = qkdResult?.phases.transmission.qubitCount || calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance);
   const matchingBases = qkdResult?.phases.basisSifting.matchingBases || 0;
@@ -105,18 +109,34 @@ export function KeyGenerationPage() {
   const discardedPct = totalPhotons > 0 ? ((discardedCount / totalPhotons) * 100).toFixed(1) : '0.0';
   const siftedBitstring = qkdResult?.phases.basisSifting.siftedKeyBits.join('') || '';
 
-  const keptEntries = qkdResult?.phases.transmission.log.filter(e => e.keep) || [];
+  const matchingEntries = (qkdResult?.phases.transmission.log || [])
+    .map((entry, idx) => ({ ...entry, photonNumber: idx + 1 }))
+    .filter(e => e.keep);
+  const matchingIndices = matchingEntries.map(e => e.photonNumber);
+
   const testSampleCount = qkdResult?.phases.qberEstimation.testBitsUsed || state.config.testBitCount || 4;
-  const testSamples = keptEntries.slice(0, testSampleCount);
+  const testSamples = matchingEntries.slice(0, testSampleCount);
+
+  // Separate stages: 1) Measure qubits, 2) Sift bases, 3) Calculate QBER
+  const [isSiftedLocal, setIsSiftedLocal] = useState(false);
+  const isMeasured = !isBlurred || currentPhaseIndex >= 2;
+  const isSifted = (isSiftedLocal && !isBlurred) || currentPhaseIndex >= 2;
+
+  const handleMeasure = () => {
+    setIsBlurred(false);
+    setIsSiftedLocal(false);
+  };
+
+  const handleSift = () => {
+    setIsSiftedLocal(true);
+  };
+
+  const handleCalculateQber = () => {
+    setCurrentPhase('qberEstimation');
+  };
 
   const handleNextPhase = () => {
-    if (currentPhase === 'basisSifting') {
-      if (isBlurred) {
-        setIsBlurred(false);
-      } else {
-        setCurrentPhase('qberEstimation');
-      }
-    } else if (currentPhase === 'qberEstimation' && !isAborted) {
+    if (currentPhase === 'qberEstimation' && !isAborted) {
       // Skip error correction phase if disabled
       setCurrentPhase(errorCorrectionEnabled ? 'errorCorrection' : 'keyEstablished');
     } else if (currentPhase === 'errorCorrection') {
@@ -127,6 +147,7 @@ export function KeyGenerationPage() {
   };
 
   const handleRetry = () => {
+    setIsSiftedLocal(false);
     startKeyGeneration();
   };
 
@@ -162,9 +183,9 @@ export function KeyGenerationPage() {
           let iconClass = styles.pending;
           if (isActive) iconClass = styles.active;
           if (isCompleted && !isFailedStep) iconClass = styles.completed;
-          if (isFailedStep || isQberActiveFailed) iconClass = styles.failed; // Keep blue dot for active QBER even if failed? Figma shows QBER is blue active dot, Error Correction and Key Estab are red X.
+          if (isFailedStep || isQberActiveFailed) iconClass = styles.failed;
 
-          if (isQberActiveFailed) iconClass = styles.active; // Figma shows QBER is active blue
+          if (isQberActiveFailed) iconClass = styles.active;
 
           return (
             <div key={phase.id} className={styles.trackerStep}>
@@ -199,58 +220,137 @@ export function KeyGenerationPage() {
         </div>
       )}
 
+      {/* Perspective / View Mode Switcher Toolbar */}
       {!isTransmitting && qkdResult && (currentPhaseIndex >= 1) && (
-        <div className={styles.tableCard}>
-          <div className={styles.tableHeader}>
-            <div>
-              <span className={styles.tableTitle}>QUBIT TRANSMISSION LOG</span>
-              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                Channel: Election Server (Sender) ──[ Quantum Channel ]──▸ Voter Terminal (Receiver)
-              </div>
+        <div className={styles.viewModeBar}>
+          <div className={styles.viewModeInfo}>
+            <div className={styles.viewModeTag}>Visualization Perspective</div>
+            <div className={styles.viewModeDesc}>
+              {viewMode === 'voter'
+                ? 'Displaying real Voter Terminal (Bob) perspective — horizontal measurement grid & phased verification cards.'
+                : 'Displaying omniscient System Diagnostic view — showing Server quantum states, preparation bases, and full channel ground truth.'}
             </div>
-            <span className={styles.tableStats}>
-              {qkdResult.phases.transmission.qubitCount || calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance)} photons · {qkdResult.phases.basisSifting.matchingBases} matching bases
-            </span>
           </div>
-          <div className={styles.logTableWrapper}>
-            <table className={styles.logTable}>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Server Bit</th>
-                  <th>Server Basis</th>
-                  <th>Photon State</th>
-                  <th className={isBlurred ? styles.blurredArea : ''}>Voter Basis</th>
-                  <th className={isBlurred ? styles.blurredArea : ''}>Voter Read</th>
-                  <th className={isBlurred ? styles.blurredArea : ''}>Basis Match</th>
-                </tr>
-              </thead>
-              <tbody>
-                {qkdResult.phases.transmission.log.map((entry, idx) => (
-                  <tr key={idx}>
-                    <td>{idx + 1}</td>
-                    <td>{entry.aliceBit}</td>
-                    <td>{entry.aliceBasis}</td>
-                    <td className={styles.photonArrow}>{getPhotonSymbol(entry.aliceBit, entry.aliceBasis)}</td>
-                    <td className={isBlurred ? styles.blurredArea : ''}>{entry.bobBasis}</td>
-                    <td className={isBlurred ? styles.blurredArea : ''}>{entry.bobRead}</td>
-                    <td className={isBlurred ? styles.blurredArea : ''}>{getKeepStatus(entry)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className={styles.viewToggleWrap}>
+            <button
+              type="button"
+              className={`${styles.viewToggleBtn} ${viewMode === 'voter' ? styles.viewToggleActive : ''}`}
+              onClick={() => setViewMode('voter')}
+            >
+              <span className={styles.viewToggleLabel}>Voter View (Default)</span>
+              <span className={styles.viewToggleSub}>Real client terminal</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.viewToggleBtn} ${viewMode === 'system' ? styles.viewToggleActive : ''}`}
+              onClick={() => setViewMode('system')}
+            >
+              <span className={styles.viewToggleLabel}>System View</span>
+              <span className={styles.viewToggleSub}>Omniscient physical trace</span>
+            </button>
           </div>
         </div>
       )}
 
-      {/* ── Basis Sifting Summary & Result Panel ── */}
-      {!isTransmitting && qkdResult && !isBlurred && (
+      {/* ── CARD 1: Qubit Transmission / Measurement Log ── */}
+      {!isTransmitting && qkdResult && (currentPhaseIndex >= 1) && (
+        <div className={styles.tableCard}>
+          <div className={styles.tableHeader}>
+            <div>
+              <span className={styles.tableTitle}>
+                {viewMode === 'voter'
+                  ? 'VOTER TERMINAL QUBIT MEASUREMENT LOG'
+                  : 'SYSTEM QUANTUM TRANSMISSION LOG'}
+              </span>
+              <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                {viewMode === 'voter'
+                  ? 'Photons received by Voter Terminal detector · Basis choice & measurement outcome'
+                  : 'Channel: Election Server (Sender) ──[ Quantum Channel ]──▸ Voter Terminal (Receiver)'}
+              </div>
+            </div>
+            <span className={styles.tableStats}>
+              {totalPhotons} photons {viewMode === 'voter' ? (!isMeasured ? 'received · measurement pending' : !isSifted ? 'measured · basis sifting pending' : `· ${matchingBases} matching bases`) : `· ${matchingBases} matching bases`}
+            </span>
+          </div>
+
+          {viewMode === 'voter' ? (
+            /* Horizontal Matrix for Voter View */
+            <div className={styles.hGridContainer}>
+              <table className={styles.hGridTable}>
+                <tbody>
+                  <tr>
+                    <th className={styles.hGridStickyLabel}>Photon #</th>
+                    {qkdResult.phases.transmission.log.map((_, idx) => (
+                      <th key={idx} className={styles.hGridHeaderCell}>#{idx + 1}</th>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th className={styles.hGridStickyLabel}>Basis</th>
+                    {qkdResult.phases.transmission.log.map((entry, idx) => (
+                      <td key={idx} className={`${styles.hGridCell} ${styles.hGridCellBasis} ${!isMeasured ? styles.blurredArea : ''}`}>
+                        {entry.bobBasis}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th className={styles.hGridStickyLabel}>Measure</th>
+                    {qkdResult.phases.transmission.log.map((entry, idx) => (
+                      <td key={idx} className={`${styles.hGridCell} ${styles.hGridCellBit} ${!isMeasured ? styles.blurredArea : ''}`}>
+                        {entry.bobRead}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* Omniscient Trace Table for System View */
+            <div className={styles.logTableWrapper}>
+              <table className={styles.logTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Server Bit</th>
+                    <th>Server Basis</th>
+                    <th>Photon State</th>
+                    <th className={!isMeasured ? styles.blurredArea : ''}>Voter Basis</th>
+                    <th className={!isMeasured ? styles.blurredArea : ''}>Voter Read</th>
+                    <th className={!isSifted ? styles.blurredArea : ''}>Basis Match</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {qkdResult.phases.transmission.log.map((entry, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{entry.aliceBit}</td>
+                      <td>{entry.aliceBasis}</td>
+                      <td className={styles.photonArrow}>{getPhotonSymbol(entry.aliceBit, entry.aliceBasis)}</td>
+                      <td className={!isMeasured ? styles.blurredArea : ''}>{entry.bobBasis}</td>
+                      <td className={!isMeasured ? styles.blurredArea : ''}>{entry.bobRead}</td>
+                      <td className={!isSifted ? styles.blurredArea : ''}>{getKeepStatus(entry)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── CARD 2: Basis Sifting Summary & Result Panel ── */}
+      {!isTransmitting && qkdResult && isSifted && (
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <div>
-              <span className={styles.panelTitle}>BASIS SIFTING (RECONCILIATION) RESULT</span>
+              <span className={styles.panelTitle}>
+                {viewMode === 'voter'
+                  ? 'BASIS SIFTING (RECONCILIATION) RESULT'
+                  : 'BASIS SIFTING (RECONCILIATION) RESULT'}
+              </span>
               <div className={styles.subHeaderDesc}>
-                Server and Voter reconciled measurement bases over public authenticated channel.
+                {viewMode === 'voter'
+                  ? 'Voter sent measurement bases to Server. Server publicly announced matching basis indices.'
+                  : 'Server and Voter reconciled measurement bases over public authenticated channel.'}
               </div>
             </div>
             <span className={`${styles.statusBadge} ${styles.statusSuccess}`}>
@@ -258,9 +358,77 @@ export function KeyGenerationPage() {
             </span>
           </div>
 
-          <div className={styles.statsRow}>
+          {viewMode === 'voter' ? (
+            /* Voter View: Match Index Header + Horizontal Kept Grid */
+            <>
+              <div className={styles.hIndexMeta}>
+                <span className={styles.hIndexLabel}>Match Index:</span>
+                <span className={styles.hIndexValues}>
+                  {matchingIndices.length > 0 ? matchingIndices.join(', ') : 'None'}
+                </span>
+                <span className={styles.hIndexSub}>
+                  ({matchingBases} matching bits · {siftingEfficiency}% yield)
+                </span>
+              </div>
+
+              <div className={styles.hGridContainer}>
+                <table className={styles.hGridTable}>
+                  <tbody>
+                    <tr>
+                      <th className={styles.hGridStickyLabel}>Kept</th>
+                      {matchingEntries.map((entry) => (
+                        <th key={entry.photonNumber} className={styles.hGridHeaderCell}>#{entry.photonNumber}</th>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th className={styles.hGridStickyLabel}>Result</th>
+                      {matchingEntries.map((entry) => (
+                        <td key={entry.photonNumber} className={`${styles.hGridCell} ${styles.hGridCellBit}`} style={{ color: 'var(--color-primary)' }}>
+                          {entry.bobRead}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            /* System View: Broadcast Announcement Box & Raw Stream */
+            <>
+              <div className={styles.detailBox}>
+                <div className={styles.detailBoxHeader}>
+                  <span className={styles.detailBoxTitle}>
+                    SERVER PUBLIC BROADCAST: MATCHING BASIS INDICES ({matchingIndices.length} POSITIONS)
+                  </span>
+                  <span className={styles.detailBoxSub}>
+                    Broadcast publicly over classical channel · Client retains only these indices
+                  </span>
+                </div>
+                <div className={styles.indicesBox}>
+                  {matchingIndices.length > 0 ? matchingIndices.map(i => `#${i}`).join(', ') : 'None'}
+                </div>
+              </div>
+
+              <div className={styles.detailBox}>
+                <div className={styles.detailBoxHeader}>
+                  <span className={styles.detailBoxTitle}>
+                    RAW SIFTED KEY STREAM ({matchingBases} BITS)
+                  </span>
+                  <span className={styles.detailBoxSub}>
+                    Formed exclusively from photons with identical basis
+                  </span>
+                </div>
+                <div className={styles.bitstreamText}>
+                  {siftedBitstring || '—'}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Sifting Metrics Row */}
+          <div className={styles.statsRow} style={{ marginTop: '16px' }}>
             <div className={styles.statCol}>
-              <span className={styles.statLabel}>Total Photons Sent</span>
+              <span className={styles.statLabel}>Photons Received</span>
               <span className={styles.statValue}>{totalPhotons}</span>
             </div>
             <div className={styles.statCol}>
@@ -271,7 +439,7 @@ export function KeyGenerationPage() {
               </span>
             </div>
             <div className={styles.statCol}>
-              <span className={styles.statLabel}>Incompatible Bases (Discarded)</span>
+              <span className={styles.statLabel}>Discarded Positions</span>
               <span className={styles.statValue}>
                 {discardedCount} photons
                 <span className={styles.statSubValue}> ({discardedPct}%)</span>
@@ -307,32 +475,21 @@ export function KeyGenerationPage() {
               />
             </div>
           </div>
-
-          {/* Sifted Key Bitstream Preview */}
-          <div className={styles.detailBox}>
-            <div className={styles.detailBoxHeader}>
-              <span className={styles.detailBoxTitle}>
-                RAW SIFTED KEY STREAM ({matchingBases} BITS)
-              </span>
-              <span className={styles.detailBoxSub}>
-                Formed exclusively from photons with identical basis
-              </span>
-            </div>
-            <div className={styles.bitstreamText}>
-              {siftedBitstring || '—'}
-            </div>
-          </div>
         </div>
       )}
 
-      {/* ── QBER Estimation & Channel Verification Panel ── */}
+      {/* ── CARD 3: QBER Estimation & Channel Verification Panel ── */}
       {!isTransmitting && qkdResult && currentPhaseIndex >= 2 && (
         <div className={`${styles.panel} ${!qkdResult.phases.qberEstimation.passed ? styles.danger : ''}`}>
           <div className={styles.panelHeader}>
             <div>
-              <span className={styles.panelTitle}>QBER ESTIMATION &amp; CHANNEL VERIFICATION</span>
+              <span className={styles.panelTitle}>
+                QBER ESTIMATION &amp; CHANNEL VERIFICATION
+              </span>
               <div className={styles.subHeaderDesc}>
-                Public parity comparison on sacrificed sample bits to detect quantum measurement disturbance.
+                {viewMode === 'voter'
+                  ? 'Server announced test bit indices and disclosed bit values. Parity check verifies channel integrity.'
+                  : 'Public parity comparison on sacrificed sample bits to detect quantum measurement disturbance.'}
               </div>
             </div>
             <span className={`${styles.statusBadge} ${qkdResult.phases.qberEstimation.passed ? styles.statusSuccess : styles.statusDanger}`}>
@@ -340,7 +497,114 @@ export function KeyGenerationPage() {
             </span>
           </div>
 
-          <div className={styles.statsRow}>
+          {viewMode === 'voter' ? (
+            /* Voter View: Test Bits Index Header + Horizontal Test Comparison Grid */
+            <>
+              <div className={styles.hIndexMeta}>
+                <span className={styles.hIndexLabel}>Test Bits Index:</span>
+                <span className={styles.hIndexValues}>
+                  {testSamples.length > 0 ? testSamples.map(s => s.photonNumber).join(', ') : 'None'}
+                </span>
+                <span className={styles.hIndexSub}>
+                  ({testSamples.length} sample bits sacrificed)
+                </span>
+              </div>
+
+              {testSamples.length > 0 && (
+                <div className={styles.hGridContainer}>
+                  <table className={styles.hGridTable}>
+                    <tbody>
+                      <tr>
+                        <th className={styles.hGridStickyLabel}>Test Photon #</th>
+                        {testSamples.map((sample) => (
+                          <th key={sample.photonNumber} className={styles.hGridHeaderCell}>#{sample.photonNumber}</th>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th className={styles.hGridStickyLabel}>Server Disclosed</th>
+                        {testSamples.map((sample) => (
+                          <td key={sample.photonNumber} className={`${styles.hGridCell} ${styles.hGridCellBit}`} style={{ color: 'var(--color-primary)' }}>
+                            {sample.aliceBit}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th className={styles.hGridStickyLabel}>Voter Measured</th>
+                        {testSamples.map((sample) => (
+                          <td key={sample.photonNumber} className={`${styles.hGridCell} ${styles.hGridCellBit}`}>
+                            {sample.bobRead}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th className={styles.hGridStickyLabel}>Result</th>
+                        {testSamples.map((sample) => {
+                          const isMatch = sample.aliceBit === sample.bobRead;
+                          return (
+                            <td key={sample.photonNumber} className={`${styles.hGridCell} ${isMatch ? styles.hGridResultO : styles.hGridResultX}`}>
+                              {isMatch ? 'O' : 'X'}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          ) : (
+            /* System View: Full Diagnostic Trace Table */
+            testSamples.length > 0 && (
+              <div className={styles.detailBox}>
+                <div className={styles.detailBoxHeader}>
+                  <span className={styles.detailBoxTitle}>
+                    SACRIFICED SAMPLE VERIFICATION TRACE ({testSamples.length} BITS COMPARED)
+                  </span>
+                  <span className={styles.detailBoxSub}>
+                    Disclosed publicly · Permanently discarded from final key
+                  </span>
+                </div>
+                <div className={styles.sampleTableWrap}>
+                  <table className={styles.sampleTable}>
+                    <thead>
+                      <tr>
+                        <th>Sample #</th>
+                        <th>Photon #</th>
+                        <th>Basis</th>
+                        <th>Server Sent</th>
+                        <th>Voter Measured</th>
+                        <th>State Match</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {testSamples.map((sample, sIdx) => {
+                        const isMatch = sample.aliceBit === sample.bobRead;
+                        return (
+                          <tr key={sIdx}>
+                            <td>#{sIdx + 1}</td>
+                            <td>Photon #{sample.photonNumber}</td>
+                            <td>{sample.aliceBasis}</td>
+                            <td style={{ fontWeight: 700 }}>{sample.aliceBit}</td>
+                            <td style={{ fontWeight: 700 }}>{sample.bobRead}</td>
+                            <td>
+                              {isMatch ? (
+                                <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>✓ Verified Match</span>
+                              ) : (
+                                <span style={{ color: 'var(--color-danger)', fontWeight: 700 }}>✕ Error (Bit Flip)</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          )}
+
+          {/* QBER Metrics Row */}
+          <div className={styles.statsRow} style={{ marginTop: '16px' }}>
             <div className={styles.statCol}>
               <span className={styles.statLabel}>Sample Bits Tested</span>
               <span className={styles.statValue}>
@@ -365,55 +629,6 @@ export function KeyGenerationPage() {
               <span className={styles.statValue}>{(state.config.errorThreshold * 100).toFixed(0)}% (Max Acceptable)</span>
             </div>
           </div>
-
-          {/* Sacrificed Sample Verification Trace Table */}
-          {testSamples.length > 0 && (
-            <div className={styles.detailBox}>
-              <div className={styles.detailBoxHeader}>
-                <span className={styles.detailBoxTitle}>
-                  SACRIFICED SAMPLE VERIFICATION TRACE ({testSamples.length} BITS COMPARED)
-                </span>
-                <span className={styles.detailBoxSub}>
-                  Disclosed publicly · Permanently discarded from final key
-                </span>
-              </div>
-              <div className={styles.sampleTableWrap}>
-                <table className={styles.sampleTable}>
-                  <thead>
-                    <tr>
-                      <th>Sample #</th>
-                      <th>Photon #</th>
-                      <th>Basis</th>
-                      <th>Server Sent</th>
-                      <th>Voter Measured</th>
-                      <th>State Match</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {testSamples.map((sample, sIdx) => {
-                      const isMatch = sample.aliceBit === sample.bobRead;
-                      return (
-                        <tr key={sIdx}>
-                          <td>#{sIdx + 1}</td>
-                          <td>Photon {sample.index || (sIdx + 1)}</td>
-                          <td>{sample.aliceBasis}</td>
-                          <td style={{ fontWeight: 700 }}>{sample.aliceBit}</td>
-                          <td style={{ fontWeight: 700 }}>{sample.bobRead}</td>
-                          <td>
-                            {isMatch ? (
-                              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>✓ Verified Match</span>
-                            ) : (
-                              <span style={{ color: 'var(--color-danger)', fontWeight: 700 }}>✕ Error (Bit Flip)</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
           {/* Visual Security Gauge Bar */}
           <div style={{ marginTop: '24px' }}>
@@ -461,7 +676,7 @@ export function KeyGenerationPage() {
               {qkdResult.phases.qberEstimation.passed ? (
                 <>
                   Error rate formula: <code>QBER = {qkdResult.phases.qberEstimation.errorsFound} / {qkdResult.phases.qberEstimation.testBitsUsed} = {(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}%</code>.
-                  Since <strong>{(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}% ≤ {(state.config.errorThreshold * 100).toFixed(0)}%</strong>, the channel is free from eavesdropping disturbance. The remaining <strong>{qkdResult.phases.basisSifting.siftedKeyBits.length - qkdResult.phases.qberEstimation.testBitsUsed} sifted bits</strong> are safe to establish the shared encryption key.
+                  Since <strong>{(qkdResult.phases.qberEstimation.qber * 100).toFixed(1)}% ≤ {(state.config.errorThreshold * 100).toFixed(0)}%</strong>, parity on publicly revealed sample bits confirms no eavesdropping disturbance. The remaining <strong>{qkdResult.phases.basisSifting.siftedKeyBits.length - qkdResult.phases.qberEstimation.testBitsUsed} sifted bits</strong> were never disclosed and remain unconditionally secret to establish the key.
                 </>
               ) : (
                 <>
@@ -473,6 +688,8 @@ export function KeyGenerationPage() {
           </div>
         </div>
       )}
+
+
 
       {/* Abort State */}
       {!isTransmitting && qkdResult && currentPhaseIndex >= 2 && isAborted && (
@@ -562,13 +779,18 @@ export function KeyGenerationPage() {
       {/* Action Buttons for proceeding manually */}
       {!isTransmitting && qkdResult && (
         <div className={styles.actionArea}>
-          {currentPhase === 'basisSifting' && isBlurred && (
-            <button className={styles.primaryButton} onClick={handleNextPhase}>
-              Measure Qubits &amp; Sift Bases ›
+          {currentPhase === 'basisSifting' && !isMeasured && (
+            <button className={styles.primaryButton} onClick={handleMeasure}>
+              Measure Qubits ›
             </button>
           )}
-          {currentPhase === 'basisSifting' && !isBlurred && (
-            <button className={styles.primaryButton} onClick={handleNextPhase}>
+          {currentPhase === 'basisSifting' && isMeasured && !isSifted && (
+            <button className={styles.primaryButton} onClick={handleSift}>
+              Sift Bases (Reconciliation) ›
+            </button>
+          )}
+          {currentPhase === 'basisSifting' && isSifted && (
+            <button className={styles.primaryButton} onClick={handleCalculateQber}>
               Calculate QBER ›
             </button>
           )}
