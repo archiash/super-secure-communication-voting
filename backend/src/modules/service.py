@@ -72,8 +72,10 @@ async def create_qkd_key(payload : GenerateKeyInput):
             eve_read=simulation_result.get("eavesdropping_key", ""),
             eve_basis=simulation_result.get("eavesdropping_basis", ""),
             test_sample=0,
+            selected_bits=[],
             error_found=0,
             qber_percent=qber,
+            qber_system=qber,
             threshold_percent=11
         )
 
@@ -131,6 +133,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         bob_basis = simulation_result["client_decryption_basis"],
         eve_read = simulation_result.get("eavesdropping_key", ""),
         eve_basis = simulation_result.get("eavesdropping_basis", ""),
+        selected_bits = test_indices,
         test_sample = test_sample_size,
         error_found = test_errors,
         qber_percent = qber_practical,

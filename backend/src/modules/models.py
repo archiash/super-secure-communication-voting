@@ -24,6 +24,7 @@ class GenerateKeyRespond(CamelModel):
     bob_basis: str
     eve_read: Optional[str] = ""
     eve_basis: Optional[str] = ""
+    selected_bits: Optional[list[int]] = []
     test_sample: int
     error_found: int = 0
     qber_percent: float
