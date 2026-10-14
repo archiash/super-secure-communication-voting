@@ -13,6 +13,10 @@ export function CastVotePage() {
   const [candidates, setCandidates] = useState<VoteOption[]>([]);
 
   useEffect(() => {
+    if (state.auth.isReplay) {
+      navigate('/logs');
+      return;
+    }
     if (state.auth.electionCode) {
       api.getCandidates(state.auth.electionCode).then(res => {
         setCandidates(res.candidates.map((c, i) => ({
@@ -25,7 +29,7 @@ export function CastVotePage() {
         })));
       }).catch(err => console.error("Failed to load candidates", err));
     }
-  }, [api, state.auth.electionCode]);
+  }, [api, state.auth.electionCode, state.auth.isReplay, navigate]);
 
   const selectedId = state.vote.selectedOptionId;
   const selectedCandidate = candidates.find((c) => c.id === selectedId);

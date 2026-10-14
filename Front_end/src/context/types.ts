@@ -17,6 +17,7 @@ export interface AppState {
     electionCode: string;
     sessionId: string;
     isAuthenticated: boolean;
+    isReplay?: boolean;
   };
 
   /** QKD key generation results */
@@ -54,7 +55,7 @@ export type AppAction =
   | { type: 'SET_CONFIG'; payload: ProtocolConfig }
   | {
       type: 'AUTHENTICATE';
-      payload: { voterId: string; electionCode: string; sessionId: string };
+      payload: { voterId: string; electionCode: string; sessionId: string; isReplay?: boolean };
     }
   | { type: 'SET_WIZARD_STEP'; payload: WizardStep }
   | { type: 'QKD_START' }

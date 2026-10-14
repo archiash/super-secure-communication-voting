@@ -674,13 +674,14 @@ export function VotingLogsPage() {
   const handleReplayProcess = (log: VotingLogEntry) => {
     const qkdResponse = buildQkdResponseFromLog(log);
 
-    // 1. Authenticate with log session credentials
+    // 1. Authenticate with log session credentials (flagged as replay)
     dispatch({
       type: 'AUTHENTICATE',
       payload: {
         voterId: log.voterId,
         electionCode: electionCode,
         sessionId: log.sessionId,
+        isReplay: true,
       },
     });
 
@@ -717,8 +718,8 @@ export function VotingLogsPage() {
       payload: 'keyGeneration',
     });
 
-    // 6. Navigate to /key-generation
-    navigate('/key-generation');
+    // 6. Navigate to /key-generation in replay mode
+    navigate('/key-generation', { state: { isReplay: true } });
   };
 
   const fetchLogs = async () => {

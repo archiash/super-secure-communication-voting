@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
 import styles from './KeyGenerationPage.module.css';
@@ -19,6 +19,10 @@ const ALL_QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
 export function KeyGenerationPage() {
   const { state, dispatch, api } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const locationState = location.state as { isReplay?: boolean } | null;
+  const isReplay = Boolean(locationState?.isReplay ?? state.auth.isReplay);
 
   // Phase state lives in global store so it survives navigation to/from Configure
   const currentPhase = state.qkd.currentPhase;
@@ -145,7 +149,11 @@ export function KeyGenerationPage() {
     } else if (currentPhase === 'errorCorrection') {
       setCurrentPhase('keyEstablished');
     } else if (currentPhase === 'keyEstablished') {
-      navigate('/cast-vote');
+      if (isReplay) {
+        navigate('/logs');
+      } else {
+        navigate('/cast-vote');
+      }
     }
   };
 
@@ -158,13 +166,30 @@ export function KeyGenerationPage() {
     <div className={styles.page}>
       <Stepper currentStep="keyGeneration" />
 
+      {isReplay && (
+        <div className={styles.replayBanner}>
+          <div className={styles.replayBannerLeft}>
+            <span className={styles.replayBannerIcon}>⟳</span>
+            <div>
+              <div className={styles.replayBannerTitle}>Replay Mode — Historical QKD Session Trace</div>
+              <div className={styles.replayBannerSub}>
+                Re-visualizing session <code>{state.auth.sessionId}</code>. This audit demonstration concludes at Key Established without proceeding to ballot casting.
+              </div>
+            </div>
+          </div>
+          <button className={styles.replayBackBtn} onClick={() => navigate('/logs')}>
+            ← Back to Logs
+          </button>
+        </div>
+      )}
+
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>BB84 Quantum Key Distribution</h1>
           <p className={styles.subtitle}>Election Server preparing quantum states &amp; establishing key with Voter Terminal</p>
         </div>
         <div className={styles.sessionInfo}>
-          <div className={styles.sessionLabel}>SESSION</div>
+          <div className={styles.sessionLabel}>{isReplay ? 'REPLAY SESSION' : 'SESSION'}</div>
           <div className={styles.sessionId}>{state.auth.sessionId || 'QS-PENDING'}</div>
         </div>
       </div>
@@ -784,9 +809,15 @@ export function KeyGenerationPage() {
                 </div>
               </>
             )}
-            <button className={styles.retryButton} onClick={handleRetry}>
-              ↻ Retry Session
-            </button>
+            {isReplay ? (
+              <button className={styles.retryButton} onClick={() => navigate('/logs')}>
+                ← Return to Audit Logs
+              </button>
+            ) : (
+              <button className={styles.retryButton} onClick={handleRetry}>
+                ↻ Retry Session
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -882,10 +913,20 @@ export function KeyGenerationPage() {
               Establish Key ›
             </button>
           )}
-          {currentPhase === 'keyEstablished' && !isAborted && (
+          {currentPhase === 'keyEstablished' && !isAborted && !isReplay && (
             <button className={styles.primaryButton} onClick={handleNextPhase}>
               Proceed to Ballot ›
             </button>
+          )}
+          {currentPhase === 'keyEstablished' && !isAborted && isReplay && (
+            <div className={styles.replayEndActions}>
+              <div className={styles.replayEndNotice}>
+                ✓ Replay Complete: Quantum key successfully established &amp; verified. Replay ends here without ballot casting.
+              </div>
+              <button className={styles.primaryButton} onClick={() => navigate('/logs')}>
+                ← Return to Audit Logs
+              </button>
+            </div>
           )}
         </div>
       )}
