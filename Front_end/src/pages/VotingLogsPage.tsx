@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import type { VotingLogEntry } from '../types';
+import type { VotingLogEntry, QKDResponse, TransmissionLogEntry, Basis, PhotonSymbol } from '../types';
 import styles from './VotingLogsPage.module.css';
 
 type ViewMode = 'voter' | 'practical' | 'system';
@@ -24,6 +24,99 @@ function stripBinPrefix(s: string): string {
 function getPhotonSymbol(bit: 0 | 1, basis: '+' | '×'): string {
   if (basis === '+') return bit === 1 ? '↑' : '→';
   return bit === 1 ? '↖' : '↗';
+}
+
+function buildQkdResponseFromLog(log: VotingLogEntry): QKDResponse {
+  const rawAliceBit   = stripBinPrefix(log.aliceBit);
+  const rawAliceBasis = stripBinPrefix(log.aliceBasis);
+  const rawBobBasis   = stripBinPrefix(log.bobBasis);
+  const rawBobRead    = stripBinPrefix(log.bobRead);
+  const rawEveBasis   = log.eveBasis ? stripBinPrefix(log.eveBasis) : '';
+  const rawEveRead    = log.eveRead  ? stripBinPrefix(log.eveRead)  : '';
+
+  const len = rawAliceBit.length || rawBobBasis.length || 0;
+  const hasEve = Boolean(rawEveBasis && rawEveRead && rawEveBasis.length > 0);
+
+  const transmissionLog: TransmissionLogEntry[] = Array.from({ length: len }, (_, i) => {
+    const aBit   = parseBit(rawAliceBit[i]   || '0');
+    const aBasis = parseBasis(rawAliceBasis[i] || '0');
+    const bBasis = parseBasis(rawBobBasis[i]   || '0');
+    const bRead  = parseBit(rawBobRead[i]     || '0');
+
+    let eveBasis: Basis | undefined = undefined;
+    let eveBit: (0 | 1) | undefined = undefined;
+    let evePhotonSymbol: PhotonSymbol | undefined = undefined;
+
+    if (hasEve && rawEveBasis[i] !== undefined && rawEveRead[i] !== undefined) {
+      eveBasis = parseBasis(rawEveBasis[i]);
+      eveBit = parseBit(rawEveRead[i]);
+      evePhotonSymbol = getPhotonSymbol(eveBit, eveBasis) as any;
+    }
+
+    return {
+      index: i + 1,
+      aliceBit: aBit,
+      aliceBasis: aBasis,
+      photonSymbol: getPhotonSymbol(aBit, aBasis) as any,
+      eveBasis,
+      eveBit,
+      evePhotonSymbol,
+      bobBasis: bBasis,
+      bobRead: bRead,
+      keep: aBasis === bBasis,
+    };
+  });
+
+  const matchingEntries = transmissionLog.filter((e) => e.keep);
+  const siftedKeyBits = matchingEntries.map((e) => e.bobRead);
+
+  const selectedBits = log.selectedBits || [];
+  let errorsFound = 0;
+  for (const sIdx of selectedBits) {
+    const entry = matchingEntries[sIdx];
+    if (entry && entry.aliceBit !== entry.bobRead) {
+      errorsFound++;
+    }
+  }
+
+  const finalKey = stripBinPrefix(log.keyGenerated) || '';
+  const qberDecimal = (log.qberPractical || 0) / 100;
+  const passed = (log.qberPractical <= log.thresholdPercent) && Boolean(finalKey);
+
+  return {
+    sessionId: log.sessionId,
+    phases: {
+      transmission: {
+        qubitCount: len,
+        log: transmissionLog,
+      },
+      basisSifting: {
+        matchingBases: matchingEntries.length,
+        siftedKeyBits,
+      },
+      qberEstimation: {
+        testBitsUsed: selectedBits.length || 4,
+        errorsFound,
+        qber: qberDecimal,
+        passed,
+      },
+      errorCorrection: {
+        applied: false,
+        correctedBits: 0,
+        method: 'none',
+      },
+      keyEstablished: {
+        finalKey,
+        keyLength: finalKey.length,
+      },
+    },
+    eveData: hasEve ? {
+      eveBasis: rawEveBasis,
+      eveReadBits: rawEveRead,
+      interceptedCount: rawEveRead.length,
+      detectable: log.qberPractical > log.thresholdPercent,
+    } : undefined,
+  };
 }
 
 // ── ViewToggle component ───────────────────────────────────────────────────
@@ -564,7 +657,7 @@ function TransmissionTable({
 // ── Main page ──────────────────────────────────────────────────────────────
 
 export function VotingLogsPage() {
-  const { state, api } = useApp();
+  const { state, dispatch, api } = useApp();
   const navigate = useNavigate();
   const [logs, setLogs] = useState<VotingLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -577,6 +670,56 @@ export function VotingLogsPage() {
   const [modalView, setModalView] = useState<ViewMode>('voter');
 
   const electionCode = state.auth.electionCode || 'ELECT2026';
+
+  const handleReplayProcess = (log: VotingLogEntry) => {
+    const qkdResponse = buildQkdResponseFromLog(log);
+
+    // 1. Authenticate with log session credentials
+    dispatch({
+      type: 'AUTHENTICATE',
+      payload: {
+        voterId: log.voterId,
+        electionCode: electionCode,
+        sessionId: log.sessionId,
+      },
+    });
+
+    // 2. Set config threshold and testBitCount to match log
+    dispatch({
+      type: 'SET_CONFIG',
+      payload: {
+        ...state.config,
+        errorThreshold: (log.thresholdPercent || 20) / 100,
+        testBitCount: (log.selectedBits && log.selectedBits.length) || state.config.testBitCount,
+        eveSimulation: Boolean(log.eveBasis && log.eveRead),
+      },
+    });
+
+    // 3. Populate QKD Result
+    dispatch({
+      type: 'QKD_SUCCESS',
+      payload: qkdResponse,
+    });
+
+    // 4. Set QKD phase to basisSifting (with isBlurred: true) so voter can measure and sift
+    dispatch({
+      type: 'SET_QKD_PHASE',
+      payload: {
+        currentPhase: 'basisSifting',
+        isTransmitting: false,
+        isBlurred: true,
+      },
+    });
+
+    // 5. Set wizard step to keyGeneration
+    dispatch({
+      type: 'SET_WIZARD_STEP',
+      payload: 'keyGeneration',
+    });
+
+    // 6. Navigate to /key-generation
+    navigate('/key-generation');
+  };
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -775,9 +918,19 @@ export function VotingLogsPage() {
                     </td>
                     <td>{formatTimestamp(log.createdAt)}</td>
                     <td>
-                      <button className={styles.inspectButton} onClick={() => setSelectedLog(log)}>
-                        Inspect BB84
-                      </button>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button className={styles.inspectButton} onClick={() => setSelectedLog(log)}>
+                          Inspect BB84
+                        </button>
+                        <button
+                          className={styles.inspectButton}
+                          style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          onClick={() => handleReplayProcess(log)}
+                          title="Re-visualize this voting session step-by-step as a new vote"
+                        >
+                          <span>⟳</span> Replay
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -795,7 +948,16 @@ export function VotingLogsPage() {
               <h3 className={styles.modalTitle}>
                 BB84 QKD Simulation Trace — <span className={styles.sessionId}>{selectedLog.sessionId}</span>
               </h3>
-              <button className={styles.modalClose} onClick={() => setSelectedLog(null)}>✕</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button
+                  className={styles.replayButton}
+                  onClick={() => handleReplayProcess(selectedLog)}
+                  title="Re-visualize this voting session step-by-step as a new vote"
+                >
+                  <span>⟳</span> Re-visualize Process ›
+                </button>
+                <button className={styles.modalClose} onClick={() => setSelectedLog(null)}>✕</button>
+              </div>
             </div>
 
             <div className={styles.modalBody}>
