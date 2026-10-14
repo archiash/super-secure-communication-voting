@@ -44,6 +44,10 @@ class CastBallotInput(CamelModel):
     voter_id: str
     encrypted_vote: str
 
+class AbortSessionInput(CamelModel):
+    session_id: str
+    election_code: str
+
 class CastBallotRespond(CamelModel):
     session_id: str
     voter_id: str

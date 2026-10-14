@@ -294,6 +294,10 @@ export class MockApiService implements ApiService {
     return { sessions: mockLogs };
   }
 
+  async abortSession(_sessionId: string, _electionCode: string): Promise<void> {
+    await this.delay(100);
+  }
+
   async resetVotes(): Promise<void> {
     this.votes = [];
     this.options = JSON.parse(JSON.stringify(DEFAULT_OPTIONS));

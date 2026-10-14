@@ -218,6 +218,24 @@ export class RealApiService implements ApiService {
     }
   }
 
+  async abortSession(sessionId: string, electionCode: string): Promise<void> {
+    try {
+      const res = await fetch(`${API_BASE}/vote/abort-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, electionCode }),
+      });
+      if (!res.ok) {
+        console.warn(`[RealApiService] abortSession returned ${res.status}`);
+      } else {
+        const data = await res.json();
+        console.log('[API Call] abortSession result:', data);
+      }
+    } catch (err) {
+      console.warn('[RealApiService] abortSession failed:', err);
+    }
+  }
+
   async resetVotes(): Promise<void> {
     try {
       const res = await fetch(`${API_BASE}/vote/reset`, { method: 'POST' });

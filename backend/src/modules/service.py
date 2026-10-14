@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput, CandidateData, CandidateRespond, CastBallotRespond, VotingLogItem, VotingLogResponse
+from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput, CandidateData, CandidateRespond, CastBallotRespond, VotingLogItem, VotingLogResponse, AbortSessionInput
 from . import qkd
 import secrets
 import string
@@ -120,6 +120,17 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "timestamp": current_time
     }
 
+    # Automatically abort any prior uncast sessions for this voter in this election
+    updated_prior = False
+    for s in election.sessions:
+        if s.voter_id == payload.voter_id and s.status not in ["VOTE_CAST", "ABORTED"]:
+            s.status = "ABORTED"
+            s.key_generated = ""
+            s.bob_key = ""
+            updated_prior = True
+    if updated_prior:
+        await election.save()
+
     await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
 
     return GenerateKeyRespond(
@@ -140,6 +151,27 @@ async def create_qkd_key(payload : GenerateKeyInput):
         qber_system = qber,
         threshold_percent = 11
     )
+
+async def abort_session(payload: AbortSessionInput):
+    election = await ElectionSchema.find_one(
+        ElectionSchema.election_code == payload.election_code
+    )
+    if not election:
+        return {"success": False, "message": f"Election '{payload.election_code}' not found"}
+
+    updated = False
+    for s in election.sessions:
+        if s.session_id == payload.session_id and s.status != "VOTE_CAST":
+            s.status = "ABORTED"
+            s.key_generated = ""
+            s.bob_key = ""
+            updated = True
+            break
+
+    if updated:
+        await election.save()
+        return {"success": True, "message": f"Session {payload.session_id} aborted"}
+    return {"success": True, "message": "No active session to abort"}
 
 async def cast_ballot(payload: CastBallotInput):
     election = await ElectionSchema.find_one(

@@ -27,6 +27,14 @@ export function AuthenticationPage() {
 
     setIsLoading(true);
     try {
+      if (state.auth.sessionId && !state.auth.isReplay) {
+        try {
+          await api.abortSession(state.auth.sessionId, state.auth.electionCode || electionCode);
+        } catch (err) {
+          console.warn('Failed to abort prior session:', err);
+        }
+      }
+
       const response = await api.verifyAuth({ voterId, electionCode });
 
       if (!response.valid) {

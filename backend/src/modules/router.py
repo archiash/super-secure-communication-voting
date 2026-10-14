@@ -1,13 +1,16 @@
 from fastapi import APIRouter, status, HTTPException
-from .models import GenerateKeyInput, GenerateKeyRespond, CastBallotInput
+from .models import GenerateKeyInput, GenerateKeyRespond, CastBallotInput, AbortSessionInput
 from . import service
 
 router = APIRouter(prefix="/vote")
 
 @router.post("/generate-key", status_code=status.HTTP_200_OK)
 async def generate_key(payload: GenerateKeyInput):
-    
     return await service.create_qkd_key(payload)
+
+@router.post("/abort-session", status_code=status.HTTP_200_OK)
+async def abort_session(payload: AbortSessionInput):
+    return await service.abort_session(payload)
 
 @router.post("/cast-ballot", status_code=status.HTTP_201_CREATED)
 async def cast_ballot(payload: CastBallotInput):
