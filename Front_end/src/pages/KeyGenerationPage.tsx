@@ -936,7 +936,7 @@ export function KeyGenerationPage() {
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <span className={`${styles.panelTitle} ${styles.blue}`}>
-              FINAL KEY · {qkdResult.phases.keyEstablished.keyLength} BITS · {Math.round((qkdResult.phases.keyEstablished.keyLength / (qkdResult.phases.transmission.qubitCount || calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance))) * 100)}% CHANNEL EFFICIENCY
+              FINAL KEY · {qkdResult.phases.keyEstablished.keyLength} BITS
             </span>
             {/*<span>🔒</span>*/}
             <span>
