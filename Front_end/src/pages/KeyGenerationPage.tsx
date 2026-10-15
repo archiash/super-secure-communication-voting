@@ -1038,16 +1038,6 @@ export function KeyGenerationPage() {
               </div>
             </div>
           )}
-
-          {/* Mathematical Leftover Hash Lemma Explanation */}
-          <div className={styles.paEquationBox}>
-            <div className={styles.paEquationFormula}>
-              Hash Mapping: K = T_S · X (mod 2)
-            </div>
-            <div>
-              Alice and Bob publicly negotiate random seed <code>S</code> to construct a 2-universal Toeplitz hash matrix <code>T_S ∈ GF(2)^(m × n)</code>. Under the Leftover Hash Lemma, even if Eve obtained partial knowledge from eavesdropping, universal hashing reduces her mutual information exponentially: <code>I_E ≤ 2^(-s) / ln(2)</code>, yielding an information-theoretically secure <code>m</code>-bit key.
-            </div>
-          </div>
         </div>
       )}
 
