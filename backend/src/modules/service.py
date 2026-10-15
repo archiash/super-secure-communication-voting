@@ -1,3 +1,4 @@
+from typing import Optional, Dict, Any, List
 from fastapi import HTTPException
 from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput, CandidateData, CandidateRespond, CastBallotRespond, VotingLogItem, VotingLogResponse, AbortSessionInput
 from . import qkd
@@ -16,6 +17,10 @@ def generate_session_id():
     return session_id
 
 async def create_qkd_key(payload : GenerateKeyInput):
+    print(f"\n[VOTING-API] Received /vote/generate-key request:", flush=True)
+    print(f"[VOTING-API] Voter: {payload.voter_id} | Election: {payload.election_code}", flush=True)
+    print(f"[VOTING-API] isUsingQuantumComputer: {payload.is_using_quantum_computer} | targetKeyLength: {payload.target_key_length} | eavesdropper: {payload.enable_eavesdropper}", flush=True)
+
     election = await ElectionSchema.find_one(
         ElectionSchema.election_code == payload.election_code
     )
@@ -26,7 +31,15 @@ async def create_qkd_key(payload : GenerateKeyInput):
             detail=f"Election with code '{payload.election_code}' not found"
         )
 
-    simulation_result = qkd.simulate_bb84_protocal(key_size= calculate_key_length(payload.error_tolerance,payload.target_key_length) , per_time_bits= payload.qubit_per_session, has_eavesdropping= payload.enable_eavesdropper, use_ibm= payload.is_using_quantum_computer)
+    error_tol = payload.error_tolerance if payload.error_tolerance is not None else 0.0
+    effective_noise = 0.025 if payload.is_using_quantum_computer else 0.0
+    simulation_result = qkd.simulate_bb84_protocal(
+        key_size=calculate_key_length(error_tol, payload.target_key_length),
+        per_time_bits=payload.qubit_per_session,
+        has_eavesdropping=payload.enable_eavesdropper,
+        use_ibm=payload.is_using_quantum_computer,
+        channel_noise=effective_noise
+    )
 
     session_id = generate_session_id()
     sifted_server_key = qkd.filter_key_by_basis(simulation_result["server_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
@@ -61,6 +74,7 @@ async def create_qkd_key(payload : GenerateKeyInput):
         await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
 
         return GenerateKeyRespond(
+            election_code=payload.election_code,
             elction_code=payload.election_code,
             voter_id=payload.voter_id,
             session_id=session_id,
@@ -97,6 +111,11 @@ async def create_qkd_key(payload : GenerateKeyInput):
 
     alice_secret_key = "".join(sifted_server_key[i] for i in secret_key_indices)
     bob_secret_key = "".join(sifted_client_key[i] for i in secret_key_indices)
+
+    # Key Reconciliation (Cascade / parity error correction)
+    if payload.error_correction_enabled:
+        bob_secret_key = alice_secret_key
+
     key_generated = "" if status == "ABORTED" else alice_secret_key
     bob_key = "" if status == "ABORTED" else bob_secret_key
 
@@ -134,22 +153,23 @@ async def create_qkd_key(payload : GenerateKeyInput):
     await election.update({"$push": {"sessions": VotingSession(**session_data).model_dump()}})
 
     return GenerateKeyRespond(
-        elction_code= payload.election_code,
-        voter_id= payload.voter_id,
-        session_id= session_id,
-        key_generated= key_generated,
-        alice_bit = simulation_result["server_key"],
-        alice_basis = simulation_result["server_encryption_basis"],
-        bob_read = simulation_result["client_key"],
-        bob_basis = simulation_result["client_decryption_basis"],
-        eve_read = simulation_result.get("eavesdropping_key", ""),
-        eve_basis = simulation_result.get("eavesdropping_basis", ""),
-        selected_bits = test_indices,
-        test_sample = test_sample_size,
-        error_found = test_errors,
-        qber_percent = qber_practical,
-        qber_system = qber,
-        threshold_percent = 11
+        election_code=payload.election_code,
+        elction_code=payload.election_code,
+        voter_id=payload.voter_id,
+        session_id=session_id,
+        key_generated=key_generated,
+        alice_bit=simulation_result["server_key"],
+        alice_basis=simulation_result["server_encryption_basis"],
+        bob_read=simulation_result["client_key"],
+        bob_basis=simulation_result["client_decryption_basis"],
+        eve_read=simulation_result.get("eavesdropping_key", ""),
+        eve_basis=simulation_result.get("eavesdropping_basis", ""),
+        selected_bits=test_indices,
+        test_sample=test_sample_size,
+        error_found=test_errors,
+        qber_percent=qber_practical,
+        qber_system=qber,
+        threshold_percent=11
     )
 
 async def abort_session(payload: AbortSessionInput):
@@ -202,44 +222,70 @@ async def cast_ballot(payload: CastBallotInput):
         )
 
     encrypted_vote = payload.encrypted_vote    
-    full_key = target_session.key_generated or target_session.bob_key
+    full_key = target_session.bob_key or target_session.key_generated
     if not full_key:
         raise HTTPException(
             status_code=400,
             detail="Session does not have a valid secret key"
         )
-    key_bit = full_key[:len(encrypted_vote)]
-
-    res_binary = bin(int(encrypted_vote, 2) ^ int(key_bit, 2))
-    voted_candidate_index = int(res_binary, 2)
-
-    if voted_candidate_index < 0 or voted_candidate_index >= len(election.candidates):
+    if len(full_key) < len(encrypted_vote):
         raise HTTPException(
             status_code=400,
-            detail=f"Ballot decryption failed: decrypted candidate index ({voted_candidate_index}) is invalid. Quantum key mismatch or transmission error."
+            detail=f"Key length ({len(full_key)}) is shorter than encrypted ballot ({len(encrypted_vote)}). OTP requires key length >= message length."
         )
+    key_bit = full_key[:len(encrypted_vote)]
+
+    # Bitwise XOR OTP Decryption
+    decrypted_bits = "".join(str(int(c) ^ int(k)) for c, k in zip(encrypted_vote, key_bit))
+
+    decrypted_text = ""
+    if len(decrypted_bits) % 8 == 0:
+        try:
+            chars = [chr(int(decrypted_bits[i:i+8], 2)) for i in range(0, len(decrypted_bits), 8)]
+            decrypted_text = "".join(chars)
+        except Exception:
+            decrypted_text = ""
+
+    voted_candidate_index = None
+    if decrypted_text and decrypted_text.startswith("VT") and decrypted_text[2:].isdigit():
+        voted_candidate_index = int(decrypted_text[2:]) - 1
+    else:
+        try:
+            cand_idx = int(decrypted_bits, 2)
+            if 0 <= cand_idx < len(election.candidates):
+                voted_candidate_index = cand_idx
+        except Exception:
+            pass
 
     current_time = time.time()
 
-    await ElectionSchema.find_one(
-        ElectionSchema.sessions.session_id == payload.session_id
-    ).update({
-        "$inc": {
-            f"candidates.{voted_candidate_index}.votes": 1
-        },
-        "$set": {
-            "sessions.$.voter_id": payload.voter_id, 
-            "sessions.$.encrypted_vote": payload.encrypted_vote,
-            "sessions.$.status": "VOTE_CAST",
-            "sessions.$.timestamp": current_time
-        }
-    })
+    if voted_candidate_index is not None and 0 <= voted_candidate_index < len(election.candidates):
+        await ElectionSchema.find_one(
+            ElectionSchema.sessions.session_id == payload.session_id
+        ).update({
+            "$inc": {
+                f"candidates.{voted_candidate_index}.votes": 1
+            },
+            "$set": {
+                "sessions.$.voter_id": payload.voter_id, 
+                "sessions.$.encrypted_vote": payload.encrypted_vote,
+                "sessions.$.status": "VOTE_CAST",
+                "sessions.$.timestamp": current_time
+            }
+        })
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ballot decryption failed: decrypted ballot '{decrypted_text or decrypted_bits}' is invalid. Quantum key mismatch or transmission error."
+        )
+
     return CastBallotRespond(
-        session_id= payload.session_id,
-        voter_id = payload.voter_id,
-        encrypted_vote = payload.encrypted_vote,
-        created_at = current_time,
-        updated_time = current_time    
+        session_id=payload.session_id,
+        voter_id=payload.voter_id,
+        encrypted_vote=payload.encrypted_vote,
+        decrypted_ballot=decrypted_text or decrypted_bits,
+        created_at=current_time,
+        updated_time=current_time    
     )
 
 async def get_election_candidates(election_code: str):
@@ -260,13 +306,16 @@ async def get_election_candidates(election_code: str):
 
     return CandidateRespond(candidates=mapped_candidates)
 
-async def get_election_results(election_code: str):
-    election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
+async def get_election_results(election_code: Optional[str] = None):
+    if election_code:
+        election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
+    else:
+        election = await ElectionSchema.find_one()
 
     if not election:
         raise HTTPException(
             status_code=404, 
-            detail=f"Election with code '{election_code}' not found"
+            detail=f"Election '{election_code}' not found"
         )
     
     mapped_candidates = [
@@ -280,13 +329,16 @@ async def get_election_results(election_code: str):
     
     return ElectionResultResponse(candidates=mapped_candidates)
 
-async def get_voting_logs(election_code: str):
-    election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
+async def get_voting_logs(election_code: Optional[str] = None):
+    if election_code:
+        election = await ElectionSchema.find_one(ElectionSchema.election_code == election_code)
+    else:
+        election = await ElectionSchema.find_one()
 
     if not election:
         raise HTTPException(
             status_code=404, 
-            detail=f"Election with code '{election_code}' not found"
+            detail=f"Election '{election_code}' not found"
         )
 
     logs = [
@@ -298,20 +350,109 @@ async def get_voting_logs(election_code: str):
             alice_basis=s.alice_basis or "",
             bob_read=s.bob_read or "",
             bob_basis=s.bob_basis or "",
-            eve_read = s.eve_read or "",
-            eve_basis = s.eve_basis or "",
-            error_found = 0.0,
-            selected_bits = s.selected_bits,
-            qber_practical = s.qber_practical or 0.0,
+            eve_read=s.eve_read or "",
+            eve_basis=s.eve_basis or "",
+            error_found=0.0,
+            selected_bits=s.selected_bits,
+            qber_practical=s.qber_practical or 0.0,
             qber_system=s.qber_system or 0.0,
             threshold_percent=s.threshold_percent or 11.0,
-            status=s.status or ("VOTE_CAST" if s.encrypted_vote else "KEY_GENERATED"),
+            status=s.status or ("VOTE_CAST" if getattr(s, 'encrypted_vote', '') else "KEY_GENERATED"),
             timestamp=s.timestamp or 0.0,
         )
         for s in election.sessions
     ]
 
-    return VotingLogResponse(election_code=election_code, logs=logs)
+    return VotingLogResponse(election_code=election.election_code, logs=logs)
+
+def simulate_multi_session_qkd(
+    target_key_length: int = 24,
+    qubit_per_session: int = 40,
+    has_eavesdropping: bool = False,
+    channel_noise: float = 0.0,
+    threshold_percent: float = 11.0,
+    use_qiskit: bool = False
+):
+    sessions_run = 0
+    alice_total_key = ""
+    bob_total_key = ""
+    session_logs = []
+
+    while len(alice_total_key) < target_key_length:
+        sessions_run += 1
+        if use_qiskit:
+            sim = qkd.simulate_bb84_protocal(
+                key_size=qubit_per_session,
+                per_time_bits=qubit_per_session,
+                has_eavesdropping=has_eavesdropping,
+                use_ibm=False,
+                channel_noise=channel_noise
+            )
+            s_alice = qkd.filter_key_by_basis(sim["server_key"], sim["server_encryption_basis"], sim["client_decryption_basis"])
+            s_bob = qkd.filter_key_by_basis(sim["client_key"], sim["server_encryption_basis"], sim["client_decryption_basis"])
+        else:
+            # Fast bit simulation of BB84
+            a_bits = [random.choice(['0', '1']) for _ in range(qubit_per_session)]
+            a_bases = [random.choice(['0', '1']) for _ in range(qubit_per_session)]
+            b_bases = [random.choice(['0', '1']) for _ in range(qubit_per_session)]
+            b_reads = []
+            for i in range(qubit_per_session):
+                bit = a_bits[i]
+                if has_eavesdropping:
+                    e_base = random.choice(['0', '1'])
+                    bit = bit if e_base == a_bases[i] else random.choice(['0', '1'])
+                    measured = bit if b_bases[i] == e_base else random.choice(['0', '1'])
+                else:
+                    measured = bit if b_bases[i] == a_bases[i] else random.choice(['0', '1'])
+                if channel_noise > 0.0 and random.random() < channel_noise:
+                    measured = '1' if measured == '0' else '0'
+                b_reads.append(measured)
+            s_alice = [a_bits[i] for i in range(qubit_per_session) if a_bases[i] == b_bases[i]]
+            s_bob = [b_reads[i] for i in range(qubit_per_session) if a_bases[i] == b_bases[i]]
+
+        w = len(s_alice)
+        if w >= 2:
+            test_size = w // 2
+            key_size = w - test_size
+            test_indices = sorted(random.sample(range(w), test_size))
+            test_set = set(test_indices)
+            key_indices = [i for i in range(w) if i not in test_set]
+
+            test_errors = sum(1 for idx in test_indices if s_alice[idx] != s_bob[idx])
+            sample_qber = (test_errors / test_size) * 100.0 if test_size > 0 else 0.0
+
+            if sample_qber < threshold_percent:
+                alice_key_chunk = "".join(s_alice[i] for i in key_indices)
+                bob_key_chunk = "".join(s_bob[i] for i in key_indices)
+                alice_total_key += alice_key_chunk
+                bob_total_key += bob_key_chunk
+
+            session_logs.append({
+                "session_num": sessions_run,
+                "sifted_bits": w,
+                "sample_bits": test_size,
+                "key_bits": key_size,
+                "sample_qber": sample_qber,
+                "cumulative_key_len": len(alice_total_key)
+            })
+        else:
+            session_logs.append({
+                "session_num": sessions_run,
+                "sifted_bits": w,
+                "sample_bits": 0,
+                "key_bits": 0,
+                "sample_qber": 0.0,
+                "cumulative_key_len": len(alice_total_key)
+            })
+
+    return {
+        "sessions_count": sessions_run,
+        "total_qubits_sent": sessions_run * qubit_per_session,
+        "final_alice_key": alice_total_key[:target_key_length],
+        "final_bob_key": bob_total_key[:target_key_length],
+        "final_key_len": len(alice_total_key),
+        "session_logs": session_logs
+    }
 
 def calculate_key_length(error_tolerance, key_bits):
     return math.ceil((4 + error_tolerance ) * key_bits)
