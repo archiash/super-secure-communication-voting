@@ -1,0 +1,189 @@
+{
+  "part1_multipliers": {
+    "32": [
+      {
+        "multiplier": 3.5,
+        "raw_sent": 112,
+        "success_rate": 5.7
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 128,
+        "success_rate": 58.3
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 141,
+        "success_rate": 90.3
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 154,
+        "success_rate": 100.0
+      },
+      {
+        "multiplier": 5.0,
+        "raw_sent": 160,
+        "success_rate": 100.0
+      }
+    ],
+    "64": [
+      {
+        "multiplier": 3.5,
+        "raw_sent": 224,
+        "success_rate": 1.7
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 256,
+        "success_rate": 51.0
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 282,
+        "success_rate": 95.0
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 307,
+        "success_rate": 100.0
+      },
+      {
+        "multiplier": 5.0,
+        "raw_sent": 320,
+        "success_rate": 100.0
+      }
+    ],
+    "128": [
+      {
+        "multiplier": 3.5,
+        "raw_sent": 448,
+        "success_rate": 0.0
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 512,
+        "success_rate": 48.7
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 563,
+        "success_rate": 99.0
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 614,
+        "success_rate": 100.0
+      },
+      {
+        "multiplier": 5.0,
+        "raw_sent": 640,
+        "success_rate": 100.0
+      }
+    ],
+    "256": [
+      {
+        "multiplier": 3.5,
+        "raw_sent": 896,
+        "success_rate": 0.0
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 1024,
+        "success_rate": 51.3
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 1126,
+        "success_rate": 100.0
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 1229,
+        "success_rate": 100.0
+      },
+      {
+        "multiplier": 5.0,
+        "raw_sent": 1280,
+        "success_rate": 100.0
+      }
+    ]
+  },
+  "part2_eavesdropping": {
+    "32": {
+      "n": 32,
+      "fpr": 0.33,
+      "tpr100": 98.67,
+      "tpr50": 58.33
+    },
+    "64": {
+      "n": 64,
+      "fpr": 0.0,
+      "tpr100": 100.0,
+      "tpr50": 48.33
+    },
+    "128": {
+      "n": 128,
+      "fpr": 0.0,
+      "tpr100": 100.0,
+      "tpr50": 60.33
+    },
+    "256": {
+      "n": 256,
+      "fpr": 0.0,
+      "tpr100": 100.0,
+      "tpr50": 75.67
+    }
+  },
+  "part3_crypto_accuracy": 100.0,
+  "part4_diff_metrics": {
+    "16": {
+      "n": 16,
+      "mean_abs_diff": 11.41,
+      "rmse": 14.71,
+      "signed_mean": -0.34,
+      "theo_se": 15.31,
+      "theo_mae": 12.22
+    },
+    "32": {
+      "n": 32,
+      "mean_abs_diff": 8.67,
+      "rmse": 10.93,
+      "signed_mean": 0.4,
+      "theo_se": 10.83,
+      "theo_mae": 8.64
+    },
+    "64": {
+      "n": 64,
+      "mean_abs_diff": 6.23,
+      "rmse": 7.91,
+      "signed_mean": -0.21,
+      "theo_se": 7.65,
+      "theo_mae": 6.11
+    },
+    "128": {
+      "n": 128,
+      "mean_abs_diff": 4.2,
+      "rmse": 5.41,
+      "signed_mean": -0.03,
+      "theo_se": 5.41,
+      "theo_mae": 4.32
+    },
+    "256": {
+      "n": 256,
+      "mean_abs_diff": 2.91,
+      "rmse": 3.7,
+      "signed_mean": -0.02,
+      "theo_se": 3.83,
+      "theo_mae": 3.05
+    },
+    "512": {
+      "n": 512,
+      "mean_abs_diff": 2.22,
+      "rmse": 2.79,
+      "signed_mean": -0.08,
+      "theo_se": 2.71,
+      "theo_mae": 2.16
+    }
+  }
+}

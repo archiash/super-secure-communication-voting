@@ -1,0 +1,272 @@
+{
+  "part1_transmission_requirements": [
+    {
+      "l_target": 64,
+      "n_check": 16,
+      "total_req": 80,
+      "multiplier": 2.0,
+      "raw_qubits": 160,
+      "mean_final": 63.7,
+      "success_rate": 53.5
+    },
+    {
+      "l_target": 64,
+      "n_check": 16,
+      "total_req": 80,
+      "multiplier": 2.2,
+      "raw_qubits": 176,
+      "mean_final": 71.8,
+      "success_rate": 88.5
+    },
+    {
+      "l_target": 64,
+      "n_check": 16,
+      "total_req": 80,
+      "multiplier": 2.4,
+      "raw_qubits": 192,
+      "mean_final": 80.8,
+      "success_rate": 99.0
+    },
+    {
+      "l_target": 64,
+      "n_check": 32,
+      "total_req": 96,
+      "multiplier": 2.0,
+      "raw_qubits": 192,
+      "mean_final": 64.2,
+      "success_rate": 52.5
+    },
+    {
+      "l_target": 64,
+      "n_check": 32,
+      "total_req": 96,
+      "multiplier": 2.2,
+      "raw_qubits": 212,
+      "mean_final": 74.4,
+      "success_rate": 94.5
+    },
+    {
+      "l_target": 64,
+      "n_check": 32,
+      "total_req": 96,
+      "multiplier": 2.4,
+      "raw_qubits": 231,
+      "mean_final": 84.1,
+      "success_rate": 100.0
+    },
+    {
+      "l_target": 64,
+      "n_check": 64,
+      "total_req": 128,
+      "multiplier": 2.0,
+      "raw_qubits": 256,
+      "mean_final": 63.6,
+      "success_rate": 53.5
+    },
+    {
+      "l_target": 64,
+      "n_check": 64,
+      "total_req": 128,
+      "multiplier": 2.2,
+      "raw_qubits": 282,
+      "mean_final": 77.4,
+      "success_rate": 94.0
+    },
+    {
+      "l_target": 64,
+      "n_check": 64,
+      "total_req": 128,
+      "multiplier": 2.4,
+      "raw_qubits": 308,
+      "mean_final": 90.3,
+      "success_rate": 100.0
+    },
+    {
+      "l_target": 128,
+      "n_check": 32,
+      "total_req": 160,
+      "multiplier": 2.0,
+      "raw_qubits": 320,
+      "mean_final": 128.7,
+      "success_rate": 55.0
+    },
+    {
+      "l_target": 128,
+      "n_check": 32,
+      "total_req": 160,
+      "multiplier": 2.2,
+      "raw_qubits": 352,
+      "mean_final": 144.1,
+      "success_rate": 95.0
+    },
+    {
+      "l_target": 128,
+      "n_check": 32,
+      "total_req": 160,
+      "multiplier": 2.4,
+      "raw_qubits": 384,
+      "mean_final": 158.1,
+      "success_rate": 100.0
+    },
+    {
+      "l_target": 128,
+      "n_check": 64,
+      "total_req": 192,
+      "multiplier": 2.0,
+      "raw_qubits": 384,
+      "mean_final": 128.3,
+      "success_rate": 52.5
+    },
+    {
+      "l_target": 128,
+      "n_check": 64,
+      "total_req": 192,
+      "multiplier": 2.2,
+      "raw_qubits": 423,
+      "mean_final": 146.9,
+      "success_rate": 98.0
+    },
+    {
+      "l_target": 128,
+      "n_check": 64,
+      "total_req": 192,
+      "multiplier": 2.4,
+      "raw_qubits": 461,
+      "mean_final": 166.3,
+      "success_rate": 100.0
+    },
+    {
+      "l_target": 256,
+      "n_check": 64,
+      "total_req": 320,
+      "multiplier": 2.0,
+      "raw_qubits": 640,
+      "mean_final": 255.3,
+      "success_rate": 50.5
+    },
+    {
+      "l_target": 256,
+      "n_check": 64,
+      "total_req": 320,
+      "multiplier": 2.2,
+      "raw_qubits": 704,
+      "mean_final": 288.1,
+      "success_rate": 99.0
+    },
+    {
+      "l_target": 256,
+      "n_check": 64,
+      "total_req": 320,
+      "multiplier": 2.4,
+      "raw_qubits": 768,
+      "mean_final": 321.7,
+      "success_rate": 100.0
+    },
+    {
+      "l_target": 256,
+      "n_check": 128,
+      "total_req": 384,
+      "multiplier": 2.0,
+      "raw_qubits": 768,
+      "mean_final": 256.4,
+      "success_rate": 48.5
+    },
+    {
+      "l_target": 256,
+      "n_check": 128,
+      "total_req": 384,
+      "multiplier": 2.2,
+      "raw_qubits": 845,
+      "mean_final": 293.7,
+      "success_rate": 98.5
+    },
+    {
+      "l_target": 256,
+      "n_check": 128,
+      "total_req": 384,
+      "multiplier": 2.4,
+      "raw_qubits": 922,
+      "mean_final": 333.5,
+      "success_rate": 100.0
+    }
+  ],
+  "part2_eavesdropping_vs_n": {
+    "16": {
+      "n": 16,
+      "fpr": 3.0,
+      "tpr100": 95.33,
+      "tpr50": 60.67,
+      "clean_mean": 1.92,
+      "clean_std": 3.26,
+      "eve100_mean": 24.83,
+      "eve100_std": 10.09
+    },
+    "32": {
+      "n": 32,
+      "fpr": 0.33,
+      "tpr100": 96.67,
+      "tpr50": 54.67,
+      "clean_mean": 1.96,
+      "clean_std": 2.42,
+      "eve100_mean": 25.05,
+      "eve100_std": 7.33
+    },
+    "64": {
+      "n": 64,
+      "fpr": 0.0,
+      "tpr100": 99.67,
+      "tpr50": 55.0,
+      "clean_mean": 1.9,
+      "clean_std": 1.73,
+      "eve100_mean": 24.82,
+      "eve100_std": 5.34
+    },
+    "128": {
+      "n": 128,
+      "fpr": 0.0,
+      "tpr100": 100.0,
+      "tpr50": 64.0,
+      "clean_mean": 1.95,
+      "clean_std": 1.26,
+      "eve100_mean": 25.0,
+      "eve100_std": 3.75
+    }
+  },
+  "part3_diff_vs_n": {
+    "16": {
+      "n": 16,
+      "mean_abs_diff": 8.44,
+      "rmse": 10.44,
+      "signed_mean": -0.15,
+      "theo_se": 10.83
+    },
+    "32": {
+      "n": 32,
+      "mean_abs_diff": 6.24,
+      "rmse": 7.81,
+      "signed_mean": 0.34,
+      "theo_se": 7.65
+    },
+    "64": {
+      "n": 64,
+      "mean_abs_diff": 4.75,
+      "rmse": 6.0,
+      "signed_mean": 0.03,
+      "theo_se": 5.41
+    },
+    "128": {
+      "n": 128,
+      "mean_abs_diff": 3.8,
+      "rmse": 4.68,
+      "signed_mean": 0.06,
+      "theo_se": 3.83
+    },
+    "256": {
+      "n": 256,
+      "mean_abs_diff": 3.0,
+      "rmse": 3.72,
+      "signed_mean": -0.24,
+      "theo_se": 2.71
+    }
+  }
+}

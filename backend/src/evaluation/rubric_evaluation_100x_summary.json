@@ -1,0 +1,365 @@
+{
+  "test_rubric_1": {
+    "32": [
+      {
+        "multiplier": 3.0,
+        "raw_sent": 96,
+        "success_rate": 0.0,
+        "mean_usable_key": 24.1
+      },
+      {
+        "multiplier": 3.5,
+        "raw_sent": 112,
+        "success_rate": 5.0,
+        "mean_usable_key": 27.5
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 128,
+        "success_rate": 54.0,
+        "mean_usable_key": 30.7
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 141,
+        "success_rate": 91.0,
+        "mean_usable_key": 31.8
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 154,
+        "success_rate": 99.0,
+        "mean_usable_key": 32.0
+      },
+      {
+        "multiplier": 5.2,
+        "raw_sent": 166,
+        "success_rate": 100.0,
+        "mean_usable_key": 32.0
+      }
+    ],
+    "64": [
+      {
+        "multiplier": 3.0,
+        "raw_sent": 192,
+        "success_rate": 0.0,
+        "mean_usable_key": 47.8
+      },
+      {
+        "multiplier": 3.5,
+        "raw_sent": 224,
+        "success_rate": 0.0,
+        "mean_usable_key": 55.6
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 256,
+        "success_rate": 50.0,
+        "mean_usable_key": 62.1
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 282,
+        "success_rate": 92.0,
+        "mean_usable_key": 63.9
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 307,
+        "success_rate": 100.0,
+        "mean_usable_key": 64.0
+      },
+      {
+        "multiplier": 5.2,
+        "raw_sent": 333,
+        "success_rate": 100.0,
+        "mean_usable_key": 64.0
+      }
+    ],
+    "128": [
+      {
+        "multiplier": 3.0,
+        "raw_sent": 384,
+        "success_rate": 0.0,
+        "mean_usable_key": 95.2
+      },
+      {
+        "multiplier": 3.5,
+        "raw_sent": 448,
+        "success_rate": 0.0,
+        "mean_usable_key": 111.6
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 512,
+        "success_rate": 46.0,
+        "mean_usable_key": 125.6
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 563,
+        "success_rate": 98.0,
+        "mean_usable_key": 127.9
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 614,
+        "success_rate": 100.0,
+        "mean_usable_key": 128.0
+      },
+      {
+        "multiplier": 5.2,
+        "raw_sent": 666,
+        "success_rate": 100.0,
+        "mean_usable_key": 128.0
+      }
+    ],
+    "256": [
+      {
+        "multiplier": 3.0,
+        "raw_sent": 768,
+        "success_rate": 0.0,
+        "mean_usable_key": 192.1
+      },
+      {
+        "multiplier": 3.5,
+        "raw_sent": 896,
+        "success_rate": 0.0,
+        "mean_usable_key": 223.4
+      },
+      {
+        "multiplier": 4.0,
+        "raw_sent": 1024,
+        "success_rate": 48.0,
+        "mean_usable_key": 252.6
+      },
+      {
+        "multiplier": 4.4,
+        "raw_sent": 1126,
+        "success_rate": 100.0,
+        "mean_usable_key": 256.0
+      },
+      {
+        "multiplier": 4.8,
+        "raw_sent": 1229,
+        "success_rate": 100.0,
+        "mean_usable_key": 256.0
+      },
+      {
+        "multiplier": 5.2,
+        "raw_sent": 1331,
+        "success_rate": 100.0,
+        "mean_usable_key": 256.0
+      }
+    ]
+  },
+  "test_rubric_2": {
+    "clean_mean": 2.109375,
+    "clean_std": 1.9686879950553364,
+    "eve100_mean": 26.421875,
+    "eve100_std": 5.762617779436269,
+    "threshold_metrics": [
+      {
+        "threshold": 1.0,
+        "fpr": 73.0,
+        "tpr": 100.0,
+        "f1": 0.7326
+      },
+      {
+        "threshold": 2.0,
+        "fpr": 35.0,
+        "tpr": 100.0,
+        "f1": 0.8511
+      },
+      {
+        "threshold": 3.0,
+        "fpr": 35.0,
+        "tpr": 100.0,
+        "f1": 0.8511
+      },
+      {
+        "threshold": 4.0,
+        "fpr": 17.0,
+        "tpr": 100.0,
+        "f1": 0.9217
+      },
+      {
+        "threshold": 5.0,
+        "fpr": 7.0,
+        "tpr": 100.0,
+        "f1": 0.9662
+      },
+      {
+        "threshold": 6.0,
+        "fpr": 7.0,
+        "tpr": 100.0,
+        "f1": 0.9662
+      },
+      {
+        "threshold": 7.0,
+        "fpr": 2.0,
+        "tpr": 100.0,
+        "f1": 0.9901
+      },
+      {
+        "threshold": 8.0,
+        "fpr": 1.0,
+        "tpr": 100.0,
+        "f1": 0.995
+      },
+      {
+        "threshold": 9.0,
+        "fpr": 1.0,
+        "tpr": 100.0,
+        "f1": 0.995
+      },
+      {
+        "threshold": 10.0,
+        "fpr": 0.0,
+        "tpr": 100.0,
+        "f1": 1.0
+      },
+      {
+        "threshold": 11.0,
+        "fpr": 0.0,
+        "tpr": 100.0,
+        "f1": 1.0
+      },
+      {
+        "threshold": 12.0,
+        "fpr": 0.0,
+        "tpr": 100.0,
+        "f1": 1.0
+      },
+      {
+        "threshold": 13.0,
+        "fpr": 0.0,
+        "tpr": 100.0,
+        "f1": 1.0
+      },
+      {
+        "threshold": 14.0,
+        "fpr": 0.0,
+        "tpr": 100.0,
+        "f1": 1.0
+      },
+      {
+        "threshold": 15.0,
+        "fpr": 0.0,
+        "tpr": 99.0,
+        "f1": 0.995
+      },
+      {
+        "threshold": 16.0,
+        "fpr": 0.0,
+        "tpr": 97.0,
+        "f1": 0.9848
+      },
+      {
+        "threshold": 17.0,
+        "fpr": 0.0,
+        "tpr": 97.0,
+        "f1": 0.9848
+      },
+      {
+        "threshold": 18.0,
+        "fpr": 0.0,
+        "tpr": 94.0,
+        "f1": 0.9691
+      },
+      {
+        "threshold": 19.0,
+        "fpr": 0.0,
+        "tpr": 86.0,
+        "f1": 0.9247
+      },
+      {
+        "threshold": 20.0,
+        "fpr": 0.0,
+        "tpr": 86.0,
+        "f1": 0.9247
+      },
+      {
+        "threshold": 21.0,
+        "fpr": 0.0,
+        "tpr": 82.0,
+        "f1": 0.9011
+      },
+      {
+        "threshold": 22.0,
+        "fpr": 0.0,
+        "tpr": 73.0,
+        "f1": 0.8439
+      },
+      {
+        "threshold": 23.0,
+        "fpr": 0.0,
+        "tpr": 73.0,
+        "f1": 0.8439
+      },
+      {
+        "threshold": 24.0,
+        "fpr": 0.0,
+        "tpr": 64.0,
+        "f1": 0.7805
+      },
+      {
+        "threshold": 25.0,
+        "fpr": 0.0,
+        "tpr": 53.0,
+        "f1": 0.6928
+      }
+    ]
+  },
+  "test_rubric_4": {
+    "16": {
+      "n": 16,
+      "mean_abs_diff": 10.91,
+      "rmse": 14.39,
+      "signed_mean": 0.13,
+      "theo_se": 15.31,
+      "theo_mae": 12.22
+    },
+    "32": {
+      "n": 32,
+      "mean_abs_diff": 8.42,
+      "rmse": 10.31,
+      "signed_mean": -0.23,
+      "theo_se": 10.83,
+      "theo_mae": 8.64
+    },
+    "64": {
+      "n": 64,
+      "mean_abs_diff": 6.02,
+      "rmse": 7.64,
+      "signed_mean": -1.08,
+      "theo_se": 7.65,
+      "theo_mae": 6.11
+    },
+    "128": {
+      "n": 128,
+      "mean_abs_diff": 4.16,
+      "rmse": 4.97,
+      "signed_mean": -0.73,
+      "theo_se": 5.41,
+      "theo_mae": 4.32
+    },
+    "256": {
+      "n": 256,
+      "mean_abs_diff": 3.04,
+      "rmse": 3.76,
+      "signed_mean": 0.39,
+      "theo_se": 3.83,
+      "theo_mae": 3.05
+    },
+    "512": {
+      "n": 512,
+      "mean_abs_diff": 2.57,
+      "rmse": 3.08,
+      "signed_mean": 0.28,
+      "theo_se": 2.71,
+      "theo_mae": 2.16
+    }
+  },
+  "total_time_seconds": 5.35
+}

@@ -1,0 +1,149 @@
+{
+  "sifting_key_sufficiency": [
+    {
+      "delta": 0.0,
+      "multiplier": 4.0,
+      "total_qubits": 96,
+      "mean_sifted": 48.4,
+      "expected_sifted": 48.0,
+      "success_rate": 56.0,
+      "mean_final_key": 24.0
+    },
+    {
+      "delta": 0.5,
+      "multiplier": 4.5,
+      "total_qubits": 108,
+      "mean_sifted": 54.2,
+      "expected_sifted": 54.0,
+      "success_rate": 87.0,
+      "mean_final_key": 24.0
+    },
+    {
+      "delta": 1.0,
+      "multiplier": 5.0,
+      "total_qubits": 120,
+      "mean_sifted": 60.1,
+      "expected_sifted": 60.0,
+      "success_rate": 99.0,
+      "mean_final_key": 24.0
+    },
+    {
+      "delta": 1.5,
+      "multiplier": 5.5,
+      "total_qubits": 132,
+      "mean_sifted": 65.5,
+      "expected_sifted": 66.0,
+      "success_rate": 100.0,
+      "mean_final_key": 24.0
+    },
+    {
+      "delta": 2.0,
+      "multiplier": 6.0,
+      "total_qubits": 144,
+      "mean_sifted": 70.9,
+      "expected_sifted": 72.0,
+      "success_rate": 100.0,
+      "mean_final_key": 24.0
+    }
+  ],
+  "qber_distribution": [
+    {
+      "scenario": "Ideal Channel (No Eve)",
+      "mean_qber": 0.0,
+      "std_qber": 0.0,
+      "accepted_pct": 100.0,
+      "expected": "0.0%"
+    },
+    {
+      "scenario": "IBM Noisy Channel (No Eve)",
+      "mean_qber": 2.98,
+      "std_qber": 2.22,
+      "accepted_pct": 99.0,
+      "expected": "1.0% - 5.0%"
+    },
+    {
+      "scenario": "Active Eve (Ideal Channel)",
+      "mean_qber": 25.25,
+      "std_qber": 5.77,
+      "accepted_pct": 1.0,
+      "expected": "~25.0%"
+    },
+    {
+      "scenario": "Active Eve (Noisy Channel)",
+      "mean_qber": 26.83,
+      "std_qber": 6.01,
+      "accepted_pct": 1.0,
+      "expected": "25.0% - 28.0%"
+    }
+  ],
+  "qber_estimation_error": [
+    {
+      "total_qubits": 40,
+      "sample_key_bits": 10,
+      "spec_bound": 8.0,
+      "mean_delta_noisy": 4.47,
+      "mean_delta_eve": 15.85
+    },
+    {
+      "total_qubits": 80,
+      "sample_key_bits": 20,
+      "spec_bound": 6.0,
+      "mean_delta_noisy": 2.8,
+      "mean_delta_eve": 11.09
+    },
+    {
+      "total_qubits": 120,
+      "sample_key_bits": 30,
+      "spec_bound": 4.5,
+      "mean_delta_noisy": 4.02,
+      "mean_delta_eve": 9.04
+    },
+    {
+      "total_qubits": 160,
+      "sample_key_bits": 40,
+      "spec_bound": 3.5,
+      "mean_delta_noisy": 2.92,
+      "mean_delta_eve": 6.47
+    },
+    {
+      "total_qubits": 200,
+      "sample_key_bits": 50,
+      "spec_bound": 3.0,
+      "mean_delta_noisy": 2.44,
+      "mean_delta_eve": 6.58
+    },
+    {
+      "total_qubits": 240,
+      "sample_key_bits": 60,
+      "spec_bound": 2.5,
+      "mean_delta_noisy": 2.24,
+      "mean_delta_eve": 5.71
+    }
+  ],
+  "ballot_decryption_accuracy": [
+    {
+      "scenario": "Ideal Channel (No Noise)",
+      "error_correction": false,
+      "accuracy_pct": 100.0,
+      "bit_error_rate": 0.0,
+      "valid_sessions": 100,
+      "pass_criteria": "100%"
+    },
+    {
+      "scenario": "Noisy Channel (Uncorrected)",
+      "error_correction": false,
+      "accuracy_pct": 53.0,
+      "bit_error_rate": 2.75,
+      "valid_sessions": 100,
+      "pass_criteria": "Corrupted (>0% error)"
+    },
+    {
+      "scenario": "Noisy Channel (With Error Correction)",
+      "error_correction": true,
+      "accuracy_pct": 100.0,
+      "bit_error_rate": 0.0,
+      "valid_sessions": 100,
+      "pass_criteria": "100%"
+    }
+  ]
+}

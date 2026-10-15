@@ -1,0 +1,91 @@
+{
+  "variation1_safety_margin": [
+    {
+      "delta": 0.0,
+      "multiplier": 4.0,
+      "total_qubits": 96,
+      "success_rate": 56.0,
+      "shortfall_rate": 44.0,
+      "mean_sifted": 48.4
+    },
+    {
+      "delta": 0.25,
+      "multiplier": 4.25,
+      "total_qubits": 102,
+      "success_rate": 74.0,
+      "shortfall_rate": 26.0,
+      "mean_sifted": 50.6
+    },
+    {
+      "delta": 0.5,
+      "multiplier": 4.5,
+      "total_qubits": 108,
+      "success_rate": 84.0,
+      "shortfall_rate": 16.0,
+      "mean_sifted": 53.7
+    },
+    {
+      "delta": 0.8,
+      "multiplier": 4.8,
+      "total_qubits": 115,
+      "success_rate": 100.0,
+      "shortfall_rate": 0.0,
+      "mean_sifted": 57.2
+    },
+    {
+      "delta": 1.0,
+      "multiplier": 5.0,
+      "total_qubits": 120,
+      "success_rate": 100.0,
+      "shortfall_rate": 0.0,
+      "mean_sifted": 60.6
+    }
+  ],
+  "variation2_key_lengths": [
+    {
+      "target_key_length": 8,
+      "raw_qubits": 32,
+      "success_rate": 57.0,
+      "std_theoretical": 8.84,
+      "std_measured": 9.07
+    },
+    {
+      "target_key_length": 16,
+      "raw_qubits": 64,
+      "success_rate": 67.0,
+      "std_theoretical": 6.25,
+      "std_measured": 6.28
+    },
+    {
+      "target_key_length": 24,
+      "raw_qubits": 96,
+      "success_rate": 54.0,
+      "std_theoretical": 5.1,
+      "std_measured": 5.1
+    },
+    {
+      "target_key_length": 40,
+      "raw_qubits": 160,
+      "success_rate": 58.0,
+      "std_theoretical": 3.95,
+      "std_measured": 3.51
+    }
+  ],
+  "variation3_local_vs_ibm": [
+    {
+      "name": "Local Simulator\n(Single-Pass, 120 Q)",
+      "success": 99.0,
+      "sessions": 1.0
+    },
+    {
+      "name": "IBM Quantum\n(Single-Pass, 40 Q Limit)",
+      "success": 0.0,
+      "sessions": 1.0
+    },
+    {
+      "name": "IBM Quantum\n(Multi-Session, r = 3.3)",
+      "success": 100.0,
+      "sessions": 3.3
+    }
+  ]
+}
