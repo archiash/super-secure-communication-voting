@@ -41,7 +41,7 @@ export function calculatePhotonCount(targetKeyLength: number, errorTolerance: nu
 export const DEFAULT_CONFIG: ProtocolConfig = {
   qubitCount: 4, // physical QPU qubits per run
   targetKeyLength: 64, // target final secret key length n
-  useRealQuantum: false,
+  useRealQuantum: true,
   eveSimulation: false,
   errorCorrectionEnabled: false,
   errorThreshold: 0.11,
