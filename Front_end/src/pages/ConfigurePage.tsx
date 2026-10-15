@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { DEFAULT_CONFIG } from '../types';
+import { DEFAULT_CONFIG, calculatePhotonCount } from '../types';
 import type { ProtocolConfig } from '../types';
 import styles from './ConfigurePage.module.css';
 
@@ -23,6 +23,13 @@ export function ConfigurePage() {
   const handleReset = () => {
     setConfig({ ...DEFAULT_CONFIG });
   };
+
+  const calculatedPhotons = calculatePhotonCount(
+    config.targetKeyLength,
+    config.errorTolerance,
+    config.securityParameter,
+    config.privacyAmplificationEnabled
+  );
 
   return (
     <div className={styles.page}>
@@ -115,8 +122,8 @@ export function ConfigurePage() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <span className={styles.cardTitle}>Target Key Size</span>
-                <span className={styles.cardDesc}>Minimum key bits needed for OTP ballot encryption</span>
+                <span className={styles.cardTitle}>Target Key Size (m)</span>
+                <span className={styles.cardDesc}>Minimum secret key bits needed for OTP ballot encryption</span>
               </div>
             </div>
             <div className={styles.sliderContainer}>
@@ -175,6 +182,75 @@ export function ConfigurePage() {
                   else updateField('errorTolerance', parseFloat(val.toFixed(2)));
                 }}
               />
+            </div>
+          </div>
+
+          {/* PRIVACY AMPLIFICATION */}
+          <div className={styles.sectionTitle}>PRIVACY AMPLIFICATION</div>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardTitle}>Privacy Amplification</span>
+                <span className={styles.cardDesc}>Universal Toeplitz hashing shrinks raw key to eliminate Eve's partial information</span>
+              </div>
+              <button
+                className={`${styles.toggle} ${config.privacyAmplificationEnabled ? styles.active : ''}`}
+                onClick={() => updateField('privacyAmplificationEnabled', !config.privacyAmplificationEnabled)}
+              >
+                <div className={styles.toggleDot} />
+              </button>
+            </div>
+          </div>
+
+          {config.privacyAmplificationEnabled && (
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardTitleArea}>
+                  <span className={styles.cardTitle}>
+                    Security Parameter <span className={styles.deltaSymbol}>s</span>
+                  </span>
+                  <span className={styles.cardDesc}>
+                    Sacrificed bits guaranteeing Eve information bound <i>I_E ≤ 2<sup>-{config.securityParameter}</sup></i> bits (8 to 32)
+                  </span>
+                </div>
+              </div>
+              <div className={styles.sliderContainer}>
+                <input
+                  type="range"
+                  className={styles.slider}
+                  min={8}
+                  max={32}
+                  step={1}
+                  value={config.securityParameter}
+                  onChange={(e) => updateField('securityParameter', parseInt(e.target.value))}
+                />
+                <input
+                  type="number"
+                  className={styles.sliderInput}
+                  min={8}
+                  max={32}
+                  step={1}
+                  value={config.securityParameter}
+                  onChange={(e) => updateField('securityParameter', parseInt(e.target.value) || 8)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* CHANNEL SIZING FORMULA */}
+          <div className={styles.card} style={{ backgroundColor: 'rgba(59, 130, 246, 0.04)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
+            <div className={styles.cardHeader}>
+              <div className={styles.cardTitleArea} style={{ maxWidth: '100%' }}>
+                <span className={styles.cardTitle} style={{ color: 'var(--color-primary)' }}>
+                  Channel Sizing: {calculatedPhotons} Photons Required
+                </span>
+                <span className={styles.cardDesc} style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+                  {config.privacyAmplificationEnabled
+                    ? `N = ⌈(4 + δ) × (m + s)⌉ = ⌈(4 + ${config.errorTolerance.toFixed(2)}) × (${config.targetKeyLength} + ${config.securityParameter})⌉ = ${calculatedPhotons}`
+                    : `N = ⌈(4 + δ) × m⌉ = ⌈(4 + ${config.errorTolerance.toFixed(2)}) × ${config.targetKeyLength}⌉ = ${calculatedPhotons}`
+                  }
+                </span>
+              </div>
             </div>
           </div>
 
