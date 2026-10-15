@@ -6,16 +6,17 @@ from pydantic import BaseModel
 class GenerateKeyInput(CamelModel):
     voter_id: str
     election_code: str
-    is_using_quantum_computer: bool
-    error_correction_enabled: bool
-    enable_eavesdropper: bool
-    qubit_per_session: int = 4
-    target_key_length: int
-    error_tolerance: float
+    is_using_quantum_computer: bool = False
+    error_correction_enabled: bool = True
+    enable_eavesdropper: bool = False
+    qubit_per_session: int = 40
+    target_key_length: int = 24
+    error_tolerance: Optional[float] = 0.0
 
 class GenerateKeyRespond(CamelModel):
     voter_id: str
-    elction_code: str
+    election_code: Optional[str] = None
+    elction_code: Optional[str] = None
     session_id: str
     key_generated: str
     alice_bit: str
@@ -29,7 +30,7 @@ class GenerateKeyRespond(CamelModel):
     error_found: int = 0
     qber_percent: float
     qber_system: Optional[float] = 0.0
-    threshold_percent: int
+    threshold_percent: int = 11
 
 class CandidateVotingResult(CamelModel):
     candidate_name: str
@@ -52,6 +53,7 @@ class CastBallotRespond(CamelModel):
     session_id: str
     voter_id: str
     encrypted_vote: str
+    decrypted_ballot: Optional[str] = None
     created_at: float
     updated_time: float
 
