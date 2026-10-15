@@ -1,0 +1,1232 @@
+{
+  "execution_timestamp": "2026-10-10 15:51:18",
+  "duration_seconds": 14.16,
+  "experiment_1_key_lengths": {
+    "sample_0pct": {
+      "32": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 32,
+          "mean_sifted": 16.16,
+          "mean_final": 16.16,
+          "std_final": 2.93,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 48,
+          "mean_sifted": 24.05,
+          "mean_final": 24.05,
+          "std_final": 3.4,
+          "success_rate": 2.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 64,
+          "mean_sifted": 31.38,
+          "mean_final": 31.38,
+          "std_final": 4.16,
+          "success_rate": 48.67
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 70,
+          "mean_sifted": 35.21,
+          "mean_final": 35.21,
+          "std_final": 4.51,
+          "success_rate": 78.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 80,
+          "mean_sifted": 40.23,
+          "mean_final": 40.23,
+          "std_final": 4.53,
+          "success_rate": 98.67
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 96,
+          "mean_sifted": 47.71,
+          "mean_final": 47.71,
+          "std_final": 4.85,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 112,
+          "mean_sifted": 56.17,
+          "mean_final": 56.17,
+          "std_final": 5.18,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 128,
+          "mean_sifted": 64.03,
+          "mean_final": 64.03,
+          "std_final": 5.1,
+          "success_rate": 100.0
+        }
+      ],
+      "64": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 64,
+          "mean_sifted": 31.81,
+          "mean_final": 31.81,
+          "std_final": 3.47,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 96,
+          "mean_sifted": 48.17,
+          "mean_final": 48.17,
+          "std_final": 5.06,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 128,
+          "mean_sifted": 64.53,
+          "mean_final": 64.53,
+          "std_final": 5.7,
+          "success_rate": 59.33
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 141,
+          "mean_sifted": 70.22,
+          "mean_final": 70.22,
+          "std_final": 5.65,
+          "success_rate": 88.67
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 160,
+          "mean_sifted": 80.61,
+          "mean_final": 80.61,
+          "std_final": 6.47,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 192,
+          "mean_sifted": 96.73,
+          "mean_final": 96.73,
+          "std_final": 6.82,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 224,
+          "mean_sifted": 111.95,
+          "mean_final": 111.95,
+          "std_final": 6.96,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 256,
+          "mean_sifted": 128.11,
+          "mean_final": 128.11,
+          "std_final": 8.42,
+          "success_rate": 100.0
+        }
+      ],
+      "128": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 128,
+          "mean_sifted": 64.05,
+          "mean_final": 64.05,
+          "std_final": 5.95,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 192,
+          "mean_sifted": 95.79,
+          "mean_final": 95.79,
+          "std_final": 6.74,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 256,
+          "mean_sifted": 127.85,
+          "mean_final": 127.85,
+          "std_final": 7.69,
+          "success_rate": 50.67
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 282,
+          "mean_sifted": 141.59,
+          "mean_final": 141.59,
+          "std_final": 8.58,
+          "success_rate": 93.33
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 320,
+          "mean_sifted": 161.11,
+          "mean_final": 161.11,
+          "std_final": 9.06,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 384,
+          "mean_sifted": 192.03,
+          "mean_final": 192.03,
+          "std_final": 9.33,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 448,
+          "mean_sifted": 224.54,
+          "mean_final": 224.54,
+          "std_final": 10.45,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 512,
+          "mean_sifted": 254.68,
+          "mean_final": 254.68,
+          "std_final": 10.61,
+          "success_rate": 100.0
+        }
+      ],
+      "256": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 256,
+          "mean_sifted": 127.41,
+          "mean_final": 127.41,
+          "std_final": 8.74,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 384,
+          "mean_sifted": 191.26,
+          "mean_final": 191.26,
+          "std_final": 9.29,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 512,
+          "mean_sifted": 257.28,
+          "mean_final": 257.28,
+          "std_final": 12.36,
+          "success_rate": 57.33
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 563,
+          "mean_sifted": 280.36,
+          "mean_final": 280.36,
+          "std_final": 11.51,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 640,
+          "mean_sifted": 319.61,
+          "mean_final": 319.61,
+          "std_final": 12.0,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 768,
+          "mean_sifted": 381.85,
+          "mean_final": 381.85,
+          "std_final": 14.37,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 896,
+          "mean_sifted": 447.49,
+          "mean_final": 447.49,
+          "std_final": 16.08,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 1024,
+          "mean_sifted": 512.81,
+          "mean_final": 512.81,
+          "std_final": 17.22,
+          "success_rate": 100.0
+        }
+      ]
+    },
+    "sample_25pct": {
+      "32": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 32,
+          "mean_sifted": 15.74,
+          "mean_final": 11.83,
+          "std_final": 2.22,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 48,
+          "mean_sifted": 24.24,
+          "mean_final": 18.23,
+          "std_final": 2.51,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 64,
+          "mean_sifted": 31.95,
+          "mean_final": 23.95,
+          "std_final": 3.14,
+          "success_rate": 0.67
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 70,
+          "mean_sifted": 35.71,
+          "mean_final": 26.83,
+          "std_final": 3.26,
+          "success_rate": 10.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 80,
+          "mean_sifted": 39.57,
+          "mean_final": 29.64,
+          "std_final": 3.44,
+          "success_rate": 33.33
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 96,
+          "mean_sifted": 46.97,
+          "mean_final": 35.2,
+          "std_final": 3.48,
+          "success_rate": 90.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 112,
+          "mean_sifted": 56.92,
+          "mean_final": 42.65,
+          "std_final": 4.01,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 128,
+          "mean_sifted": 65.28,
+          "mean_final": 48.97,
+          "std_final": 4.56,
+          "success_rate": 100.0
+        }
+      ],
+      "64": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 64,
+          "mean_sifted": 31.77,
+          "mean_final": 23.81,
+          "std_final": 2.93,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 96,
+          "mean_sifted": 47.74,
+          "mean_final": 35.78,
+          "std_final": 3.54,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 128,
+          "mean_sifted": 64.3,
+          "mean_final": 48.22,
+          "std_final": 4.95,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 141,
+          "mean_sifted": 71.19,
+          "mean_final": 53.39,
+          "std_final": 4.64,
+          "success_rate": 2.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 160,
+          "mean_sifted": 81.15,
+          "mean_final": 60.89,
+          "std_final": 4.57,
+          "success_rate": 33.33
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 192,
+          "mean_sifted": 96.1,
+          "mean_final": 72.1,
+          "std_final": 4.86,
+          "success_rate": 96.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 224,
+          "mean_sifted": 110.37,
+          "mean_final": 82.77,
+          "std_final": 5.47,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 256,
+          "mean_sifted": 127.26,
+          "mean_final": 95.45,
+          "std_final": 5.82,
+          "success_rate": 100.0
+        }
+      ],
+      "128": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 128,
+          "mean_sifted": 63.65,
+          "mean_final": 47.75,
+          "std_final": 4.39,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 192,
+          "mean_sifted": 96.41,
+          "mean_final": 72.33,
+          "std_final": 4.97,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 256,
+          "mean_sifted": 128.28,
+          "mean_final": 96.2,
+          "std_final": 6.08,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 282,
+          "mean_sifted": 140.51,
+          "mean_final": 105.35,
+          "std_final": 6.46,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 320,
+          "mean_sifted": 159.21,
+          "mean_final": 119.42,
+          "std_final": 6.71,
+          "success_rate": 10.67
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 384,
+          "mean_sifted": 191.41,
+          "mean_final": 143.51,
+          "std_final": 7.07,
+          "success_rate": 99.33
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 448,
+          "mean_sifted": 224.65,
+          "mean_final": 168.47,
+          "std_final": 8.5,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 512,
+          "mean_sifted": 257.97,
+          "mean_final": 193.49,
+          "std_final": 8.69,
+          "success_rate": 100.0
+        }
+      ],
+      "256": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 256,
+          "mean_sifted": 127.47,
+          "mean_final": 95.65,
+          "std_final": 5.46,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 384,
+          "mean_sifted": 191.85,
+          "mean_final": 143.92,
+          "std_final": 7.17,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 512,
+          "mean_sifted": 256.35,
+          "mean_final": 192.25,
+          "std_final": 8.21,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 563,
+          "mean_sifted": 281.99,
+          "mean_final": 211.47,
+          "std_final": 9.05,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 640,
+          "mean_sifted": 320.18,
+          "mean_final": 240.12,
+          "std_final": 8.81,
+          "success_rate": 4.67
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 768,
+          "mean_sifted": 384.29,
+          "mean_final": 288.19,
+          "std_final": 10.49,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 896,
+          "mean_sifted": 447.83,
+          "mean_final": 335.85,
+          "std_final": 10.48,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 1024,
+          "mean_sifted": 510.77,
+          "mean_final": 383.07,
+          "std_final": 12.01,
+          "success_rate": 100.0
+        }
+      ]
+    },
+    "sample_33pct": {
+      "32": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 32,
+          "mean_sifted": 15.97,
+          "mean_final": 10.63,
+          "std_final": 1.98,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 48,
+          "mean_sifted": 24.17,
+          "mean_final": 16.11,
+          "std_final": 2.26,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 64,
+          "mean_sifted": 32.41,
+          "mean_final": 21.61,
+          "std_final": 2.93,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 70,
+          "mean_sifted": 34.87,
+          "mean_final": 23.23,
+          "std_final": 2.7,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 80,
+          "mean_sifted": 39.97,
+          "mean_final": 26.69,
+          "std_final": 3.19,
+          "success_rate": 4.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 96,
+          "mean_sifted": 49.31,
+          "mean_final": 33.03,
+          "std_final": 3.49,
+          "success_rate": 63.33
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 112,
+          "mean_sifted": 56.03,
+          "mean_final": 37.63,
+          "std_final": 3.69,
+          "success_rate": 94.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 128,
+          "mean_sifted": 63.49,
+          "mean_final": 42.61,
+          "std_final": 3.93,
+          "success_rate": 99.33
+        }
+      ],
+      "64": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 64,
+          "mean_sifted": 31.93,
+          "mean_final": 21.29,
+          "std_final": 2.68,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 96,
+          "mean_sifted": 47.36,
+          "mean_final": 31.69,
+          "std_final": 3.63,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 128,
+          "mean_sifted": 63.87,
+          "mean_final": 42.94,
+          "std_final": 3.54,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 141,
+          "mean_sifted": 70.67,
+          "mean_final": 47.45,
+          "std_final": 3.46,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 160,
+          "mean_sifted": 79.93,
+          "mean_final": 53.67,
+          "std_final": 4.44,
+          "success_rate": 2.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 192,
+          "mean_sifted": 96.9,
+          "mean_final": 64.88,
+          "std_final": 4.81,
+          "success_rate": 64.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 224,
+          "mean_sifted": 112.17,
+          "mean_final": 75.12,
+          "std_final": 5.57,
+          "success_rate": 98.67
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 256,
+          "mean_sifted": 127.22,
+          "mean_final": 85.13,
+          "std_final": 5.28,
+          "success_rate": 100.0
+        }
+      ],
+      "128": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 128,
+          "mean_sifted": 63.97,
+          "mean_final": 42.96,
+          "std_final": 3.85,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 192,
+          "mean_sifted": 97.13,
+          "mean_final": 65.09,
+          "std_final": 4.8,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 256,
+          "mean_sifted": 128.23,
+          "mean_final": 85.82,
+          "std_final": 5.16,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 282,
+          "mean_sifted": 140.93,
+          "mean_final": 94.37,
+          "std_final": 5.26,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 320,
+          "mean_sifted": 160.27,
+          "mean_final": 107.45,
+          "std_final": 6.49,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 384,
+          "mean_sifted": 194.46,
+          "mean_final": 130.31,
+          "std_final": 6.84,
+          "success_rate": 64.67
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 448,
+          "mean_sifted": 223.28,
+          "mean_final": 149.55,
+          "std_final": 7.03,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 512,
+          "mean_sifted": 255.83,
+          "mean_final": 171.41,
+          "std_final": 8.25,
+          "success_rate": 100.0
+        }
+      ],
+      "256": [
+        {
+          "multiplier": 1.0,
+          "raw_qubits": 256,
+          "mean_sifted": 128.53,
+          "mean_final": 86.05,
+          "std_final": 5.12,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 1.5,
+          "raw_qubits": 384,
+          "mean_sifted": 191.64,
+          "mean_final": 128.41,
+          "std_final": 6.74,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.0,
+          "raw_qubits": 512,
+          "mean_sifted": 255.5,
+          "mean_final": 171.23,
+          "std_final": 7.05,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.2,
+          "raw_qubits": 563,
+          "mean_sifted": 281.93,
+          "mean_final": 188.95,
+          "std_final": 7.39,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 2.5,
+          "raw_qubits": 640,
+          "mean_sifted": 319.81,
+          "mean_final": 214.21,
+          "std_final": 9.05,
+          "success_rate": 0.0
+        },
+        {
+          "multiplier": 3.0,
+          "raw_qubits": 768,
+          "mean_sifted": 384.33,
+          "mean_final": 257.55,
+          "std_final": 10.05,
+          "success_rate": 58.0
+        },
+        {
+          "multiplier": 3.5,
+          "raw_qubits": 896,
+          "mean_sifted": 448.34,
+          "mean_final": 300.38,
+          "std_final": 10.02,
+          "success_rate": 100.0
+        },
+        {
+          "multiplier": 4.0,
+          "raw_qubits": 1024,
+          "mean_sifted": 511.01,
+          "mean_final": 342.37,
+          "std_final": 11.71,
+          "success_rate": 100.0
+        }
+      ]
+    }
+  },
+  "experiment_2_eavesdropping_and_threshold": {
+    "clean_summary": {
+      "noise_0pct": {
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "p95": 0.0
+      },
+      "noise_2pct": {
+        "mean": 1.9756526157801557,
+        "std": 2.201838130584687,
+        "min": 0.0,
+        "max": 9.75609756097561,
+        "p95": 5.555555555555555
+      },
+      "noise_4pct": {
+        "mean": 4.204439279145695,
+        "std": 3.031748096172077,
+        "min": 0.0,
+        "max": 15.0,
+        "p95": 9.30232558139535
+      }
+    },
+    "eve_summary": {
+      "eve_25pct": {
+        "mean": 8.520493879993113,
+        "std": 4.48900981782378,
+        "min": 0.0,
+        "max": 21.052631578947366,
+        "p5": 2.4361207897793262
+      },
+      "eve_50pct": {
+        "mean": 13.306345227265673,
+        "std": 4.900336436613299,
+        "min": 0.0,
+        "max": 24.390243902439025,
+        "p5": 5.256410256410256
+      },
+      "eve_75pct": {
+        "mean": 19.645269901426165,
+        "std": 6.8309362398713525,
+        "min": 4.878048780487805,
+        "max": 37.5,
+        "p5": 9.371366279069768
+      },
+      "eve_100pct": {
+        "mean": 24.70558549587284,
+        "std": 6.755593795333337,
+        "min": 9.090909090909092,
+        "max": 46.15384615384615,
+        "p5": 14.285714285714285
+      }
+    },
+    "threshold_metrics": [
+      {
+        "threshold": 1.0,
+        "fpr": 53.0,
+        "tpr": 100.0,
+        "precision": 65.36,
+        "recall": 100.0,
+        "f1": 0.7905
+      },
+      {
+        "threshold": 2.0,
+        "fpr": 53.0,
+        "tpr": 100.0,
+        "precision": 65.36,
+        "recall": 100.0,
+        "f1": 0.7905
+      },
+      {
+        "threshold": 3.0,
+        "fpr": 20.5,
+        "tpr": 100.0,
+        "precision": 82.99,
+        "recall": 100.0,
+        "f1": 0.907
+      },
+      {
+        "threshold": 4.0,
+        "fpr": 19.5,
+        "tpr": 100.0,
+        "precision": 83.68,
+        "recall": 100.0,
+        "f1": 0.9112
+      },
+      {
+        "threshold": 5.0,
+        "fpr": 14.0,
+        "tpr": 100.0,
+        "precision": 87.72,
+        "recall": 100.0,
+        "f1": 0.9346
+      },
+      {
+        "threshold": 6.0,
+        "fpr": 3.0,
+        "tpr": 100.0,
+        "precision": 97.09,
+        "recall": 100.0,
+        "f1": 0.9852
+      },
+      {
+        "threshold": 7.0,
+        "fpr": 2.5,
+        "tpr": 100.0,
+        "precision": 97.56,
+        "recall": 100.0,
+        "f1": 0.9877
+      },
+      {
+        "threshold": 8.0,
+        "fpr": 1.5,
+        "tpr": 100.0,
+        "precision": 98.52,
+        "recall": 100.0,
+        "f1": 0.9926
+      },
+      {
+        "threshold": 9.0,
+        "fpr": 0.5,
+        "tpr": 100.0,
+        "precision": 99.5,
+        "recall": 100.0,
+        "f1": 0.9975
+      },
+      {
+        "threshold": 10.0,
+        "fpr": 0.0,
+        "tpr": 99.5,
+        "precision": 100.0,
+        "recall": 99.5,
+        "f1": 0.9975
+      },
+      {
+        "threshold": 11.0,
+        "fpr": 0.0,
+        "tpr": 99.0,
+        "precision": 100.0,
+        "recall": 99.0,
+        "f1": 0.995
+      },
+      {
+        "threshold": 12.0,
+        "fpr": 0.0,
+        "tpr": 99.0,
+        "precision": 100.0,
+        "recall": 99.0,
+        "f1": 0.995
+      },
+      {
+        "threshold": 13.0,
+        "fpr": 0.0,
+        "tpr": 98.5,
+        "precision": 100.0,
+        "recall": 98.5,
+        "f1": 0.9924
+      },
+      {
+        "threshold": 14.0,
+        "fpr": 0.0,
+        "tpr": 96.5,
+        "precision": 100.0,
+        "recall": 96.5,
+        "f1": 0.9822
+      },
+      {
+        "threshold": 15.0,
+        "fpr": 0.0,
+        "tpr": 92.5,
+        "precision": 100.0,
+        "recall": 92.5,
+        "f1": 0.961
+      },
+      {
+        "threshold": 16.0,
+        "fpr": 0.0,
+        "tpr": 88.5,
+        "precision": 100.0,
+        "recall": 88.5,
+        "f1": 0.939
+      },
+      {
+        "threshold": 17.0,
+        "fpr": 0.0,
+        "tpr": 87.0,
+        "precision": 100.0,
+        "recall": 87.0,
+        "f1": 0.9305
+      },
+      {
+        "threshold": 18.0,
+        "fpr": 0.0,
+        "tpr": 81.0,
+        "precision": 100.0,
+        "recall": 81.0,
+        "f1": 0.895
+      },
+      {
+        "threshold": 19.0,
+        "fpr": 0.0,
+        "tpr": 77.0,
+        "precision": 100.0,
+        "recall": 77.0,
+        "f1": 0.8701
+      },
+      {
+        "threshold": 20.0,
+        "fpr": 0.0,
+        "tpr": 71.0,
+        "precision": 100.0,
+        "recall": 71.0,
+        "f1": 0.8304
+      },
+      {
+        "threshold": 21.0,
+        "fpr": 0.0,
+        "tpr": 70.0,
+        "precision": 100.0,
+        "recall": 70.0,
+        "f1": 0.8235
+      },
+      {
+        "threshold": 22.0,
+        "fpr": 0.0,
+        "tpr": 62.5,
+        "precision": 100.0,
+        "recall": 62.5,
+        "f1": 0.7692
+      },
+      {
+        "threshold": 23.0,
+        "fpr": 0.0,
+        "tpr": 59.5,
+        "precision": 100.0,
+        "recall": 59.5,
+        "f1": 0.7461
+      },
+      {
+        "threshold": 24.0,
+        "fpr": 0.0,
+        "tpr": 53.5,
+        "precision": 100.0,
+        "recall": 53.5,
+        "f1": 0.6971
+      },
+      {
+        "threshold": 25.0,
+        "fpr": 0.0,
+        "tpr": 45.5,
+        "precision": 100.0,
+        "recall": 45.5,
+        "f1": 0.6254
+      }
+    ],
+    "best_threshold": 9.0,
+    "best_f1": 0.9975062344139651
+  },
+  "experiment_3_encryption_decryption": {
+    "all_deterministic_passed": true,
+    "random_stress_success_rate": 100.0,
+    "qber_impact": [
+      {
+        "key_qber": 0.0,
+        "ballot_ber": 0.0,
+        "ballot_corruption_rate": 0.0
+      },
+      {
+        "key_qber": 1.0,
+        "ballot_ber": 0.87,
+        "ballot_corruption_rate": 12.7
+      },
+      {
+        "key_qber": 5.0,
+        "ballot_ber": 5.27,
+        "ballot_corruption_rate": 57.8
+      },
+      {
+        "key_qber": 11.0,
+        "ballot_ber": 10.95,
+        "ballot_corruption_rate": 84.4
+      },
+      {
+        "key_qber": 25.0,
+        "ballot_ber": 25.43,
+        "ballot_corruption_rate": 98.9
+      }
+    ]
+  },
+  "experiment_4_sample_vs_key_qber": {
+    "64": {
+      "sample_10pct": {
+        "sample_ratio": 0.1,
+        "mean_abs_diff": 12.82,
+        "rmse": 16.33,
+        "signed_mean": -0.87,
+        "std_diff": 10.11,
+        "correlation": 0.0313
+      },
+      "sample_20pct": {
+        "sample_ratio": 0.2,
+        "mean_abs_diff": 12.21,
+        "rmse": 15.06,
+        "signed_mean": -0.09,
+        "std_diff": 8.82,
+        "correlation": 0.0054
+      },
+      "sample_33pct": {
+        "sample_ratio": 0.33,
+        "mean_abs_diff": 8.67,
+        "rmse": 11.22,
+        "signed_mean": -1.41,
+        "std_diff": 7.13,
+        "correlation": 0.0069
+      },
+      "sample_50pct": {
+        "sample_ratio": 0.5,
+        "mean_abs_diff": 8.6,
+        "rmse": 10.91,
+        "signed_mean": -0.76,
+        "std_diff": 6.71,
+        "correlation": 0.0065
+      }
+    },
+    "128": {
+      "sample_10pct": {
+        "sample_ratio": 0.1,
+        "mean_abs_diff": 10.76,
+        "rmse": 13.07,
+        "signed_mean": 0.1,
+        "std_diff": 7.42,
+        "correlation": 0.0447
+      },
+      "sample_20pct": {
+        "sample_ratio": 0.2,
+        "mean_abs_diff": 7.22,
+        "rmse": 8.97,
+        "signed_mean": 0.83,
+        "std_diff": 5.33,
+        "correlation": 0.0972
+      },
+      "sample_33pct": {
+        "sample_ratio": 0.33,
+        "mean_abs_diff": 6.16,
+        "rmse": 7.92,
+        "signed_mean": 1.27,
+        "std_diff": 4.98,
+        "correlation": 0.0257
+      },
+      "sample_50pct": {
+        "sample_ratio": 0.5,
+        "mean_abs_diff": 6.4,
+        "rmse": 8.15,
+        "signed_mean": 0.48,
+        "std_diff": 5.05,
+        "correlation": -0.021
+      }
+    },
+    "256": {
+      "sample_10pct": {
+        "sample_ratio": 0.1,
+        "mean_abs_diff": 6.34,
+        "rmse": 8.23,
+        "signed_mean": -0.48,
+        "std_diff": 5.24,
+        "correlation": 0.1214
+      },
+      "sample_20pct": {
+        "sample_ratio": 0.2,
+        "mean_abs_diff": 5.4,
+        "rmse": 7.05,
+        "signed_mean": -0.6,
+        "std_diff": 4.53,
+        "correlation": 0.0393
+      },
+      "sample_33pct": {
+        "sample_ratio": 0.33,
+        "mean_abs_diff": 4.46,
+        "rmse": 5.71,
+        "signed_mean": -0.26,
+        "std_diff": 3.56,
+        "correlation": 0.0588
+      },
+      "sample_50pct": {
+        "sample_ratio": 0.5,
+        "mean_abs_diff": 4.61,
+        "rmse": 5.69,
+        "signed_mean": 0.31,
+        "std_diff": 3.33,
+        "correlation": 0.0008
+      }
+    },
+    "512": {
+      "sample_10pct": {
+        "sample_ratio": 0.1,
+        "mean_abs_diff": 5.11,
+        "rmse": 6.51,
+        "signed_mean": 0.44,
+        "std_diff": 4.03,
+        "correlation": -0.0337
+      },
+      "sample_20pct": {
+        "sample_ratio": 0.2,
+        "mean_abs_diff": 3.75,
+        "rmse": 4.76,
+        "signed_mean": 0.18,
+        "std_diff": 2.92,
+        "correlation": 0.0067
+      },
+      "sample_33pct": {
+        "sample_ratio": 0.33,
+        "mean_abs_diff": 3.38,
+        "rmse": 4.2,
+        "signed_mean": -0.16,
+        "std_diff": 2.51,
+        "correlation": -0.018
+      },
+      "sample_50pct": {
+        "sample_ratio": 0.5,
+        "mean_abs_diff": 3.03,
+        "rmse": 3.77,
+        "signed_mean": -0.01,
+        "std_diff": 2.24,
+        "correlation": 0.1163
+      }
+    }
+  }
+}

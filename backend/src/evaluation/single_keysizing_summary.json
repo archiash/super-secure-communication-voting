@@ -1,0 +1,49 @@
+{
+  "table": [
+    {
+      "delta": "0.00",
+      "multiplier": "4.00x",
+      "qubits": 96,
+      "theory_mean_key": "24.0 bits",
+      "theory_prob": "~54%",
+      "local_sim": "51.5%",
+      "ibm_quantum": "53.5%"
+    },
+    {
+      "delta": "0.25",
+      "multiplier": "4.25x",
+      "qubits": 102,
+      "theory_mean_key": "25.5 bits",
+      "theory_prob": "~76%",
+      "local_sim": "74.0%",
+      "ibm_quantum": "71.0%"
+    },
+    {
+      "delta": "0.50",
+      "multiplier": "4.50x",
+      "qubits": 108,
+      "theory_mean_key": "27.0 bits",
+      "theory_prob": "~89%",
+      "local_sim": "92.0%",
+      "ibm_quantum": "85.5%"
+    },
+    {
+      "delta": "0.80",
+      "multiplier": "4.80x",
+      "qubits": 116,
+      "theory_mean_key": "29.0 bits",
+      "theory_prob": "~97%",
+      "local_sim": "98.5%",
+      "ibm_quantum": "97.0%"
+    },
+    {
+      "delta": "1.00",
+      "multiplier": "5.00x",
+      "qubits": 120,
+      "theory_mean_key": "30.0 bits",
+      "theory_prob": "~99%",
+      "local_sim": "100.0%",
+      "ibm_quantum": "97.0%"
+    }
+  ]
+}
