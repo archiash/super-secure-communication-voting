@@ -12,6 +12,8 @@ class GenerateKeyInput(CamelModel):
     qubit_per_session: int = 40
     target_key_length: int = 24
     error_tolerance: Optional[float] = 0.0
+    privacy_amplification_enabled: bool = True
+    security_parameter: int = 16
 
 class GenerateKeyRespond(CamelModel):
     voter_id: str
@@ -31,6 +33,11 @@ class GenerateKeyRespond(CamelModel):
     qber_percent: float
     qber_system: Optional[float] = 0.0
     threshold_percent: int = 11
+    privacy_amplification_enabled: bool = True
+    pa_seed: Optional[str] = ""
+    pa_compression_ratio: Optional[float] = 0.0
+    eve_info_bound: Optional[float] = 0.0
+    raw_key_length: Optional[int] = 0
 
 class CandidateVotingResult(CamelModel):
     candidate_name: str
@@ -79,6 +86,11 @@ class VotingLogItem(CamelModel):
     qber_practical: Optional[float] = 0.0
     qber_system: Optional[float] = 0.0
     threshold_percent: Optional[float] = 11.0
+    privacy_amplification_enabled: Optional[bool] = True
+    pa_seed: Optional[str] = ""
+    pa_compression_ratio: Optional[float] = 0.0
+    eve_info_bound: Optional[float] = 0.0
+    raw_key_length: Optional[int] = 0
     status: Optional[str] = "KEY_GENERATED"
     timestamp: float
 
@@ -108,6 +120,11 @@ class VotingSession(BaseModel):
     qber_practical: Optional[float] = 0.0
     qber_system: Optional[float] = 0.0
     threshold_percent: Optional[float] = 11.0
+    privacy_amplification_enabled: Optional[bool] = True
+    pa_seed: Optional[str] = ""
+    pa_compression_ratio: Optional[float] = 0.0
+    eve_info_bound: Optional[float] = 0.0
+    raw_key_length: Optional[int] = 0
     status: Optional[str] = "KEY_GENERATED"
     timestamp: float
 

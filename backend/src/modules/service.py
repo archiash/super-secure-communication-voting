@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any, List
 from fastapi import HTTPException
 from .models import GenerateKeyRespond, GenerateKeyInput, ElectionResultResponse, ElectionSchema, CandidateVotingResult, VotingSession, CastBallotInput, CandidateData, CandidateRespond, CastBallotRespond, VotingLogItem, VotingLogResponse, AbortSessionInput
-from . import qkd
+from . import qkd, privacy_amplification
 import secrets
 import string
 import time
@@ -33,8 +33,11 @@ async def create_qkd_key(payload : GenerateKeyInput):
 
     error_tol = payload.error_tolerance if payload.error_tolerance is not None else 0.0
     effective_noise = 0.025 if payload.is_using_quantum_computer else 0.0
+    sec_param = payload.security_parameter if payload.privacy_amplification_enabled else 0
+    total_qubits = calculate_key_length(error_tol, payload.target_key_length, security_parameter=sec_param)
+
     simulation_result = qkd.simulate_bb84_protocal(
-        key_size=calculate_key_length(error_tol, payload.target_key_length),
+        key_size=total_qubits,
         per_time_bits=payload.qubit_per_session,
         has_eavesdropping=payload.enable_eavesdropper,
         use_ibm=payload.is_using_quantum_computer,
@@ -46,9 +49,10 @@ async def create_qkd_key(payload : GenerateKeyInput):
     sifted_client_key = qkd.filter_key_by_basis(simulation_result["client_key"], simulation_result["server_encryption_basis"], simulation_result["client_decryption_basis"])
 
     w = len(sifted_server_key)
-    n = payload.target_key_length
+    m = payload.target_key_length
+    desired_raw_secret_len = m + sec_param
 
-    if w < 2 * n:
+    if w < desired_raw_secret_len + 4:
         current_time = time.time()
         status = "ABORTED"
         qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key) if w > 0 else 0.0
@@ -68,6 +72,11 @@ async def create_qkd_key(payload : GenerateKeyInput):
             "qber_practical": 0.0,
             "qber_system": qber,
             "threshold_percent": 11.0,
+            "privacy_amplification_enabled": payload.privacy_amplification_enabled,
+            "pa_seed": "",
+            "pa_compression_ratio": 0.0,
+            "eve_info_bound": 0.0,
+            "raw_key_length": 0,
             "status": status,
             "timestamp": current_time
         }
@@ -90,18 +99,23 @@ async def create_qkd_key(payload : GenerateKeyInput):
             error_found=0,
             qber_percent=qber,
             qber_system=qber,
-            threshold_percent=11
+            threshold_percent=11,
+            privacy_amplification_enabled=payload.privacy_amplification_enabled,
+            pa_seed="",
+            pa_compression_ratio=0.0,
+            eve_info_bound=0.0,
+            raw_key_length=0
         )
 
     all_indices = list(range(w))
-    test_indices = sorted(random.sample(all_indices, w - n))
+    test_sample_size = w - desired_raw_secret_len
+    test_indices = sorted(random.sample(all_indices, test_sample_size))
     test_indices_set = set(test_indices)
     secret_key_indices = [i for i in all_indices if i not in test_indices_set]
 
     server_random_picked_bits = extract_chars_by_index(test_indices, sifted_server_key)
     client_random_picked_bits = extract_chars_by_index(test_indices, sifted_client_key)
     
-    test_sample_size = len(test_indices)
     test_errors = sum(1 for a, b in zip(server_random_picked_bits, client_random_picked_bits) if a != b)
     qber_practical = (test_errors / test_sample_size) * 100.0 if test_sample_size > 0 else 0.0
     qber = 100 * qkd.QBER(sifted_server_key, sifted_client_key)
@@ -109,15 +123,34 @@ async def create_qkd_key(payload : GenerateKeyInput):
     current_time = time.time()
     status = "ABORTED" if qber_practical > 11.0 else "KEY_GENERATED"
 
-    alice_secret_key = "".join(sifted_server_key[i] for i in secret_key_indices)
-    bob_secret_key = "".join(sifted_client_key[i] for i in secret_key_indices)
+    alice_raw = "".join(sifted_server_key[i] for i in secret_key_indices)
+    bob_raw = "".join(sifted_client_key[i] for i in secret_key_indices)
 
-    # Key Reconciliation (Cascade / parity error correction)
-    if payload.error_correction_enabled:
-        bob_secret_key = alice_secret_key
+    # Assuming no error or ideal channel
+    if payload.error_correction_enabled or effective_noise == 0.0:
+        bob_raw = alice_raw
 
-    key_generated = "" if status == "ABORTED" else alice_secret_key
-    bob_key = "" if status == "ABORTED" else bob_secret_key
+    if status == "ABORTED":
+        key_generated = ""
+        bob_key = ""
+        pa_seed = ""
+        pa_compression_ratio = 0.0
+        eve_info_bound = 0.0
+        raw_key_len = len(alice_raw)
+    else:
+        raw_key_len = len(alice_raw)
+        if payload.privacy_amplification_enabled and raw_key_len >= m:
+            pa_seed = privacy_amplification.generate_toeplitz_seed(raw_key_len, m)
+            key_generated = privacy_amplification.toeplitz_hash(alice_raw, pa_seed, m)
+            bob_key = privacy_amplification.toeplitz_hash(bob_raw, pa_seed, m)
+            pa_compression_ratio = round((1.0 - (m / raw_key_len)) * 100.0, 1)
+            eve_info_bound = round(float(2.0 ** (-sec_param)), 8) if sec_param > 0 else 0.0
+        else:
+            key_generated = alice_raw[:m]
+            bob_key = bob_raw[:m]
+            pa_seed = ""
+            pa_compression_ratio = 0.0
+            eve_info_bound = 0.0
 
     session_data = {
         "session_id" : session_id,
@@ -135,6 +168,11 @@ async def create_qkd_key(payload : GenerateKeyInput):
         "qber_practical": qber_practical,
         "qber_system": qber,
         "threshold_percent": 11.0,
+        "privacy_amplification_enabled": payload.privacy_amplification_enabled,
+        "pa_seed": pa_seed,
+        "pa_compression_ratio": pa_compression_ratio,
+        "eve_info_bound": eve_info_bound,
+        "raw_key_length": raw_key_len,
         "status": status,
         "timestamp": current_time
     }
@@ -169,7 +207,12 @@ async def create_qkd_key(payload : GenerateKeyInput):
         error_found=test_errors,
         qber_percent=qber_practical,
         qber_system=qber,
-        threshold_percent=11
+        threshold_percent=11,
+        privacy_amplification_enabled=payload.privacy_amplification_enabled,
+        pa_seed=pa_seed,
+        pa_compression_ratio=pa_compression_ratio,
+        eve_info_bound=eve_info_bound,
+        raw_key_length=raw_key_len
     )
 
 async def abort_session(payload: AbortSessionInput):
@@ -454,8 +497,8 @@ def simulate_multi_session_qkd(
         "session_logs": session_logs
     }
 
-def calculate_key_length(error_tolerance, key_bits):
-    return math.ceil((4 + error_tolerance ) * key_bits)
+def calculate_key_length(error_tolerance: float, key_bits: int, security_parameter: int = 0) -> int:
+    return math.ceil((4 + error_tolerance) * (key_bits + security_parameter))
 
 def get_unique_random_indices(max_value, count):
         

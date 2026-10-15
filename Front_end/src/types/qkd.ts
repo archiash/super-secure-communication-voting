@@ -89,12 +89,31 @@ export interface EveResult {
   detectable: boolean;
 }
 
-/** The 5 sub-step phases of Key Generation */
+/** Result of Privacy Amplification phase */
+export interface PrivacyAmplificationResult {
+  /** Whether privacy amplification was applied */
+  applied: boolean;
+  /** Raw key length in bits before hashing (m + s) */
+  rawKeyLength: number;
+  /** Amplified secret key length in bits (m) */
+  amplifiedKeyLength: number;
+  /** Public Toeplitz matrix seed of length n + m - 1 */
+  paSeed: string;
+  /** Compression ratio percentage */
+  compressionRatio: number;
+  /** Upper bound on Eve's mutual information (<= 2^-s) */
+  eveInfoBound: number;
+  /** Security parameter s */
+  securityParameter: number;
+}
+
+/** The 6 sub-step phases of Key Generation */
 export type QKDPhase =
   | 'transmission'
   | 'basisSifting'
   | 'qberEstimation'
   | 'errorCorrection'
+  | 'privacyAmplification'
   | 'keyEstablished';
 
 /** Complete QKD key generation response */
@@ -105,6 +124,7 @@ export interface QKDResponse {
     basisSifting: SiftingResult;
     qberEstimation: QBERResult;
     errorCorrection: ErrorCorrectionResult;
+    privacyAmplification?: PrivacyAmplificationResult;
     keyEstablished: KeyResult;
   };
   /** Only present when eveSimulation config is enabled */
@@ -142,6 +162,12 @@ export interface VotingLogEntry {
   /** True system QBER including Eve's impact (0-100) */
   qberSystem: number;
   thresholdPercent: number;
+  // ── Privacy Amplification ────────────────────────────────
+  privacyAmplificationEnabled?: boolean;
+  paSeed?: string;
+  paCompressionRatio?: number;
+  eveInfoBound?: number;
+  rawKeyLength?: number;
   // ── Session metadata ─────────────────────────────────────
   /** Raw status string from backend, e.g. "KEY READY", "VOTE_CAST", "ABORTED" */
   status: string;

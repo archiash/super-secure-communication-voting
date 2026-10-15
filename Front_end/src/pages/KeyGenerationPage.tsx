@@ -9,10 +9,11 @@ import type { QKDPhase, TransmissionLogEntry, Basis } from '../types';
 type ViewMode = 'voter' | 'practical' | 'system';
 
 const ALL_QKD_PHASES: { id: QKDPhase; title: string; subtitle: string }[] = [
-  { id: 'transmission', title: 'Transmission', subtitle: '40 photons' },
+  { id: 'transmission', title: 'Transmission', subtitle: 'Photons' },
   { id: 'basisSifting', title: 'Basis Sifting', subtitle: 'Reconciliation' },
   { id: 'qberEstimation', title: 'QBER Estimation', subtitle: 'Error analysis' },
   { id: 'errorCorrection', title: 'Error Correction', subtitle: 'Cascade protocol' },
+  { id: 'privacyAmplification', title: 'Privacy Amplification', subtitle: 'Toeplitz hash' },
   { id: 'keyEstablished', title: 'Key Established', subtitle: '' },
 ];
 
@@ -98,20 +99,38 @@ export function KeyGenerationPage() {
     qkdResult && (qkdResult.phases.qberEstimation.qber > state.config.errorThreshold)
   );
   const errorCorrectionEnabled = state.config.errorCorrectionEnabled;
-  const QKD_PHASES = errorCorrectionEnabled
-    ? ALL_QKD_PHASES
-    : ALL_QKD_PHASES.filter(p => p.id !== 'errorCorrection');
-  const currentPhaseIndex = QKD_PHASES.findIndex(p => p.id === currentPhase);
+  const privacyAmplificationEnabled = state.config.privacyAmplificationEnabled;
+  const QKD_PHASES = ALL_QKD_PHASES.filter((p) => {
+    if (p.id === 'errorCorrection' && !errorCorrectionEnabled) return false;
+    if (p.id === 'privacyAmplification' && !privacyAmplificationEnabled) return false;
+    return true;
+  });
+  const currentPhaseIndex = QKD_PHASES.findIndex((p) => p.id === currentPhase);
+  const ecPhaseIndex = QKD_PHASES.findIndex((p) => p.id === 'errorCorrection');
+  const paPhaseIndex = QKD_PHASES.findIndex((p) => p.id === 'privacyAmplification');
 
   const [viewMode, setViewMode] = useState<ViewMode>('voter');
+  const [seedCopied, setSeedCopied] = useState(false);
+
+  const handleCopySeed = (seed: string) => {
+    navigator.clipboard.writeText(seed);
+    setSeedCopied(true);
+    setTimeout(() => setSeedCopied(false), 2000);
+  };
 
   // Derived metrics for detailed visualization
-  const totalPhotons = qkdResult?.phases.transmission.qubitCount || calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance);
+  const totalPhotons = qkdResult?.phases.transmission.qubitCount || calculatePhotonCount(
+    state.config.targetKeyLength,
+    state.config.errorTolerance,
+    state.config.securityParameter,
+    state.config.privacyAmplificationEnabled
+  );
   const matchingBases = qkdResult?.phases.basisSifting.matchingBases || 0;
   const discardedCount = Math.max(0, totalPhotons - matchingBases);
   const siftingEfficiency = totalPhotons > 0 ? ((matchingBases / totalPhotons) * 100).toFixed(1) : '0.0';
   const discardedPct = totalPhotons > 0 ? ((discardedCount / totalPhotons) * 100).toFixed(1) : '0.0';
   const siftedBitstring = qkdResult?.phases.basisSifting.siftedKeyBits.join('') || '';
+  const paData = qkdResult?.phases.privacyAmplification;
 
   const hasEveData = Boolean(qkdResult?.phases.transmission.log.some(e => e.eveBasis !== undefined));
   const eveInterceptedCount = hasEveData ? (qkdResult?.phases.transmission.log.filter(e => e.eveBasis !== undefined).length || 0) : 0;
@@ -172,9 +191,20 @@ export function KeyGenerationPage() {
 
   const handleNextPhase = () => {
     if (currentPhase === 'qberEstimation' && !isAborted) {
-      // Skip error correction phase if disabled
-      setCurrentPhase(errorCorrectionEnabled ? 'errorCorrection' : 'keyEstablished');
+      if (errorCorrectionEnabled) {
+        setCurrentPhase('errorCorrection');
+      } else if (privacyAmplificationEnabled) {
+        setCurrentPhase('privacyAmplification');
+      } else {
+        setCurrentPhase('keyEstablished');
+      }
     } else if (currentPhase === 'errorCorrection') {
+      if (privacyAmplificationEnabled) {
+        setCurrentPhase('privacyAmplification');
+      } else {
+        setCurrentPhase('keyEstablished');
+      }
+    } else if (currentPhase === 'privacyAmplification') {
       setCurrentPhase('keyEstablished');
     } else if (currentPhase === 'keyEstablished') {
       if (isReplay) {
@@ -254,7 +284,7 @@ export function KeyGenerationPage() {
               <div className={styles.stepTitle}>{phase.title}</div>
               <div className={styles.stepDesc}>
                 {phase.id === 'transmission'
-                  ? `${calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance)} photons`
+                  ? `${calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance, state.config.securityParameter, state.config.privacyAmplificationEnabled)} photons`
                   : phase.subtitle}
               </div>
             </div>
@@ -266,7 +296,7 @@ export function KeyGenerationPage() {
         <div className={styles.transmittingBox}>
           <div className={styles.chipIcon}>▣</div>
           <div className={styles.transmittingText}>
-            Election Server is preparing &amp; transmitting {calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance)} polarized photons...
+            Election Server is preparing &amp; transmitting {calculatePhotonCount(state.config.targetKeyLength, state.config.errorTolerance, state.config.securityParameter, state.config.privacyAmplificationEnabled)} polarized photons...
           </div>
           <div className={styles.transmittingSub}>
             {state.config.useRealQuantum
@@ -902,7 +932,7 @@ export function KeyGenerationPage() {
       )}
 
       {/* Error Correction Panel */}
-      {!isTransmitting && qkdResult && errorCorrectionEnabled && currentPhaseIndex >= 3 && qkdResult.phases.qberEstimation.passed && (
+      {!isTransmitting && qkdResult && errorCorrectionEnabled && ecPhaseIndex !== -1 && currentPhaseIndex >= ecPhaseIndex && qkdResult.phases.qberEstimation.passed && (
         <div className={styles.panel}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>CASCADE ERROR CORRECTION</span>
@@ -927,6 +957,96 @@ export function KeyGenerationPage() {
           </div>
           <div className={styles.panelFooterText}>
             Remaining error rate: 0% (all errors corrected via parity checks)
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Amplification Panel */}
+      {!isTransmitting && qkdResult && privacyAmplificationEnabled && paPhaseIndex !== -1 && currentPhaseIndex >= paPhaseIndex && qkdResult.phases.qberEstimation.passed && paData && (
+        <div className={styles.panel}>
+          <div className={styles.panelHeader}>
+            <div>
+              <span className={styles.panelTitle}>
+                PRIVACY AMPLIFICATION · TOEPLITZ UNIVERSAL HASHING
+              </span>
+              <div className={styles.subHeaderDesc}>
+                Universal Toeplitz hash matrix T_S compresses raw sifted bits to extract unconditionally secure secret key bits.
+              </div>
+            </div>
+            <span className={`${styles.statusBadge} ${styles.statusSuccess}`}>
+              ✓ INFORMATION-THEORETICALLY SECURE
+            </span>
+          </div>
+
+          <div className={styles.statsRow}>
+            <div className={styles.statCol}>
+              <span className={styles.statLabel}>Raw Input Bits (n)</span>
+              <span className={styles.statValue}>
+                {paData.rawKeyLength || (state.config.targetKeyLength + state.config.securityParameter)} bits
+                <span className={styles.statSubValue}> (m + s)</span>
+              </span>
+            </div>
+            <div className={styles.statCol}>
+              <span className={styles.statLabel}>Security Margin (s)</span>
+              <span className={styles.statValue}>
+                {paData.securityParameter || state.config.securityParameter} bits
+                <span className={styles.statSubValue}> (Sacrificed)</span>
+              </span>
+            </div>
+            <div className={styles.statCol}>
+              <span className={styles.statLabel}>Amplified Key (m)</span>
+              <span className={styles.statValue} style={{ color: 'var(--color-primary)' }}>
+                {paData.amplifiedKeyLength || state.config.targetKeyLength} bits
+              </span>
+            </div>
+            <div className={styles.statCol}>
+              <span className={styles.statLabel}>Compression Ratio</span>
+              <span className={styles.statValue}>
+                {paData.compressionRatio
+                  ? `${paData.compressionRatio.toFixed(1)}%`
+                  : `${((state.config.targetKeyLength / (state.config.targetKeyLength + state.config.securityParameter)) * 100).toFixed(1)}%`}
+              </span>
+            </div>
+            <div className={styles.statCol}>
+              <span className={styles.statLabel}>Eve Information Bound</span>
+              <span className={styles.statValue} style={{ color: 'var(--color-success)' }}>
+                ≤ 2^{`-${paData.securityParameter || state.config.securityParameter}`} bits
+                <span className={styles.statSubValue}>
+                  {' '}(~{(Math.pow(2, -(paData.securityParameter || state.config.securityParameter)) / Math.LN2).toExponential(2)} bits)
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* Public Toeplitz Seed */}
+          {paData.paSeed && (
+            <div className={styles.paMatrixCard}>
+              <div className={styles.paSeedHeader}>
+                <span className={styles.paSeedTitle}>
+                  Public Toeplitz Matrix Seed S ({paData.paSeed.length} bits = n + m - 1)
+                </span>
+                <button
+                  type="button"
+                  className={styles.paSeedCopyBtn}
+                  onClick={() => handleCopySeed(paData.paSeed)}
+                >
+                  {seedCopied ? '✓ Copied' : 'Copy Seed'}
+                </button>
+              </div>
+              <div className={styles.paSeedText}>
+                {paData.paSeed}
+              </div>
+            </div>
+          )}
+
+          {/* Mathematical Leftover Hash Lemma Explanation */}
+          <div className={styles.paEquationBox}>
+            <div className={styles.paEquationFormula}>
+              Hash Mapping: K = T_S · X (mod 2)
+            </div>
+            <div>
+              Alice and Bob publicly negotiate random seed <code>S</code> to construct a 2-universal Toeplitz hash matrix <code>T_S ∈ GF(2)^(m × n)</code>. Under the Leftover Hash Lemma, even if Eve obtained partial knowledge from eavesdropping, universal hashing reduces her mutual information exponentially: <code>I_E ≤ 2^(-s) / ln(2)</code>, yielding an information-theoretically secure <code>m</code>-bit key.
+            </div>
           </div>
         </div>
       )}
@@ -982,12 +1102,27 @@ export function KeyGenerationPage() {
               Run Cascade Protocol ›
             </button>
           )}
-          {currentPhase === 'qberEstimation' && !isAborted && !errorCorrectionEnabled && (
+          {currentPhase === 'qberEstimation' && !isAborted && !errorCorrectionEnabled && privacyAmplificationEnabled && (
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Run Privacy Amplification ›
+            </button>
+          )}
+          {currentPhase === 'qberEstimation' && !isAborted && !errorCorrectionEnabled && !privacyAmplificationEnabled && (
             <button className={styles.primaryButton} onClick={handleNextPhase}>
               Establish Key ›
             </button>
           )}
-          {currentPhase === 'errorCorrection' && !isAborted && (
+          {currentPhase === 'errorCorrection' && !isAborted && privacyAmplificationEnabled && (
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Run Privacy Amplification ›
+            </button>
+          )}
+          {currentPhase === 'errorCorrection' && !isAborted && !privacyAmplificationEnabled && (
+            <button className={styles.primaryButton} onClick={handleNextPhase}>
+              Establish Key ›
+            </button>
+          )}
+          {currentPhase === 'privacyAmplification' && !isAborted && (
             <button className={styles.primaryButton} onClick={handleNextPhase}>
               Establish Key ›
             </button>

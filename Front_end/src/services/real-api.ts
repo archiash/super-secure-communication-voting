@@ -52,6 +52,8 @@ export class RealApiService implements ApiService {
           qubitPerSession: config.qubitCount,
           targetKeyLength: config.targetKeyLength,
           errorTolerance: config.errorTolerance,
+          privacyAmplificationEnabled: config.privacyAmplificationEnabled,
+          securityParameter: config.securityParameter ?? 16,
         }),
       });
       if (!res.ok) throw new Error(`Key generation failed: ${res.statusText}`);
@@ -109,6 +111,15 @@ export class RealApiService implements ApiService {
             applied: config.errorCorrectionEnabled && data.qberPercent <= data.thresholdPercent && Boolean(data.keyGenerated && data.keyGenerated.length > 0),
             correctedBits: data.errorFound,
             method: config.errorCorrectionEnabled ? 'cascade' : 'none',
+          },
+          privacyAmplification: {
+            applied: Boolean(data.privacyAmplificationEnabled && data.paSeed),
+            rawKeyLength: data.rawKeyLength || (data.keyGenerated?.length ? data.keyGenerated.length + (config.securityParameter || 16) : 0),
+            amplifiedKeyLength: data.keyGenerated?.length || 0,
+            paSeed: data.paSeed || '',
+            compressionRatio: data.paCompressionRatio || 0,
+            eveInfoBound: data.eveInfoBound || 0,
+            securityParameter: config.securityParameter || 16,
           },
           keyEstablished: {
             finalKey: data.keyGenerated,

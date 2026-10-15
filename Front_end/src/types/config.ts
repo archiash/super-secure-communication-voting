@@ -19,6 +19,12 @@ export interface ProtocolConfig {
   /** Whether Cascade error correction is enabled */
   errorCorrectionEnabled: boolean;
 
+  /** Whether Privacy Amplification (Toeplitz universal hashing) is enabled */
+  privacyAmplificationEnabled: boolean;
+
+  /** Security parameter s in bits (e.g. 16) ensuring Eve information <= 2^-s */
+  securityParameter: number;
+
   /** Maximum acceptable QBER before key is rejected. e.g., 0.11 (11%) */
   errorThreshold: number;
 
@@ -31,9 +37,18 @@ export interface ProtocolConfig {
 
 /**
  * Calculate the total number of polarized photons to transmit in the channel:
- * N_photons = ceil((4 + delta) * targetKeyLength)
+ * With Privacy Amplification: N_photons = ceil((4 + delta) * (targetKeyLength + s))
+ * Without Privacy Amplification: N_photons = ceil((4 + delta) * targetKeyLength)
  */
-export function calculatePhotonCount(targetKeyLength: number, errorTolerance: number): number {
+export function calculatePhotonCount(
+  targetKeyLength: number,
+  errorTolerance: number,
+  securityParameter: number = 16,
+  privacyAmplificationEnabled: boolean = true
+): number {
+  if (privacyAmplificationEnabled) {
+    return Math.ceil((4 + errorTolerance) * (targetKeyLength + securityParameter));
+  }
   return Math.ceil((4 + errorTolerance) * targetKeyLength);
 }
 
@@ -44,6 +59,8 @@ export const DEFAULT_CONFIG: ProtocolConfig = {
   useRealQuantum: true,
   eveSimulation: false,
   errorCorrectionEnabled: false,
+  privacyAmplificationEnabled: true,
+  securityParameter: 16,
   errorThreshold: 0.11,
   testBitCount: 4,
   errorTolerance: 0.05,

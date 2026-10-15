@@ -67,8 +67,15 @@ export class MockApiService implements ApiService {
     const sessionId = generateSessionId();
 
     // --- Phase 1: Transmission ---
-    // Calculate raw photons transmitted in the optical channel: (4 + δ) × n
-    const photonsToTransmit = calculatePhotonCount(config.targetKeyLength, config.errorTolerance);
+    // Calculate raw photons transmitted in the optical channel: (4 + δ) × (m + s)
+    const secParam = config.securityParameter ?? 16;
+    const paEnabled = config.privacyAmplificationEnabled ?? true;
+    const photonsToTransmit = calculatePhotonCount(
+      config.targetKeyLength,
+      config.errorTolerance,
+      secParam,
+      paEnabled
+    );
     const log = this.simulateTransmission(photonsToTransmit, config.eveSimulation);
 
     // --- Phase 2: Basis Sifting ---
@@ -88,19 +95,6 @@ export class MockApiService implements ApiService {
       }
     }
     const qber = testBitCount > 0 ? errorsFound / testBitCount : 0;
-    // this funtion is use to force the QBER to be clearly above threshold so Eve is reliably detected every run.
-    //let qber = testBitCount > 0 ? errorsFound / testBitCount : 0;
-
-    // When Eve is simulated, she ALWAYS causes a detectable disturbance (≥25% QBER).
-    // If the random sampling didn't catch enough errors, we force the QBER to be
-    // clearly above threshold so Eve is reliably detected every run.
-    //if (config.eveSimulation && qber <= config.errorThreshold) {
-    // Target a QBER that is visibly above threshold (e.g. 25%)
-    //const targetQber = Math.max(0.25, config.errorThreshold + 0.1);
-    //errorsFound = Math.ceil(targetQber * testBitCount);
-    //qber = testBitCount > 0 ? errorsFound / testBitCount : targetQber;
-    //}
-
     const passed = qber <= config.errorThreshold;
 
     // Remove test bits from the key
@@ -110,7 +104,6 @@ export class MockApiService implements ApiService {
     let correctedBits = 0;
     const correctedKey = [...remainingBits];
     if (config.errorCorrectionEnabled && passed) {
-      // Simple simulation: if there are errors, "correct" them
       const originalAliceBits = keptEntries.slice(testBitCount).map((e) => e.aliceBit);
       for (let i = 0; i < correctedKey.length; i++) {
         if (correctedKey[i] !== originalAliceBits[i]) {
@@ -120,10 +113,35 @@ export class MockApiService implements ApiService {
       }
     }
 
-    // --- Phase 5: Key Established ---
-    // Truncate to target key length
-    const finalKeyBits = correctedKey.slice(0, config.targetKeyLength);
-    const finalKey = finalKeyBits.join('');
+    // --- Phase 5: Privacy Amplification (Toeplitz Hashing) ---
+    let finalKey = '';
+    let paSeed = '';
+    let paCompressionRatio = 0;
+    let eveInfoBound = 0;
+    const rawKeyLen = remainingBits.length;
+
+    if (passed) {
+      if (paEnabled && remainingBits.length >= config.targetKeyLength) {
+        const seedLen = remainingBits.length + config.targetKeyLength - 1;
+        paSeed = Array.from({ length: seedLen }, () => (Math.random() < 0.5 ? '0' : '1')).join('');
+        const m = config.targetKeyLength;
+        const n = remainingBits.length;
+        const outBits: number[] = [];
+        for (let i = 0; i < m; i++) {
+          let sum = 0;
+          for (let j = 0; j < n; j++) {
+            const seedBit = parseInt(paSeed[m - 1 - i + j], 10);
+            sum += seedBit * correctedKey[j];
+          }
+          outBits.push(sum % 2);
+        }
+        finalKey = outBits.join('');
+        paCompressionRatio = Math.round((1 - config.targetKeyLength / remainingBits.length) * 1000) / 10;
+        eveInfoBound = Math.pow(2, -secParam);
+      } else {
+        finalKey = correctedKey.slice(0, config.targetKeyLength).join('');
+      }
+    }
 
     // --- Eve data ---
     let eveData = undefined;
@@ -160,6 +178,15 @@ export class MockApiService implements ApiService {
           applied: config.errorCorrectionEnabled && passed,
           correctedBits,
           method: config.errorCorrectionEnabled ? 'cascade' : 'none',
+        },
+        privacyAmplification: {
+          applied: paEnabled && Boolean(paSeed),
+          rawKeyLength: rawKeyLen,
+          amplifiedKeyLength: finalKey.length,
+          paSeed,
+          compressionRatio: paCompressionRatio,
+          eveInfoBound,
+          securityParameter: secParam,
         },
         keyEstablished: {
           finalKey,
