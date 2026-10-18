@@ -379,7 +379,128 @@ def render_all_plots(data=None):
     save_minimal(fig, "minimal_fig4_optimal_delta_vs_keysize_localsim.png")
     plt.close(fig)
 
-    print("\n[COMPLETE] ALL 8 Publication-Grade Minimal Figures Rendered Successfully!")
+    # ==========================================================================
+    # 9. PRIVACY AMPLIFICATION: Eve Knowledge Before vs. After
+    # ==========================================================================
+    if "privacy_amplification_analysis" in data:
+        pa_data = data["privacy_amplification_analysis"]["results"]
+        pa_keys = [int(k) for k in pa_data.keys()]
+        x_pa = np.arange(len(pa_keys))
+
+        fig, ax = plt.subplots(figsize=(7.6, 4.8), facecolor='white')
+        before_s16 = [pa_data[str(k)]["16"]["k_before_mean"] for k in pa_keys]
+        after_s8 = [pa_data[str(k)]["8"]["k_after_mean"] for k in pa_keys]
+        after_s16 = [pa_data[str(k)]["16"]["k_after_mean"] for k in pa_keys]
+        after_s32 = [pa_data[str(k)]["32"]["k_after_mean"] for k in pa_keys]
+
+        w_pa = 0.20
+        b0 = ax.bar(x_pa - 1.5 * w_pa, before_s16, w_pa, label='Before PA (Eve Raw Knowledge)', color='#e11d48', alpha=0.9, edgecolor='none')
+        b1 = ax.bar(x_pa - 0.5 * w_pa, after_s8, w_pa, label='After PA (s = 8 bits)', color='#f59e0b', alpha=0.9, edgecolor='none')
+        b2 = ax.bar(x_pa + 0.5 * w_pa, after_s16, w_pa, label='After PA (s = 16 bits)', color='#0284c7', alpha=0.9, edgecolor='none')
+        b3 = ax.bar(x_pa + 1.5 * w_pa, after_s32, w_pa, label='After PA (s = 32 bits)', color='#059669', alpha=0.9, edgecolor='none')
+
+        for i in range(len(pa_keys)):
+            ax.text(x_pa[i] - 1.5 * w_pa, before_s16[i] + 0.8, f"{before_s16[i]:.1f}b", ha='center', va='bottom', fontsize=8.5, fontweight='bold', color='#9f1239')
+            v8 = after_s8[i]; v16 = after_s16[i]; v32 = after_s32[i]
+            txt8 = f"{v8:.2f}" if v8 > 0 else "0"
+            txt16 = f"{v16:.2f}" if v16 > 0 else "0"
+            txt32 = f"{v32:.2f}" if v32 > 0 else "0"
+            ax.text(x_pa[i] - 0.5 * w_pa, max(0.4, v8) + 0.5, txt8, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#b45309', rotation=90)
+            ax.text(x_pa[i] + 0.5 * w_pa, max(0.4, v16) + 0.5, txt16, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#0369a1', rotation=90)
+            ax.text(x_pa[i] + 1.5 * w_pa, max(0.4, v32) + 0.5, txt32, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#047857', rotation=90)
+
+        ax.set_title("Eve Eavesdropping Knowledge: Before vs. After Privacy Amplification", pad=14)
+        ax.set_xlabel("Target Key Size n (bits)")
+        ax.set_ylabel("Eve Known Bits (bits)")
+        ax.set_xticks(x_pa)
+        ax.set_xticklabels([f"{k}b" for k in pa_keys])
+        ax.set_ylim(0, max(before_s16) * 1.18)
+        ax.grid(axis='y', linestyle='-', linewidth=0.7, color='#f1f5f9')
+        ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), frameon=False, fontsize=8.6, handletextpad=0.5, labelspacing=0.8)
+        save_minimal(fig, "minimal_privacy_amplification_before_after.png")
+        plt.close(fig)
+
+        # ==========================================================================
+        # 10. PRIVACY AMPLIFICATION: Full Elimination Rate (%)
+        # ==========================================================================
+        fig, ax = plt.subplots(figsize=(7.6, 4.6), facecolor='white')
+        pct_s8 = [pa_data[str(k)]["8"]["pct_fully_disappeared"] for k in pa_keys]
+        pct_s16 = [pa_data[str(k)]["16"]["pct_fully_disappeared"] for k in pa_keys]
+        pct_s32 = [pa_data[str(k)]["32"]["pct_fully_disappeared"] for k in pa_keys]
+
+        ax.plot(x_pa, pct_s32, marker='s', markersize=6.5, color='#059669', linewidth=2.0, label=f'Security Parameter s = 32 (Avg: {np.mean(pct_s32):.1f}% Erased)')
+        ax.plot(x_pa, pct_s16, marker='o', markersize=6.0, color='#0284c7', linewidth=1.8, label=f'Security Parameter s = 16 (Avg: {np.mean(pct_s16):.1f}% Erased)')
+        ax.plot(x_pa, pct_s8, marker='^', markersize=6.0, color='#f59e0b', linewidth=1.6, linestyle='--', label=f'Security Parameter s = 8 (Avg: {np.mean(pct_s8):.1f}% Erased)')
+
+        for i in range(len(pa_keys)):
+            ax.text(x_pa[i], pct_s32[i] + 1.2, f"{pct_s32[i]:.0f}%", ha='center', va='bottom', fontsize=8.4, fontweight='bold', color='#047857')
+            if pct_s16[i] < 100.0:
+                ax.text(x_pa[i] + 0.15, pct_s16[i] - 1.6, f"{pct_s16[i]:.0f}%", ha='left', va='top', fontsize=8.2, fontweight='bold', color='#0369a1')
+            ax.text(x_pa[i], pct_s8[i] - 1.5, f"{pct_s8[i]:.0f}%", ha='center', va='top', fontsize=8.2, fontweight='bold', color='#b45309')
+
+        ax.set_title("Probability of Complete Eve Knowledge Elimination (k_after = 0 bits)", pad=14)
+        ax.set_xlabel("Target Key Size n (bits)")
+        ax.set_ylabel("Full Elimination Percentage (%)")
+        ax.set_xticks(x_pa)
+        min_pa_pct = min(min(pct_s8), min(pct_s16), min(pct_s32))
+        ax.set_ylim(min(75, min_pa_pct - 5), 106)
+        ax.grid(axis='y', linestyle='-', linewidth=0.7, color='#f1f5f9')
+        ax.legend(loc='upper left', bbox_to_anchor=(1.02, 1.0), frameon=False, fontsize=8.6, handletextpad=0.5, labelspacing=0.8)
+        save_minimal(fig, "minimal_privacy_amplification_elimination_rate.png")
+        plt.close(fig)
+
+        # ==========================================================================
+        # 11. PRIVACY AMPLIFICATION: Unified 2-Panel Summary
+        # ==========================================================================
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15.2, 5.4), facecolor='white')
+        b0 = ax1.bar(x_pa - 1.5 * w_pa, before_s16, w_pa, label='Before PA (Eve Raw Knowledge)', color='#e11d48', alpha=0.9, edgecolor='none')
+        b1 = ax1.bar(x_pa - 0.5 * w_pa, [max(0.3, v) for v in after_s8], w_pa, label='After PA (s = 8b)', color='#f59e0b', alpha=0.9, edgecolor='none')
+        b2 = ax1.bar(x_pa + 0.5 * w_pa, [max(0.3, v) for v in after_s16], w_pa, label='After PA (s = 16b)', color='#0284c7', alpha=0.9, edgecolor='none')
+        b3 = ax1.bar(x_pa + 1.5 * w_pa, [max(0.3, v) for v in after_s32], w_pa, label='After PA (s = 32b)', color='#059669', alpha=0.9, edgecolor='none')
+
+        for i in range(len(pa_keys)):
+            ax1.text(x_pa[i] - 1.5 * w_pa, before_s16[i] + 0.8, f"{before_s16[i]:.1f}b", ha='center', va='bottom', fontsize=8.5, fontweight='bold', color='#9f1239')
+            v8 = after_s8[i]; v16 = after_s16[i]; v32 = after_s32[i]
+            txt8 = f"{v8:.2f}" if v8 > 0 else "0"
+            txt16 = f"{v16:.2f}" if v16 > 0 else "0"
+            txt32 = f"{v32:.2f}" if v32 > 0 else "0"
+            ax1.text(x_pa[i] - 0.5 * w_pa, max(0.4, v8) + 0.5, txt8, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#b45309', rotation=90)
+            ax1.text(x_pa[i] + 0.5 * w_pa, max(0.4, v16) + 0.5, txt16, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#0369a1', rotation=90)
+            ax1.text(x_pa[i] + 1.5 * w_pa, max(0.4, v32) + 0.5, txt32, ha='center', va='bottom', fontsize=7.8, fontweight='bold', color='#047857', rotation=90)
+
+        ax1.set_title("A. Eve Known Bits: Before vs. After Privacy Amplification", pad=14, fontsize=10.5, fontweight='bold')
+        ax1.set_xlabel("Target Key Size n (bits)")
+        ax1.set_ylabel("Eve Known Bits (bits)")
+        ax1.set_xticks(x_pa)
+        ax1.set_xticklabels([f"{k}b" for k in pa_keys])
+        ax1.set_ylim(0, max(before_s16) * 1.18)
+        ax1.grid(axis='y', linestyle='-', linewidth=0.7, color='#f1f5f9')
+        ax1.legend(loc='upper left', frameon=False, fontsize=8.4)
+
+        ax2.plot(x_pa, pct_s32, marker='s', markersize=6.5, color='#059669', linewidth=2.0, label=f's = 32 bits (Avg: {np.mean(pct_s32):.1f}% Erased)')
+        ax2.plot(x_pa, pct_s16, marker='o', markersize=6.0, color='#0284c7', linewidth=1.8, label=f's = 16 bits (Avg: {np.mean(pct_s16):.1f}% Erased)')
+        ax2.plot(x_pa, pct_s8, marker='^', markersize=6.0, color='#f59e0b', linewidth=1.6, linestyle='--', label=f's = 8 bits (Avg: {np.mean(pct_s8):.1f}% Erased)')
+
+        for i in range(len(pa_keys)):
+            ax2.text(x_pa[i], pct_s32[i] + 1.2, f"{pct_s32[i]:.0f}%", ha='center', va='bottom', fontsize=8.4, fontweight='bold', color='#047857')
+            if pct_s16[i] < 100.0:
+                ax2.text(x_pa[i] + 0.15, pct_s16[i] - 1.6, f"{pct_s16[i]:.0f}%", ha='left', va='top', fontsize=8.2, fontweight='bold', color='#0369a1')
+            ax2.text(x_pa[i], pct_s8[i] - 1.5, f"{pct_s8[i]:.0f}%", ha='center', va='top', fontsize=8.2, fontweight='bold', color='#b45309')
+
+        ax2.set_title("B. Probability of Complete Knowledge Elimination (k_after = 0)", pad=14, fontsize=10.5, fontweight='bold')
+        ax2.set_xlabel("Target Key Size n (bits)")
+        ax2.set_ylabel("Full Elimination Percentage (%)")
+        ax2.set_xticks(x_pa)
+        ax2.set_xticklabels([f"{k}b" for k in pa_keys])
+        ax2.set_ylim(min(75, min_pa_pct - 5), 106)
+        ax2.grid(axis='y', linestyle='-', linewidth=0.7, color='#f1f5f9')
+        ax2.legend(loc='lower left', frameon=False, fontsize=8.4)
+
+        plt.subplots_adjust(wspace=0.22)
+        save_minimal(fig, "minimal_privacy_amplification_summary.png")
+        plt.close(fig)
+
+    print("\n[COMPLETE] ALL Publication-Grade Minimal Figures Rendered Successfully!")
     print("All text strictly outside canvas. Smaller axis labels applied.")
 
 

@@ -12087,5 +12087,255 @@
         0.5
       ]
     }
+  },
+  "privacy_amplification_analysis": {
+    "metadata": {
+      "trials_per_condition": 100,
+      "undetected_qber_scenario": 0.08,
+      "key_sizes": [
+        8,
+        16,
+        32,
+        64,
+        128,
+        256
+      ],
+      "security_parameters": [
+        8,
+        16,
+        32
+      ],
+      "hash_family": "2-Universal Toeplitz Hashing over GF(2)"
+    },
+    "results": {
+      "8": {
+        "8": {
+          "n_target": 8,
+          "security_parameter": 8,
+          "n_raw_input": 20,
+          "undetected_qber": 0.08,
+          "k_before_mean": 3.04,
+          "k_before_std": 1.618147088493503,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 8,
+          "security_parameter": 16,
+          "n_raw_input": 29,
+          "undetected_qber": 0.08,
+          "k_before_mean": 4.81,
+          "k_before_std": 1.9529208893347423,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 8,
+          "security_parameter": 32,
+          "n_raw_input": 48,
+          "undetected_qber": 0.08,
+          "k_before_mean": 7.99,
+          "k_before_std": 2.459654447275064,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      },
+      "16": {
+        "8": {
+          "n_target": 16,
+          "security_parameter": 8,
+          "n_raw_input": 29,
+          "undetected_qber": 0.08,
+          "k_before_mean": 4.67,
+          "k_before_std": 2.0883246873989685,
+          "k_after_mean": 0.02,
+          "k_after_max": 1,
+          "pct_fully_disappeared": 98.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 16,
+          "security_parameter": 16,
+          "n_raw_input": 39,
+          "undetected_qber": 0.08,
+          "k_before_mean": 6.05,
+          "k_before_std": 2.6433879775772606,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 16,
+          "security_parameter": 32,
+          "n_raw_input": 58,
+          "undetected_qber": 0.08,
+          "k_before_mean": 9.41,
+          "k_before_std": 2.6309503986202403,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      },
+      "32": {
+        "8": {
+          "n_target": 32,
+          "security_parameter": 8,
+          "n_raw_input": 48,
+          "undetected_qber": 0.08,
+          "k_before_mean": 8.11,
+          "k_before_std": 2.501579501035296,
+          "k_after_mean": 0.09,
+          "k_after_max": 2,
+          "pct_fully_disappeared": 93.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 32,
+          "security_parameter": 16,
+          "n_raw_input": 58,
+          "undetected_qber": 0.08,
+          "k_before_mean": 8.9,
+          "k_before_std": 2.5278449319529077,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 32,
+          "security_parameter": 32,
+          "n_raw_input": 77,
+          "undetected_qber": 0.08,
+          "k_before_mean": 11.82,
+          "k_before_std": 3.4128580398252724,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      },
+      "64": {
+        "8": {
+          "n_target": 64,
+          "security_parameter": 8,
+          "n_raw_input": 86,
+          "undetected_qber": 0.08,
+          "k_before_mean": 14.27,
+          "k_before_std": 3.0359677205135105,
+          "k_after_mean": 0.04,
+          "k_after_max": 1,
+          "pct_fully_disappeared": 96.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 64,
+          "security_parameter": 16,
+          "n_raw_input": 96,
+          "undetected_qber": 0.08,
+          "k_before_mean": 15.19,
+          "k_before_std": 3.0156093911513144,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 64,
+          "security_parameter": 32,
+          "n_raw_input": 115,
+          "undetected_qber": 0.08,
+          "k_before_mean": 18.12,
+          "k_before_std": 4.373282520030006,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      },
+      "128": {
+        "8": {
+          "n_target": 128,
+          "security_parameter": 8,
+          "n_raw_input": 162,
+          "undetected_qber": 0.08,
+          "k_before_mean": 26.5,
+          "k_before_std": 4.697871858618538,
+          "k_after_mean": 0.19,
+          "k_after_max": 4,
+          "pct_fully_disappeared": 87.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 128,
+          "security_parameter": 16,
+          "n_raw_input": 172,
+          "undetected_qber": 0.08,
+          "k_before_mean": 27.97,
+          "k_before_std": 4.719014727673564,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 128,
+          "security_parameter": 32,
+          "n_raw_input": 191,
+          "undetected_qber": 0.08,
+          "k_before_mean": 30.89,
+          "k_before_std": 5.46423828177359,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      },
+      "256": {
+        "8": {
+          "n_target": 256,
+          "security_parameter": 8,
+          "n_raw_input": 315,
+          "undetected_qber": 0.08,
+          "k_before_mean": 50.71,
+          "k_before_std": 6.629170385500737,
+          "k_after_mean": 0.4,
+          "k_after_max": 7,
+          "pct_fully_disappeared": 81.0,
+          "leftover_hash_leakage_bound": 0.005635527503472513
+        },
+        "16": {
+          "n_target": 256,
+          "security_parameter": 16,
+          "n_raw_input": 324,
+          "undetected_qber": 0.08,
+          "k_before_mean": 51.58,
+          "k_before_std": 6.88502723306161,
+          "k_after_mean": 0.1,
+          "k_after_max": 10,
+          "pct_fully_disappeared": 99.0,
+          "leftover_hash_leakage_bound": 2.2013779310439505e-05
+        },
+        "32": {
+          "n_target": 256,
+          "security_parameter": 32,
+          "n_raw_input": 343,
+          "undetected_qber": 0.08,
+          "k_before_mean": 54.3,
+          "k_before_std": 6.400781202322103,
+          "k_after_mean": 0.0,
+          "k_after_max": 0,
+          "pct_fully_disappeared": 100.0,
+          "leftover_hash_leakage_bound": 3.359036149664231e-10
+        }
+      }
+    }
   }
 }

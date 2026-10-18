@@ -92,6 +92,7 @@ class VotingLogItem(CamelModel):
     eve_info_bound: Optional[float] = 0.0
     raw_key_length: Optional[int] = 0
     status: Optional[str] = "KEY_GENERATED"
+    encrypted_vote: Optional[str] = None
     timestamp: float
 
 class VotingLogResponse(CamelModel):
@@ -126,6 +127,7 @@ class VotingSession(BaseModel):
     eve_info_bound: Optional[float] = 0.0
     raw_key_length: Optional[int] = 0
     status: Optional[str] = "KEY_GENERATED"
+    encrypted_vote: Optional[str] = None
     timestamp: float
 
 class ElectionSchema(Document):
