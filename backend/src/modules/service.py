@@ -401,6 +401,7 @@ async def get_voting_logs(election_code: Optional[str] = None):
             qber_system=s.qber_system or 0.0,
             threshold_percent=s.threshold_percent or 11.0,
             status=s.status or ("VOTE_CAST" if getattr(s, 'encrypted_vote', '') else "KEY_GENERATED"),
+            encrypted_vote=getattr(s, 'encrypted_vote', None),
             timestamp=s.timestamp or 0.0,
         )
         for s in election.sessions

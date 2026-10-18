@@ -1007,15 +1007,6 @@ export function KeyGenerationPage() {
                   : `${((state.config.targetKeyLength / (state.config.targetKeyLength + state.config.securityParameter)) * 100).toFixed(1)}%`}
               </span>
             </div>
-            <div className={styles.statCol}>
-              <span className={styles.statLabel}>Eve Information Bound</span>
-              <span className={styles.statValue} style={{ color: 'var(--color-success)' }}>
-                ≤ 2^{`-${paData.securityParameter || state.config.securityParameter}`} bits
-                <span className={styles.statSubValue}>
-                  {' '}(~{(Math.pow(2, -(paData.securityParameter || state.config.securityParameter)) / Math.LN2).toExponential(2)} bits)
-                </span>
-              </span>
-            </div>
           </div>
 
           {/* Public Toeplitz Seed */}

@@ -4,38 +4,45 @@ import { useApp } from '../context/AppContext';
 import { Stepper } from '../components/layout/Stepper';
 import styles from './AuthenticationPage.module.css';
 
+const getNextVoterNumber = (): number => {
+  const stored = localStorage.getItem('demo_voter_counter');
+  let num = stored ? parseInt(stored, 10) : 1;
+  if (isNaN(num) || num < 1 || num >= 200) {
+    num = 1;
+    localStorage.setItem('demo_voter_counter', '1');
+  }
+  return num;
+};
+
 export function AuthenticationPage() {
   const { state, dispatch, api } = useApp();
   const navigate = useNavigate();
 
-  const [voterId, setVoterId] = useState('');
-  const [electionCode, setElectionCode] = useState('');
+  const [voterId, setVoterId] = useState(() => `V-2026-${getNextVoterNumber()}`);
+  const [electionCode, setElectionCode] = useState('ELECT2026');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAuthenticate = async () => {
     setError(null);
 
-    if (!voterId.trim()) {
-      setError('Voter ID is required.');
-      return;
-    }
-    if (!electionCode.trim()) {
-      setError('Election Code is required.');
-      return;
-    }
+    const effectiveVoterId = voterId.trim() || `V-2026-${getNextVoterNumber()}`;
+    const effectiveElectionCode = electionCode.trim() || 'ELECT2026';
+
+    if (!voterId.trim()) setVoterId(effectiveVoterId);
+    if (!electionCode.trim()) setElectionCode(effectiveElectionCode);
 
     setIsLoading(true);
     try {
       if (state.auth.sessionId && !state.auth.isReplay) {
         try {
-          await api.abortSession(state.auth.sessionId, state.auth.electionCode || electionCode);
+          await api.abortSession(state.auth.sessionId, state.auth.electionCode || effectiveElectionCode);
         } catch (err) {
           console.warn('Failed to abort prior session:', err);
         }
       }
 
-      const response = await api.verifyAuth({ voterId, electionCode });
+      const response = await api.verifyAuth({ voterId: effectiveVoterId, electionCode: effectiveElectionCode });
 
       if (!response.valid) {
         setError(response.error || 'Authentication failed.');
@@ -43,11 +50,17 @@ export function AuthenticationPage() {
         return;
       }
 
+      // Increment running demo voter counter for the next session
+      const match = effectiveVoterId.match(/V-2026-(\d+)/i);
+      const currentNum = match ? parseInt(match[1], 10) : getNextVoterNumber();
+      const nextNum = isNaN(currentNum) ? 1 : currentNum + 1;
+      localStorage.setItem('demo_voter_counter', nextNum.toString());
+
       dispatch({
         type: 'AUTHENTICATE',
         payload: {
-          voterId,
-          electionCode,
+          voterId: effectiveVoterId,
+          electionCode: effectiveElectionCode,
           sessionId: response.sessionId,
         },
       });
