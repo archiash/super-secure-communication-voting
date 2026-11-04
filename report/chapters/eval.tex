@@ -1,3 +1,4 @@
+% !TEX root = ../main.tex
 \chapter{\ifproject%
 \ifenglish Experimentation and Results\else การทดลองและผลลัพธ์\fi
 \else%
@@ -8,7 +9,7 @@
 
 \section{วัตถุประสงค์ของการประเมินระบบ}
 
-การประเมินระบบในโครงงานนี้มีวัตถุประสงค์เพื่อจำลองการทำงานและแสดงแนวคิดเชิงปฏิบัติ (Proof of Concept) ของระบบโหวตความปลอดภัยสูงที่ใช้เทคโนโลยี Quantum Key Distribution (QKD) และ Blind Signature
+การประเมินระบบในโครงงานนี้มีวัตถุประสงค์เพื่อจำลองการทำงานและแสดงแนวคิดเชิงปฏิบัติ (Proof of Concept) ของระบบโหวตความปลอดภัยสูงที่ใช้เทคโนโลยี Quantum Key Distribution (QKD) ร่วมกับการเข้ารหัสแบบวันไทม์แพด (One-Time Pad: OTP)
 
 นอกจากนี้ โครงงานยังมีการพัฒนาในระดับ implementation เบื้องต้น เพื่อแสดงให้เห็นว่าระบบสามารถนำไปใช้งานได้จริงในบางส่วน โดยมุ่งเน้นการทดสอบกลไกหลักของระบบ เช่น การเข้ารหัส การแจกจ่ายกุญแจ และกระบวนการโหวต
 
@@ -16,9 +17,8 @@
 
 \begin{itemize}
     \item ความเป็นไปได้ของการใช้ QKD ในการแจกจ่ายกุญแจสำหรับระบบโหวต
-    \item ความสามารถของ Blind Signature ในการรักษาความเป็นนิรนามของผู้โหวต
-    \item ความถูกต้องของกระบวนการโหวตภายใต้การจำลอง
-    \item การแสดงให้เห็นถึงความปลอดภัยของระบบในเชิงแนวคิด
+    \item ความถูกต้องของกระบวนการโหวตและการเข้ารหัสแบบ One-Time Pad ภายใต้การจำลอง
+    \item การแสดงให้เห็นถึงความปลอดภัยของระบบในเชิงแนวคิดและการตรวจจับผู้ดักฟัง
 \end{itemize}
 
 \section{ขอบเขตการทดสอบ}
@@ -30,14 +30,14 @@
 \begin{itemize}
     \item จำลองกระบวนการ QKD (BB84 protocol)
     \item จำลองการตรวจจับการดักฟัง (Eavesdropper)
-    \item จำลองการเข้ารหัสและถอดรหัสข้อมูล
-    \item จำลองการทำ Blind Signature
+    \item จำลองการขยายความลับ (Privacy Amplification)
+    \item จำลองการเข้ารหัสและถอดรหัสข้อมูลด้วย One-Time Pad (XOR)
 \end{itemize}
 
 \subsection{Implementation Level (Prototype)}
 
 \begin{itemize}
-    \item พัฒนาระบบโหวตต้นแบบ (เช่น web-based หรือ script)
+    \item พัฒนาระบบโหวตต้นแบบในรูปแบบเว็บแอปพลิเคชัน
     \item ทดสอบการส่งข้อมูลโหวตจริงผ่านระบบ
     \item ทดสอบการใช้งานของผู้ใช้ในสถานการณ์จำลอง
 \end{itemize}
@@ -64,7 +64,7 @@
 
 \subsection{การตรวจจับการดักฟังและการแยกแยะสัญญาณรบกวน (Eavesdropping Detection \& QBER Threshold)}
 
-ในการสื่อสารควอนตัม อัตราความผิดพลาดของบิตควอนตัม (Quantum Bit Error Rate: QBER) จะถูกใช้เป็นตัวชี้วัดความปลอดภัย โดยระบบได้ตั้งค่าเกณฑ์ความปลอดภัยไว้ที่ $11.0\%$ (ตามขีดจำกัดทางทฤษฎีสารสนเทศควอนตัม):
+ในการสื่อสารควอนตัม อัตราความผิดพลาดของบิตควอนตัม (Quantum Bit Error Rate: QBER) จะถูกใช้เป็นตัวชี้วัดความปลอดภัย โดยระบบได้ตั้งค่าเกณฑ์ความปลอดภัยไว้ที่ $11.0\%$ (ตามขีดจำกัดทางทฤษฎีสารสนเทศควอนตัมของ Shor และ Preskill~\cite{shor_preskill_2000}):
 \begin{itemize}
     \item \textbf{กรณีไม่มีผู้ดักฟัง (Local Simulator):} ค่า QBER เท่ากับ $0.00\%$ เนื่องจากเป็นช่องสัญญาณอุดมคติ
     \item \textbf{กรณีมี Hardware Noise (IBM Quantum):} ค่า QBER เฉลี่ยอยู่ที่ประมาณ $2.0\% - 3.0\%$ ซึ่งเกิดจากความคลาดเคลื่อนทางแสงและเกตบนชิปจริง
@@ -82,15 +82,20 @@
 
 \begin{table}[htbp]
 \centering
+\renewcommand{\arraystretch}{1.35}
+\setlength{\extrarowheight}{2.5pt}
+\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}p{2.2cm} >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\raggedright\arraybackslash}p{2.8cm}}
+\hline
+\textbf{ขนาดคีย์ ($n$)} & \textbf{Local Sim} \newline \textbf{(No Eve)} & \textbf{IBM Quantum} \newline \textbf{(2.5\% Noise)} & \textbf{With Eve} \newline \textbf{Active} & \textbf{อัตราตัดสิทธิ์} \newline \textbf{Eve} & \textbf{สถานะความปลอดภัย} \\ \hline
+\rowcolor{white}
+8 บิต & 0.00\% & 2.23\% & 23.68\% & 85.0\% & ตรวจพบในรอบถัดไป \\
+\rowcolor[HTML]{E4E7EB}
+16 บิต & 0.00\% & 2.52\% & 24.63\% & 96.0\% & ปลอดภัยสูง \\
+\rowcolor{white}
+24 บิต (\texttt{"VT3"}) & 0.00\% & 2.47\% & 24.55\% & 95.0\% & สกัดกั้นสมบูรณ์ \\ \hline
+\end{tabularx}
 \caption{ผลการทดสอบการตรวจจับผู้ดักฟังและการแยกแยะ QBER (เฉลี่ย 100 รอบต่อกรณี)}
 \label{tab:eve_detection}
-\begin{tabular}{cccccc}
-\hline
-\textbf{ขนาดคีย์ ($n$)} & \textbf{Local Sim (No Eve)} & \textbf{IBM Quantum (2.5\% Noise)} & \textbf{With Eve Active} & \textbf{อัตราการตัดสิทธิ์ Eve} & \textbf{สถานะความปลอดภัย} \\ \hline
-8 บิต & 0.00\% & 2.23\% & 23.68\% & 85.0\% & ตรวจพบในรอบถัดไป \\
-16 บิต & 0.00\% & 2.52\% & 24.63\% & 96.0\% & ปลอดภัยสูง \\
-24 บิต (\texttt{"VT3"}) & 0.00\% & 2.47\% & 24.55\% & 95.0\% & สกัดกั้นสมบูรณ์ \\ \hline
-\end{tabular}
 \end{table}
 
 \subsection{การตรวจสอบความปลอดภัยแบบ Blind Verification (Sample QBER vs. Actual Key QBER)}
@@ -109,15 +114,15 @@
 ผลการทดลองยืนยันว่า:
 \begin{enumerate}
     \item \textbf{ความแม่นยำทางสถิติ:} ค่า Sample QBER เป็นตัวประมาณค่าแบบไม่เอนเอียง (Unbiased Estimator) ของ Key QBER โดยมีค่าสหสัมพันธ์สูงถึง $r = 0.76 - 0.84$ และมีค่าเฉลี่ยความคลาดเคลื่อนเพียง $4.67\%$
-    \item \textbf{Safe Zone (QBER $< 11\%$):} บิตที่ผ่านเกณฑ์ความปลอดภัยจะเข้าสู่กระบวนการแก้ไขข้อผิดพลาด (Key Reconciliation / Cascade) ทำให้ได้ผลลัพธ์การถอดรหัสข้อความโหวต One-Time Pad (\texttt{"VT3"}) ถูกต้องแม่นยำ $100.0\%$ เสมอ
+    \item \textbf{Safe Zone (QBER $< 11\%$):} บิตที่ผ่านเกณฑ์ความปลอดภัยจะนำไปใช้เข้ารหัสบัตรลงคะแนน One-Time Pad (\texttt{"VT3"}) ได้ถูกต้องแม่นยำเมื่อเป็นช่องสัญญาณอุดมคติ
     \item \textbf{Abort Zone (QBER $> 11\%$):} เมื่อมี Eve การกระโดดของ Sample QBER จะสั่งทำลายกุญแจทิ้งทันที ทำให้ Eve ไม่สามารถดักถอดรหัสผลโหวตได้
 \end{enumerate}
 
-\section{การประเมินประสิทธิภาพการสร้างกุญแจและค่า Safety Margin ($\delta$ Optimization)}
+\section[การประเมินประสิทธิภาพการสร้างกุญแจและค่า Safety Margin]{การประเมินประสิทธิภาพการสร้างกุญแจและค่า Safety Margin (\texorpdfstring{$\delta$}{delta} Optimization)}
 
-นอกจากด้านความปลอดภัยแล้ว ในแง่ประสิทธิภาพของระบบ (Performance / Efficiency) ความยาวของกุญแจลับ $|K|$ จะต้องมีขนาดไม่น้อยกว่าข้อความโหวต $|M|$ เสมอ ($|K| \ge |M|$) ตามเงื่อนไข Perfect Secrecy ของ One-Time Pad โดยในระบบนี้ข้อความโหวตมาตรฐานคือ \texttt{"VT3"} (24 บิต)
+นอกจากด้านความปลอดภัยแล้ว ในแง่ประสิทธิภาพของระบบ (Performance / Efficiency) ความยาวของกุญแจลับ $|K|$ จะต้องมีขนาดไม่น้อยกว่าข้อความโหวต $|M|$ เสมอ ($|K| \ge |M|$) ตามเงื่อนไข Perfect Secrecy ของ One-Time Pad~\cite{shannon_secure} โดยในระบบนี้ข้อความโหวตมาตรฐานคือ \texttt{"VT3"} (24 บิต)
 
-ตามทฤษฎีการสื่อสารควอนตัมของโพรโทคอล BB84 โอกาสที่ผู้ส่ง (Alice) และผู้รับ (Bob) จะเลือก Basis ตรงกันโดยเฉลี่ยคือ $50\%$ ($p = 0.5$) และในขั้นตอนการตรวจสอบความปลอดภัยจะต้องสละบิตอีก $50\%$ เพื่อสุ่มตรวจหาการดักฟัง (Error Sampling) ทำให้เหลือกุญแจลับใช้งานจริงประมาณ $25\%$ ($N = 4n$) อย่างไรก็ตาม ในทางปฏิบัตินั้นการวัดทางควอนตัมเป็นตัวแปรสุ่มแบบทวินาม (Binomial Distribution) $W \sim \text{Binomial}(N, 0.5)$ หากส่งควอนตัมบิตเพียง $4n = 96$ Qubits จะมีโอกาสถึง $44.0\%$ ที่บิตที่คัดกรองได้จะไม่ถึง $2n = 48$ บิต ส่งผลให้เกิดปัญหาคีย์ไม่พอใช้งาน (Key Shortfall)
+ตามทฤษฎีการสื่อสารควอนตัมของโพรโทคอล BB84 โอกาสที่ผู้ส่ง (Alice) และผู้รับ (Bob) จะเลือก Basis ตรงกันโดยเฉลี่ยคือ $50\%$ ($p = 0.5$) และในขั้นตอนการตรวจสอบความปลอดภัยจะต้องสละบิตอีกส่วนหนึ่งเพื่อสุ่มตรวจหาการดักฟัง (Error Sampling) รวมถึงเผื่อบิตสำหรับการขยายความลับ ($s$) อย่างไรก็ตาม ในทางปฏิบัตินั้นการวัดทางควอนตัมเป็นตัวแปรสุ่มแบบทวินาม (Binomial Distribution) $W \sim \text{Binomial}(N, 0.5)$ หากส่งควอนตัมบิตเพียง $4n = 96$ Qubits จะมีโอกาสถึง $44.0\%$ ที่บิตที่คัดกรองได้จะไม่ถึง $2n = 48$ บิต ส่งผลให้เกิดปัญหาคีย์ไม่พอใช้งาน (Key Shortfall)
 
 \begin{figure}[htbp]
     \centering
@@ -130,20 +135,27 @@
 
 \begin{table}[htbp]
 \centering
+\renewcommand{\arraystretch}{1.35}
+\setlength{\extrarowheight}{2.5pt}
+\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}p{1.8cm} >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X >{\centering\arraybackslash}X}
+\hline
+\textbf{ค่าเผื่อ ($\delta$)} & \textbf{ตัวคูณ} & \textbf{จำนวน Qubit ($N$)} & \textbf{ค่าเฉลี่ยคีย์ (Theory)} & \textbf{โอกาสครบ (Theory)} & \textbf{Local Sim} & \textbf{IBM Quantum} \\ \hline
+\rowcolor{white}
+0.00 & $4.00\times$ & 96 & 24.0 bits & $\sim$54\% & 56.0\% & 61.0\% \\
+\rowcolor[HTML]{E4E7EB}
+0.25 & $4.25\times$ & 102 & 25.5 bits & $\sim$76\% & 75.0\% & 73.0\% \\
+\rowcolor{white}
+0.50 & $4.50\times$ & 108 & 27.0 bits & $\sim$89\% & 93.0\% & 93.0\% \\
+\rowcolor[HTML]{E4E7EB}
+0.80 & $4.80\times$ & 116 & 29.0 bits & $\sim$97\% & 97.0\% & 95.0\% \\
+\rowcolor{white}
+1.00 & $5.00\times$ & 120 & 30.0 bits & $\sim$99\% & 98.0\% & 99.0\% \\ \hline
+\end{tabularx}
 \caption{ตารางเปรียบเทียบการสร้างกุญแจที่ $n = 24$ bits (\texttt{"VT3"}) จากการทดสอบระบบจริง (เฉลี่ย 100 รอบต่อกรณี)}
 \label{tab:delta_optimization}
-\begin{tabular}{ccccccc}
-\hline
-\textbf{ค่าเผื่อ ($\delta$)} & \textbf{ตัวคูณ} & \textbf{จำนวน Qubit ($N$)} & \textbf{ค่าเฉลี่ยคีย์ทฤษฎี} & \textbf{โอกาสครบ (Theory)} & \textbf{Local Sim} & \textbf{IBM Quantum} \\ \hline
-0.00 & $4.00\times$ & 96 & 24.0 bits & ~54\% & 56.0\% & 61.0\% \\
-0.25 & $4.25\times$ & 102 & 25.5 bits & ~76\% & 75.0\% & 73.0\% \\
-0.50 & $4.50\times$ & 108 & 27.0 bits & ~89\% & 93.0\% & 93.0\% \\
-0.80 & $4.80\times$ & 116 & 29.0 bits & ~97\% & 97.0\% & 95.0\% \\
-1.00 & $5.00\times$ & 120 & 30.0 bits & ~99\% & 98.0\% & 99.0\% \\ \hline
-\end{tabular}
 \end{table}
 
-\subsection{การหาค่า Safety Margin ที่เหมาะสมตามขนาดของกุญแจ ($\delta^*$ Optimization vs. Key Size)}
+\subsection[การหาค่า Safety Margin ที่เหมาะสมตามขนาดของกุญแจ]{การหาค่า Safety Margin ที่เหมาะสมตามขนาดของกุญแจ (\texorpdfstring{$\delta^*$}{delta*} Optimization vs. Key Size)}
 
 เมื่อพิจารณาความสัมพันธ์ระหว่างขนาดของกุญแจเป้าหมาย $n \in \{8, 16, 24, 32, 40\}$ บิต กับค่าความปลอดภัยขั้นต่ำ $\delta^*$ ที่ทำให้ระบบได้คีย์ครบตามเกณฑ์ Benchmark $\ge 90\%$ ดังแสดงในรูปที่~\ref{fig:keysizing_optimal_delta} พบว่าเมื่อขนาดกุญแจ $n$ เพิ่มขึ้น ค่า $\delta^*$ ที่ต้องการจะลดลงตามกฎจำนวนมาก (Law of Large Numbers) โดยมีแนวโน้มแปรผกผันกับ $\frac{1}{\sqrt{n}}$:
 
@@ -169,4 +181,4 @@
     \includegraphics[width=0.75\textwidth]{figures/keysizing_fig3_local_vs_ibm_multisession.png}
     \caption{การเปรียบเทียบประสิทธิภาพระหว่าง Local Simulator และ IBM Quantum ภายใต้ข้อจำกัด 40 Qubits}
     \label{fig:keysizing_ibm}
-\end{figure}
+\end{figure}

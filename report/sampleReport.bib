@@ -1,12 +1,9 @@
-@book{aiw,
-    title = "Alice's Adventures in Wonderland",
-    author = "Lewis Carroll",
-    publisher = "George MacDonald",
-    year = 1865
-}
+%% ============================================================================
+%% 1. Classical & Information-Theoretic Cryptography
+%% ============================================================================
 
 @article{vernam_cipher,
-  author  = {Vernam, G. S.},
+  author  = {Vernam, Gilbert S.},
   title   = {Cipher Printing Telegraph Systems For Secret Wire and Radio Telegraphic Communications},
   journal = {Journal of the American Institute of Electrical Engineers},
   year    = {1926},
@@ -16,135 +13,335 @@
   doi     = {10.1109/T-AIEE.1926.5061224}
 }
 
+@article{shannon_secure,
+  author  = {Shannon, Claude E.},
+  title   = {Communication Theory of Secrecy Systems},
+  journal = {Bell System Technical Journal},
+  volume  = {28},
+  number  = {4},
+  pages   = {656--715},
+  year    = {1949},
+  doi     = {10.1002/j.1538-7305.1949.tb00928.x}
+}
 
-@inproceedings{bb84,
-  title={Quantum cryptography: Public key distribution and coin tossing},
-  author={Bennett, Charles H and Brassard, Gilles},
-  booktitle={Proceedings of IEEE International Conference on Computers, Systems and Signal Processing},
-  pages={175--179},
-  year={1984},
-  organization={IEEE},
-  address={Bangalore, India}
+@article{rivest_rsa,
+  author  = {Rivest, Ronald L. and Shamir, Adi and Adleman, Leonard},
+  title   = {A Method for Obtaining Digital Signatures and Public-Key Cryptosystems},
+  journal = {Communications of the ACM},
+  volume  = {21},
+  number  = {2},
+  pages   = {120--126},
+  year    = {1978},
+  doi     = {10.1145/359340.359342}
+}
+
+@article{diffie_hellman,
+  author  = {Diffie, Whitfield and Hellman, Martin},
+  title   = {New Directions in Cryptography},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {22},
+  number  = {6},
+  pages   = {644--654},
+  year    = {1976},
+  doi     = {10.1109/TIT.1976.1055638}
 }
 
 @misc{cerruti2021timepadshortkey,
-      title={One Time Pad and the Short Key Dream}, 
-      author={Umberto Cerruti},
-      year={2021},
-      eprint={2108.06981},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2108.06981}, 
+  author        = {Cerruti, Umberto},
+  title         = {One Time Pad and the Short Key Dream},
+  year          = {2021},
+  eprint        = {2108.06981},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  url           = {https://arxiv.org/abs/2108.06981}
 }
 
-@article{shannon_secure,
-  author = {Shannon, C. E.},
-  title = {Communication Theory of Secrecy Systems},
-  journal = {Bell System Technical Journal},
-  volume = {28},
-  number = {4},
-  pages = {656-715},
-  doi = {https://doi.org/10.1002/j.1538-7305.1949.tb00928.x},
-  url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/j.1538-7305.1949.tb00928.x},
-  eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/j.1538-7305.1949.tb00928.x},
-  year = {1949}
+%% ============================================================================
+%% 2. Quantum Computing & Threat to Public-Key Cryptography
+%% ============================================================================
+
+@inproceedings{shor_1994,
+  author    = {Shor, Peter W.},
+  title     = {Algorithms for Quantum Computation: Discrete Logarithms and Factoring},
+  booktitle = {Proceedings 35th Annual Symposium on Foundations of Computer Science (FOCS)},
+  pages     = {124--134},
+  year      = {1994},
+  publisher = {IEEE},
+  doi       = {10.1109/SFCS.1994.365700}
 }
 
-@misc{aumasson_qkd_critique,
-  author = {Jean-Philippe Aumasson},
-  title = {The QKD Hoax},
-  year = {2020},
-  url = {https://www.aumasson.jp/hoax/qkd.pdf}
+@book{nielsen_chuang,
+  author    = {Nielsen, Michael A. and Chuang, Isaac L.},
+  title     = {Quantum Computation and Quantum Information: 10th Anniversary Edition},
+  publisher = {Cambridge University Press},
+  year      = {2010},
+  address   = {Cambridge, UK}
 }
 
-@article{arxiv_2307_15116,
-  author  = {Unknown},
-  title   = {Analysis of Quantum Cryptography and Security Models},
-  year    = {2023},
-  journal = {arXiv preprint},
-  url     = {https://arxiv.org/pdf/2307.15116}
+@article{wootters_zurek_nocloning,
+  author  = {Wootters, William K. and Zurek, Wojciech H.},
+  title   = {A Single Quantum Cannot Be Cloned},
+  journal = {Nature},
+  volume  = {299},
+  number  = {5886},
+  pages   = {802--803},
+  year    = {1982},
+  doi     = {10.1038/299802a0}
 }
 
-@misc{sequentech_protocol,
-  author = {Sequent Tech},
-  title = {Sequent Cryptographic Protocol},
-  year = {2021},
-  url = {https://sequentech.io/wp-content/uploads/2022/06/2021-03-19-proto-1-Sequent-Cryptographic-Protocol.pdf}
+@techreport{nist_pqc,
+  author      = {Chen, Lily and Jordan, Stephen and Liu, Yi-Kai and Moody, Dustin and Peralta, Rene and Perlner, Ray and Smith-Tone, Daniel},
+  title       = {Report on Post-Quantum Cryptography},
+  institution = {National Institute of Standards and Technology (NIST)},
+  number      = {NISTIR 8105},
+  year        = {2016},
+  doi         = {10.6028/NIST.IR.8105}
 }
 
-@misc{nass_vidaloop,
-  author = {National Association of Secretaries of State (NASS)},
-  title = {Vidaloop Voting System White Paper},
-  year = {2021},
-  url = {https://www.nass.org/sites/default/files/2021-08/white-paper-vidaloop-nass-summer21.pdf}
+%% ============================================================================
+%% 3. BB84 Protocol, QKD Security & 11% QBER Threshold
+%% ============================================================================
+
+@inproceedings{bb84,
+  author       = {Bennett, Charles H. and Brassard, Gilles},
+  title        = {Quantum Cryptography: Public Key Distribution and Coin Tossing},
+  booktitle    = {Proceedings of IEEE International Conference on Computers, Systems and Signal Processing},
+  pages        = {175--179},
+  year         = {1984},
+  organization = {IEEE},
+  address      = {Bangalore, India}
+}
+
+@article{bennett_1992_experimental,
+  author  = {Bennett, Charles H. and Bessette, Fran{\c{c}}ois and Brassard, Gilles and Salvail, Louis and Smolin, John},
+  title   = {Experimental Quantum Cryptography},
+  journal = {Journal of Cryptology},
+  volume  = {5},
+  number  = {1},
+  pages   = {3--28},
+  year    = {1992},
+  doi     = {10.1007/BF00191318}
+}
+
+@article{shor_preskill_2000,
+  author  = {Shor, Peter W. and Preskill, John},
+  title   = {Simple Proof of Security of the {BB84} Quantum Key Distribution Protocol},
+  journal = {Physical Review Letters},
+  volume  = {85},
+  number  = {2},
+  pages   = {441--444},
+  year    = {2000},
+  doi     = {10.1103/PhysRevLett.85.441}
+}
+
+@article{gisin_qkd_review,
+  author  = {Gisin, Nicolas and Ribordy, Gr{\'e}goire and Tittel, Wolfgang and Zbinden, Hugo},
+  title   = {Quantum Cryptography},
+  journal = {Reviews of Modern Physics},
+  volume  = {74},
+  number  = {1},
+  pages   = {145--195},
+  year    = {2002},
+  doi     = {10.1103/RevModPhys.74.145}
+}
+
+@article{scarani_qkd_practical,
+  author  = {Scarani, Valerio and Bechmann-Pasquinucci, Helle and Cerf, Nicolas J. and Du{\v{s}}ek, Miloslav and L{\"u}tkenhaus, Norbert and Peev, Momtchil},
+  title   = {The Security of Practical Quantum Key Distribution},
+  journal = {Reviews of Modern Physics},
+  volume  = {81},
+  number  = {3},
+  pages   = {1301--1350},
+  year    = {2009},
+  doi     = {10.1103/RevModPhys.81.1301}
+}
+
+@article{pirandola_advances_qkd,
+  author  = {Pirandola, Stefano and Andersen, Ulrik L. and Banchi, Leonardo and Berta, Mario and Bunandar, Darius and Colbeck, Roger and Englund, Dirk and Gehring, Tobias and Lupo, Cosmo and Ottaviani, Carlo and Pereira, Jason L. and Razavi, Mohsen and Shamsul Shaari, Jesni and Tomamichel, Marco and Usenko, Vladyslav C. and Vallone, Giuseppe and Villoresi, Paolo and Wallden, Petros},
+  title   = {Advances in Quantum Cryptography},
+  journal = {Advances in Optics and Photonics},
+  volume  = {12},
+  number  = {4},
+  pages   = {1012--1236},
+  year    = {2020},
+  doi     = {10.1364/AOP.361502}
+}
+
+%% ============================================================================
+%% 4. Error Correction (Cascade) & Privacy Amplification (Toeplitz / LHL)
+%% ============================================================================
+
+@inproceedings{brassard_salvail_cascade,
+  author    = {Brassard, Gilles and Salvail, Louis},
+  title     = {Secret-Key Reconciliation by Public Discussion},
+  booktitle = {Advances in Cryptology --- EUROCRYPT '93},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {765},
+  pages     = {410--423},
+  year      = {1994},
+  publisher = {Springer},
+  doi       = {10.1007/3-540-48285-7_35}
+}
+
+@article{carter_wegman_universal,
+  author  = {Carter, J. Lawrence and Wegman, Mark N.},
+  title   = {Universal Classes of Hash Functions},
+  journal = {Journal of Computer and System Sciences},
+  volume  = {18},
+  number  = {2},
+  pages   = {143--154},
+  year    = {1979},
+  doi     = {10.1016/0022-0000(79)90044-8}
+}
+
+@article{bennett_privacy_amp_1995,
+  author  = {Bennett, Charles H. and Brassard, Gilles and Cr{\'e}peau, Claude and Maurer, Ueli M.},
+  title   = {Generalized Privacy Amplification},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {41},
+  number  = {6},
+  pages   = {1915--1923},
+  year    = {1995},
+  doi     = {10.1109/18.476316}
+}
+
+@inproceedings{impagliazzo_leftover_hash,
+  author    = {Impagliazzo, Russell and Levin, Leonid A. and Luby, Michael},
+  title     = {Pseudo-Random Generation from One-Way Functions},
+  booktitle = {Proceedings of the Twenty-First Annual ACM Symposium on Theory of Computing (STOC)},
+  pages     = {12--24},
+  year      = {1989},
+  publisher = {ACM},
+  doi       = {10.1145/73007.73009}
+}
+
+@inproceedings{krawczyk_toeplitz,
+  author    = {Krawczyk, Hugo},
+  title     = {{LFSR}-based Hashing and Authentication},
+  booktitle = {Advances in Cryptology --- CRYPTO '94},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {839},
+  pages     = {129--139},
+  year      = {1994},
+  publisher = {Springer},
+  doi       = {10.1007/3-540-48658-5_15}
+}
+
+@article{renner_security_qkd,
+  author  = {Renner, Renato},
+  title   = {Security of Quantum Key Distribution},
+  journal = {International Journal of Quantum Information},
+  volume  = {6},
+  number  = {01},
+  pages   = {1--127},
+  year    = {2008},
+  doi     = {10.1142/S0219749908003256}
+}
+
+%% ============================================================================
+%% 5. E-Voting, Quantum Voting & Real-World QKD Networks
+%% ============================================================================
+
+@article{peev_secoqc_2009,
+  author  = {Peev, Momtchil and Pacher, Christoph and All{\'e}aume, Romain and Barreiro, Claudio and Bouda, Jan and Boxleitner, Walter and Debuisschert, Thierry and Diamanti, Eleni and Dianati, Mehrdad and Dynes, James F. and others},
+  title   = {The {SECOQC} Quantum Key Distribution Network in {Vienna}},
+  journal = {New Journal of Physics},
+  volume  = {11},
+  number  = {7},
+  pages   = {075001},
+  year    = {2009},
+  doi     = {10.1088/1367-2630/11/7/075001}
+}
+
+@misc{idquantique_geneva_2007,
+  author       = {{ID Quantique}},
+  title        = {Quantum Cryptography for Secure Ballot Transmission in the 2007 {Geneva} State Elections},
+  howpublished = {ID Quantique Case Study / White Paper},
+  year         = {2007},
+  url          = {https://www.idquantique.com/}
+}
+
+@article{vaccaro_quantum_voting,
+  author  = {Vaccaro, Joan A. and Spring, Joseph and Chefles, Anthony},
+  title   = {Quantum Protocols for Anonymous Voting and Surveying},
+  journal = {Physical Review A},
+  volume  = {75},
+  number  = {1},
+  pages   = {012333},
+  year    = {2007},
+  doi     = {10.1103/PhysRevA.75.012333}
+}
+
+@article{horoshko_quantum_voting,
+  author  = {Horoshko, Dmitri and Kilin, Sergei},
+  title   = {Quantum Anonymous Voting with Anonymity Check},
+  journal = {Physics Letters A},
+  volume  = {375},
+  number  = {8},
+  pages   = {1172--1175},
+  year    = {2011},
+  doi     = {10.1016/j.physleta.2011.01.038}
 }
 
 @misc{e2e_voting,
-  author = {Sequent Tech},
-  title = {What is End-to-End Verifiable Voting?},
-  year = {2022},
-  url = {https://sequentech.io/glossary/what-is-end-to-end-verifiable-voting/}
-}
-
-@misc{facebook_example,
-  author = {Facebook},
-  title = {Example Image Reference},
-  year = {2023},
-  url = {https://www.facebook.com/photo?fbid=1217185943847732}
-}
-
-@misc{blind_signature_wiki,
-  author = {Wikipedia},
-  title = {Blind Signature},
-  year = {2024},
-  url = {https://en.wikipedia.org/wiki/Blind_signature}
-}
-
-@misc{quantum_crypto_article,
-  author = {AIORI},
-  title = {Cryptography in the Quantum Era},
-  year = {2023},
-  url = {https://portal.aiori.in/cryptography-in-quantum-era/}
-}
-
-@misc{secoqc_project,
-  author = {European Commission},
-  title = {Secure Communication based on Quantum Cryptography (SECOQC)},
-  year = {2004},
-  url = {https://cordis.europa.eu/project/id/506813}
-}
-
-@misc{secoqc_wiki,
-  author = {Wikipedia},
-  title = {Secure Communication based on Quantum Cryptography},
-  year = {2024},
-  url = {https://en.wikipedia.org/wiki/Secure_Communication_based_on_Quantum_Cryptography}
+  author        = {Benaloh, Josh and Rivest, Ronald and Ryan, Peter Y. A. and Stark, Philip and Teague, Vanessa and Vora, Poorvi},
+  title         = {End-to-End Verifiability},
+  year          = {2015},
+  eprint        = {1504.03778},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CR},
+  url           = {https://arxiv.org/abs/1504.03778}
 }
 
 @misc{ect_evoting_1,
   author = {สำนักงานคณะกรรมการการเลือกตั้ง (กกต.)},
-  title = {เอกสารเกี่ยวกับระบบเลือกตั้งอิเล็กทรอนิกส์},
-  year = {2022},
-  url = {https://www.ect.go.th/web-upload/1xff0d34e409a13ef56eea54c52a291126/m_document/2162/25829/file_download/e0d9455b5f5a69951b2f6bb217d66343.pdf}
+  title  = {เอกสารเกี่ยวกับระบบเลือกตั้งอิเล็กทรอนิกส์},
+  year   = {2022},
+  url    = {https://www.ect.go.th/web-upload/1xff0d34e409a13ef56eea54c52a291126/m_document/2162/25829/file_download/e0d9455b5f5a69951b2f6bb217d66343.pdf}
 }
 
 @misc{ect_evoting_2,
   author = {สำนักงานคณะกรรมการการเลือกตั้ง (กกต.)},
-  title = {รายงานระบบเลือกตั้งอิเล็กทรอนิกส์},
-  year = {2023},
-  url = {https://www.ect.go.th/web-upload/1xff0d34e409a13ef56eea54c52a291126/m_document/2162/26772/file_download/456fe07ed5c39466f0801e2ca28dc71b.pdf}
+  title  = {รายงานระบบเลือกตั้งอิเล็กทรอนิกส์},
+  year   = {2023},
+  url    = {https://www.ect.go.th/web-upload/1xff0d34e409a13ef56eea54c52a291126/m_document/2162/26772/file_download/456fe07ed5c39466f0801e2ca28dc71b.pdf}
 }
 
-@misc{thairath_evoting,
-  author = {ไทยรัฐ},
-  title = {ข่าวเกี่ยวกับ e-Voting ในประเทศไทย},
-  year = {2021},
-  url = {https://www.thairath.co.th/news/politic/2058792}
+%% ============================================================================
+%% 6. Quantum Simulation Software & Hardware Framework
+%% ============================================================================
+
+@misc{qiskit2024,
+  author        = {Javadi-Abhari, Ali and Treinish, Matthew and Krsulich, Kevin and Wood, Christopher J. and Lishman, Jake and Gacon, Julien and Martiel, Simon and Nation, Paul D. and Bishop, Lev S. and Cross, Andrew W. and Johnson, Blake R. and Gambetta, Jay M.},
+  title         = {Quantum Computing with {Qiskit}},
+  year          = {2024},
+  eprint        = {2405.08810},
+  archivePrefix = {arXiv},
+  primaryClass  = {quant-ph},
+  doi           = {10.48550/arXiv.2405.08810},
+  url           = {https://arxiv.org/abs/2405.08810}
 }
+
 
 @misc{elect_in_th,
-  author = {elect.in.th},
-  title = {E-Voting คืออะไร},
-  year = {2022},
-  url = {https://elect.in.th/e-voting/}
+  author = {{elect.in.th}},
+  title  = {{E-Voting} คืออะไร},
+  year   = {2022},
+  url    = {https://elect.in.th/e-voting/}
+}
+
+@misc{cmu_cpe_curriculum,
+  author       = {{ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่}},
+  title        = {หลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมคอมพิวเตอร์ (หลักสูตรปรับปรุง พ.ศ. 2564)},
+  howpublished = {มหาวิทยาลัยเชียงใหม่},
+  year         = {2021},
+  url          = {https://cpe.eng.cmu.ac.th/}
+}
+
+@misc{ibm_quantum_system_one,
+  author       = {{IBM Quantum}},
+  title        = {IBM Quantum System One: Architecture and Physical Noise Characteristics},
+  howpublished = {IBM Research White Paper},
+  year         = {2023},
+  url          = {https://www.ibm.com/quantum}
 }
