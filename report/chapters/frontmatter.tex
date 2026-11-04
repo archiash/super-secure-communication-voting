@@ -1,25 +1,22 @@
+% !TEX root = ../main.tex
 \maketitle
 \makesignature
 
 \ifproject
 \begin{abstractTH}
-เขียนบทคัดย่อของโครงงานที่นี่
+โครงงานฉบับนี้นำเสนอการออกแบบและพัฒนาระบบจำลองการลงคะแนนเสียงออนไลน์ความปลอดภัยสูงโดยประยุกต์ใช้การกระจายกุญแจแบบควอนตัม (Quantum Key Distribution: QKD) ภายใต้โพรโทคอล BB84 ร่วมกับการเข้ารหัสแบบวันไทม์แพด (One-Time Pad: OTP) เพื่อป้องกันภัยคุกคามจากคอมพิวเตอร์ควอนตัมที่สามารถทำลายระบบเข้ารหัสแบบกุญแจอสมมาตรดั้งเดิมด้วยอัลกอริทึมของชอร์ (Shor's Algorithm) และเพื่อรับประกันความลับเชิงทฤษฎีสารสนเทศ (Information-Theoretic Security) ในการส่งข้อมูลผลการลงคะแนนเสียง
 
-การเขียนรายงานเป็นส่วนหนึ่งของการทำโครงงานวิศวกรรมคอมพิวเตอร์
-เพื่อทบทวนทฤษฎีที่เกี่ยวข้อง อธิบายขั้นตอนวิธีแก้ปัญหาเชิงวิศวกรรม และวิเคราะห์และสรุปผลการทดลองอุปกรณ์และระบบต่างๆ
-\enskip อย่างไรก็ดี การสร้างรูปเล่มรายงานให้ถูกรูปแบบนั้นเป็นขั้นตอนที่ยุ่งยาก
-แม้ว่าจะมีต้นแบบสำหรับใช้ในโปรแกรม Microsoft Word แล้วก็ตาม
-แต่นักศึกษาส่วนใหญ่ยังคงค้นพบว่าการใช้งานมีความซับซ้อน และเกิดความผิดพลาดในการจัดรูปแบบ กำหนดเลขหัวข้อ และสร้างสารบัญอยู่
-\enskip ภาควิชาวิศวกรรมคอมพิวเตอร์จึงได้จัดทำต้นแบบรูปเล่มรายงานโดยใช้ระบบจัดเตรียมเอกสาร
-\LaTeX{} เพื่อช่วยให้นักศึกษาเขียนรายงานได้อย่างสะดวกและรวดเร็วมากยิ่งขึ้น
+\enskip ระบบที่พัฒนาขึ้นอยู่ในรูปแบบเว็บแอปพลิเคชัน โดยส่วนติดต่อผู้ใช้งานพัฒนาด้วยภาษา TypeScript และไลบรารี React ร่วมกับส่วนประมวลผลฝั่งเซิร์ฟเวอร์ด้วย FastAPI, ฐานข้อมูล MongoDB และไลบรารี Qiskit สำหรับจำลองวงจรควอนตัมทั้งบนตัวจำลอง Qiskit Aer และเครื่องคอมพิวเตอร์ควอนตัมจริงของ IBM Quantum ผ่าน Qiskit IBM Runtime กระบวนการทำงานครอบคลุมตั้งแต่การส่งควอนตัมบิต การคัดกรองฐานวัด (Basis Sifting) การประมาณค่าอัตราความผิดพลาดของบิตควอนตัม (Quantum Bit Error Rate: QBER) การขยายความลับด้วยเมทริกซ์โทพลิตซ์ (Toeplitz Matrix Privacy Amplification) ไปจนถึงการเข้ารหัสและถอดรหัสผลโหวตด้วยตัวดำเนินการ Exclusive OR (XOR)
+
+\enskip ผลการทดลองและประเมินประสิทธิภาพแสดงให้เห็นว่า เกณฑ์ความปลอดภัย QBER ที่ร้อยละ 11.0 สามารถแยกแยะสัญญาณรบกวนของฮาร์ดแวร์ควอนตัม (เฉลี่ยร้อยละ 2.2--2.8) ออกจากการโจมตีแบบดักวัดและส่งต่อ (Intercept-and-Resend Attack) ของผู้ดักฟัง ซึ่งก่อให้เกิดความผิดพลาดเฉลี่ยร้อยละ 24.5--25.0 ได้อย่างแม่นยำ นอกจากนี้ การกำหนดค่าเผื่อความปลอดภัย (Safety Margin) ที่ $\delta = 0.8$ หรือการใช้กลไกเชื่อมต่อกุญแจหลายรอบ (Multi-Session Key Concatenation) ช่วยให้ระบบสามารถสร้างกุญแจลับขนาด 24 บิตได้สำเร็จมากกว่าร้อยละ 95 และเมื่อทำงานร่วมกับกระบวนการขยายความลับ ระบบสามารถลดทอนข้อมูลที่อาจรั่วไหลไปยังผู้ดักฟังให้มีขอบเขตไม่เกิน $2^{-s}$ ซึ่งเข้าใกล้ศูนย์ได้อย่างมีประสิทธิภาพ
 \end{abstractTH}
 
 \begin{abstract}
-The abstract would be placed here. It usually does not exceed 350 words
-long (not counting the heading), and must not take up more than one (1) page
-(even if fewer than 350 words long).
+This project presents the design and implementation of an educational interactive web simulation for secure online voting utilizing Quantum Key Distribution (QKD) based on the BB84 protocol combined with One-Time Pad (OTP) encryption. While conventional public-key cryptosystems such as RSA and ECC are vulnerable to quantum attacks via Shor's algorithm, combining BB84 key exchange with OTP encryption provides information-theoretic security and immediate eavesdropping detection for electronic ballot transmission.
 
-Make sure your abstract sits inside the \texttt{abstract} environment.
+\enskip The system is built as a full-stack web application featuring a React and TypeScript frontend, a FastAPI backend, MongoDB persistence, and Qiskit quantum circuit execution supporting both local Qiskit Aer simulation and cloud-based IBM Quantum processors via Qiskit IBM Runtime. The implemented pipeline visualizes and executes quantum-secured voting stages: qubit transmission, basis sifting, Quantum Bit Error Rate (QBER) estimation via random test-bit sacrificing, Toeplitz universal hashing for privacy amplification, and bitwise XOR ballot encryption and decryption across three educational inspection perspectives.
+
+\enskip Experimental evaluations confirm that the theoretical 11.0\% QBER security threshold reliably separates normal quantum hardware noise (2.2\%--2.8\%) from active intercept-and-resend eavesdropping (~24.5\%--25.0\%). Furthermore, configuring a qubit sizing safety margin of $\delta = 0.8$ or utilizing multi-session key concatenation overcomes binomial sifting variance and 40-qubit hardware register constraints to achieve over 95\% key generation reliability for 24-bit ballots. Combined with Toeplitz privacy amplification, the system effectively reduces an eavesdropper's mutual information to negligible upper bounds ($\le 2^{-s}$).
 \end{abstract}
 
 \iffalse
@@ -31,10 +28,13 @@ Dedication page is optional.
 \fi % \iffalse
 
 \begin{acknowledgments}
-Your acknowledgments go here. Make sure it sits inside the
-\texttt{acknowledgment} environment.
+โครงงานวิศวกรรมคอมพิวเตอร์เรื่อง ระบบโหวตความปลอดภัยสูงโดยใช้การกระจายคีย์แบบควอนตัม ฉบับนี้สำเร็จลุล่วงไปได้ด้วยดี คณะผู้จัดทำขอกราบขอบพระคุณ รองศาสตราจารย์ ดร.\,สรรพวรรธน์ กันตะบุตร อาจารย์ที่ปรึกษาโครงงาน ที่ได้สละเวลาอันมีค่าในการให้คำแนะนำ แนวคิด ตลอดจนตรวจทานแก้ไขข้อบกพร่องต่าง ๆ ด้วยความเอาใจใส่ตั้งแต่เริ่มต้นจนกระทั่งโครงงานเสร็จสมบูรณ์
 
-\acksign{2020}{5}{25}
+\enskip ขอกราบขอบพระคุณ ผู้ช่วยศาสตราจารย์ ดร.\,นวดนย์ คุณเลิศกิจ ศาสตราจารย์ ดร.\,สันติ พิทักษ์กิจนุกูร และ รองศาสตราจารย์ ดร.\,นิพนธ์ ธีรอำพน คณะกรรมการสอบโครงงานทุกท่าน ที่ได้กรุณาให้ข้อเสนอแนะและแนวทางในการปรับปรุงการทดลองและการวิเคราะห์ผลให้มีความถูกต้องและสมบูรณ์ยิ่งขึ้น รวมถึงคณาจารย์และบุคลากรภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ ทุกท่านที่ได้ประสิทธิ์ประสาทวิชาความรู้แก่คณะผู้จัดทำ
+
+\enskip สุดท้ายนี้ คณะผู้จัดทำขอกราบขอบพระคุณบิดา มารดา และครอบครัว ที่คอยให้การสนับสนุนและเป็นกำลังใจสำคัญตลอดการศึกษา รวมถึงเพื่อน ๆ ทุกคนที่ให้ความช่วยเหลือแลกเปลี่ยนเรียนรู้ร่วมกันมาโดยตลอด
+
+\acksign{2026}{10}{16}
 \end{acknowledgments}%
 \fi % \ifproject
 
