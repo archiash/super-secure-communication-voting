@@ -10,6 +10,9 @@
 \newenvironment{statementB}[2]{\par\medskip\refstepcounter{statementB}\noindent\textbf{#1~\thestatementB}\ifx\relax#2\relax\else~(#2)\fi\textbf{.}\ }{\par\medskip}
 \newenvironment{proofB}{\par\noindent\textit{Proof.}\ }{\hfill\rule{0.6em}{0.6em}\par\medskip}
 
+% ใส่รูปถ้ามีไฟล์ ถ้ายังไม่มีให้แสดงกรอบแทน (กัน build ล้ม)
+\newcommand{\maybegraphics}[2][]{\IfFileExists{#2}{\includegraphics[#1]{#2}}{\fbox{\parbox[c][4cm][c]{0.8\textwidth}{\centering\ttfamily [missing: \detokenize{#2}]}}}}
+
 \section{Idealized Case: Perfect Keys}
 \label{sec:concat-ideal}
 
@@ -130,3 +133,444 @@ Let $\Phi$ map $(m,k,e)\mapsto(m,\,m\oplus k[1:n],\,e)$. Then $\rho_{MCE}=\Phi\b
 \begin{statementB}{Remark}{Application to the Voting System}
 Sessions that are aborted (QBER above the threshold) are discarded completely. The number of accepted sessions needed for an $n$-bit ballot is fixed, $r=\lceil n/l\rceil$, where $l$ is the length of one accepted session key; aborted attempts only repeat the process with fresh randomness and fresh Toeplitz seeds. With $\varepsilon_i\lesssim2^{-s}$, the overall error is at most $r\cdot2^{-s}$; for example $s=16$ and $r=4$ give $\varepsilon\lesssim2^{-14}$. Thus concatenation does not leave the security level unchanged, but it degrades it linearly in $r$, so $s$ should be chosen such that $r\cdot2^{-s}$ is acceptably small.
 \end{statementB}
+
+% ============================================================
+% ภาคผนวก ข : คู่มือการใช้งานระบบ
+% วิธีใช้: \input{appendix_b_manual} ต่อจากภาคผนวก ก (ที่เรียก \appendix ไปแล้ว)
+%          ถ้า template ของภาควิชาใช้ \chapter ใน \appendix เลขจะออกเป็น "ข" เอง
+% ต้องใช้แพ็กเกจ: graphicx (ปกติมีอยู่แล้ว)
+% รูปทั้งหมดวางไว้ในโฟลเดอร์ figures/ ตามชื่อไฟล์ที่ระบุใน comment ของแต่ละรูป
+% ตรงไหนที่เป็น \tbd{...} คือยังไม่มีข้อมูล ให้ค้นหา "รอระบุ" แล้วเติมทีหลัง
+% ============================================================
+
+\providecommand{\tbd}[1]{\textbf{[รอระบุ: #1]}}
+
+\chapter{คู่มือการใช้งานระบบ}
+\label{app:manual}
+
+ภาคผนวกนี้อธิบายวิธีการใช้งานระบบจำลองการลงคะแนนเสียงด้วยการกระจายกุญแจควอนตัม
+(Quantum Cryptographic Voting System) ตั้งแต่การตั้งค่าระบบ การสร้างกุญแจด้วยโพรโทคอล BB84
+การลงคะแนนด้วย One-Time Pad ไปจนถึงการเรียกดูผลและบันทึกการตรวจสอบย้อนหลัง
+
+%------------------------------------------------------------
+\section{ภาพรวมของระบบ}
+
+ระบบเป็นเว็บแอปพลิเคชันจำลอง (Simulation Engine) ที่แสดงกระบวนการส่งข้อมูลโดยสร้างกุญแจควอนตัมระหว่าง
+Election Server (ผู้ส่ง) กับ Voter Terminal (ผู้รับ) จากนั้นนำกุญแจไปเข้ารหัสบัตรลงคะแนนด้วย
+One-Time Pad ($C = M \oplus K$) แล้วส่งเฉพาะข้อความที่เข้ารหัสแล้วไปยังเซิร์ฟเวอร์
+ผู้ใช้สามารถเรียกดูผลการทำงานและประวัติของทุกเซสชันได้ผ่านหน้า Results และ Transmission Logs
+
+ระบบรองรับการจำลองสองรูปแบบ ได้แก่ Qiskit Aer (จำลองบนเครื่องเซิร์ฟเวอร์) และ IBM Quantum
+(คอมพิวเตอร์ควอนตัมจริงผ่านคลาวด์) และสามารถเปิดการจำลองผู้ดักฟัง (Eve)
+แบบ Intercept-and-Resend เพื่อสาธิตการตรวจจับการดักฟังได้
+
+\subsection{ข้อกำหนดเบื้องต้นในการใช้งาน}
+\begin{itemize}
+  \item เว็บเบราว์เซอร์: \tbd{ระบุเบราว์เซอร์และเวอร์ชันที่รองรับ}
+  \item ที่อยู่ของระบบ (URL): \tbd{ระบุ URL}
+  \item การใช้ IBM Quantum จริง: ต้องตั้งค่า API Token ฝั่งเซิร์ฟเวอร์ \tbd{ระบุวิธีการตั้งค่า}
+\end{itemize}
+
+\subsection{เมนูหลัก}
+แถบเมนูด้านบนของทุกหน้าประกอบด้วยเมนูดังตารางที่~\ref{tab:manual-menu}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{เมนู} & \textbf{หน้าที่} \\ \hline
+Home & หน้าแรก เริ่มการลงคะแนนด้วยการยืนยันตัวตน (Voter Authentication) \\ \hline
+Configure & ตั้งค่าพารามิเตอร์ของโพรโทคอลและการจำลอง \\ \hline
+Transmission Logs & ดูบันทึกการสื่อสาร{ระบุรายละเอียดของหน้านี้} \\ \hline
+Results & ดูรายงานการจำลอง QKD BB84 และผลการลงคะแนน \\ \hline
+SIMULATION ENGINE & ป้ายแสดงว่าระบบทำงานในโหมดจำลอง \\ \hline
+\end{tabular}
+\caption{เมนูหลักของระบบ}
+\label{tab:manual-menu}
+\end{table}
+
+\subsection{มุมมองการแสดงผลทั้งสาม}
+ในขั้นตอนสร้างกุญแจและหน้า Results ผู้ใช้สลับมุมมองได้ที่แถบ Visualization Perspective
+ดังตารางที่~\ref{tab:manual-views}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|p{4cm}|p{6cm}|}
+\hline
+\textbf{มุมมอง} & \textbf{ผู้ใช้เป้าหมาย} & \textbf{ข้อมูลที่แสดง} \\ \hline
+Voter View (ค่าเริ่มต้น) & ผู้ลงคะแนน & เฉพาะผลการวัดที่เครื่องผู้ลงคะแนนและประกาศสาธารณะ \\ \hline
+Practical View & ผู้ดูแลระบบ ผู้ตรวจสอบ & ข้อมูลฝั่ง Server และ Voter ประกอบกัน \\ \hline
+System View & ผู้ศึกษา ผู้วิจัย & ความจริงทั้งระบบ (Ground Truth) รวมถึงกระบวนการของ Eve \\ \hline
+\end{tabular}
+\caption{มุมมองการแสดงผลของระบบ}
+\label{tab:manual-views}
+\end{table}
+
+เมื่อเลือก System View ระบบแสดงตาราง System Quantum Transmission Log (Eve Process Visible)
+ซึ่งแสดงเส้นทางการส่งโฟตอนจริงทั้งหมด (Election Server $\rightarrow$ [Eve Interception] $\rightarrow$ Voter Terminal)
+ดังรูปที่~\ref{fig:manual-system-view}
+มุมขวาบนของตารางสรุปจำนวนโฟตอนที่ส่ง จำนวนบิตที่ผ่านการคัดกรองฐาน จำนวนบิตที่ผิดพลาด (bit flips)
+และค่า QBER ที่แท้จริง (true QBER)
+แต่ละแถวของตารางคือโฟตอนหนึ่งตัว ประกอบด้วยคอลัมน์
+Server Bit (บิตที่เซิร์ฟเวอร์สุ่ม), Server Basis (ฐานที่ใช้เข้ารหัส),
+Server Photon (สถานะโพลาไรเซชันที่ส่ง), Voter Basis (ฐานที่ผู้ลงคะแนนใช้วัด),
+Voter Read (บิตที่วัดได้) และ Basis Match ($\checkmark$ เมื่อฐานตรงกันและบิตถูกเก็บไว้ $\times$ เมื่อฐานไม่ตรงและบิตถูกทิ้ง)
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.95\textwidth]{figures/manual_system_view.png}
+\caption{ตาราง System Quantum Transmission Log ในมุมมอง System View}
+\label{fig:manual-system-view}
+\end{figure}
+
+%------------------------------------------------------------
+\section{การตั้งค่าระบบ (Configure)}
+
+เข้าได้จากเมนู Configure หรือลิงก์ Edit ในกล่อง Active Configuration ของหน้ายืนยันตัวตน
+และกลับด้วยปุ่ม ``$\leftarrow$ Back'' ดังรูปที่~\ref{fig:manual-config}
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-10-31_173015.png  (หน้า Protocol Configuration) >>>
+\maybegraphics[width=0.95\textwidth]{figures/manual_configure.png}
+\caption{หน้า Protocol Configuration}
+\label{fig:manual-config}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|p{9.5cm}|}
+\hline
+\textbf{ตัวเลือก} & \textbf{คำอธิบาย} \\ \hline
+Use Quantum Computer & เปิด: ส่งงานไปประมวลผลบนคอมพิวเตอร์ควอนตัมจริงของ IBM Quantum (ต้องรอคิว)
+ปิด: จำลองด้วย Qiskit Aer \\ \hline
+Simulate Eve & เปิด: จำลองการโจมตีแบบ Intercept-and-Resend ทำให้ QBER สูงขึ้นประมาณ 25\% \\ \hline
+QPU Qubit Capacity & จำนวนคิวบิตกายภาพต่อหนึ่งวงจร ปรับได้ 4--64 (ค่าในตัวอย่าง 32) \\ \hline
+Target Key Size ($m$) & จำนวนบิตกุญแจลับขั้นต่ำสำหรับเข้ารหัสบัตรลงคะแนน (ค่าในตัวอย่าง 64 บิต) \\ \hline
+Safety Margin ($\delta$) & ค่าเผื่อคิวบิตที่ส่งเพิ่ม ปรับได้ 0--2 (ค่าในตัวอย่าง 0.05) ยิ่งมากยิ่งปลอดภัยแต่ใช้คิวบิตมากขึ้น \\ \hline
+Privacy Amplification & เปิด/ปิดการขยายความลับด้วย Toeplitz Universal Hashing \\ \hline
+\end{tabular}
+\caption{ตัวเลือกในหน้า Protocol Configuration}
+\label{tab:manual-config}
+\end{table}
+
+จำนวนโฟตอนที่ส่งคำนวณจากสมการ~(\ref{eq:manual-n}) เมื่อกำหนด $s = 16$ บิต
+
+\begin{equation}
+N = \lceil (4 + \delta)(m + s) \rceil
+\label{eq:manual-n}
+\end{equation}
+
+ตัวอย่างเช่น $m = 64$ และ $\delta = 0.05$ จะได้ $N = \lceil 4.05 \times 80 \rceil = 324$ โฟตอน
+
+\tbd{ตัวเลือกอื่นที่อยู่ถัดลงไปของหน้า Configure และปุ่มบันทึกการตั้งค่า (ถ้ามี)}
+
+%------------------------------------------------------------
+\section{ขั้นตอนการลงคะแนน}
+
+การลงคะแนนหนึ่งเซสชันแบ่งเป็น 4 ขั้นตอนตามแถบความคืบหน้าด้านบนของหน้าจอ ได้แก่
+Authentication, Key Generation, Cast Vote และ Confirmation
+ขั้นตอนที่ผ่านแล้วจะแสดงเป็นเครื่องหมายถูกสีเขียว
+
+\subsection{ขั้นตอนที่ 1: ยืนยันตัวตน (Authentication)}
+
+\begin{enumerate}
+  \item เลือกเมนู Home
+  \item กรอก Voter ID (เช่น \texttt{V-2026-2})
+  \item กรอก Election Code (รหัสสาธิตคือ \texttt{ELECT2026})
+  \item ตรวจสอบกล่อง Active Configuration ด้านขวาซึ่งสรุปค่าที่ใช้อยู่ ได้แก่ Target key length, Safety margin,
+        QPU Qubit capacity, Use quantum computer และ Eve simulation หากต้องการแก้ไขให้กด Edit
+  \item กดปุ่ม ``Authenticate \& Generate Quantum Key''
+\end{enumerate}
+
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-10-31_171414.png  (หน้า Voter Authentication) >>>
+\maybegraphics[width=0.95\textwidth]{figures/manual_auth.png}
+\caption{หน้า Voter Authentication}
+\label{fig:manual-auth}
+\end{figure}
+
+\subsection{ขั้นตอนที่ 2: สร้างกุญแจด้วย BB84 (Key Generation)}
+
+หน้านี้แสดงชื่อ BB84 Quantum Key Distribution พร้อมรหัสเซสชันที่มุมขวาบน (เช่น \texttt{Qs-nuo0g3jw})
+แถบความคืบหน้าย่อยแบ่งเป็น 5 ขั้น ได้แก่ Transmission, Basis Sifting, QBER Estimation,
+Privacy Amplification และ Key Established
+ผู้ใช้กดปุ่มที่มุมขวาล่างเพื่อไปทีละขั้น และสลับมุมมองได้ที่แถบ Visualization Perspective
+(ตารางที่~\ref{tab:manual-views}) รูปในหัวข้อนี้ใช้มุมมอง Voter View ซึ่งเป็นค่าเริ่มต้น
+
+\paragraph{2.1 รับโฟตอน (Transmission)}
+เมื่อเข้าสู่หน้านี้ เซิร์ฟเวอร์ส่งโฟตอนมายังเครื่องผู้ลงคะแนนเรียบร้อยแล้ว
+ขั้น Transmission ขึ้นเครื่องหมายถูกพร้อมจำนวนโฟตอนที่ส่ง
+ตาราง Voter Terminal Qubit Measurement Log แสดงหมายเลขโฟตอน
+($\#1, \#2, \ldots$) โดยแถว Basis และ Measure ยังว่างอยู่
+มุมขวาของตารางแสดงจำนวนโฟตอนที่ได้รับและสถานะ measurement pending
+ดังรูปที่~\ref{fig:manual-keygen-pending} จากนั้นกดปุ่ม ``Measure Qubits''
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_pending.png}
+\caption{ขั้นตอนสร้างกุญแจ: ได้รับโฟตอนแล้ว รอการวัด}
+\label{fig:manual-keygen-pending}
+\end{figure}
+
+\paragraph{2.2 วัดโฟตอน (Measurement)}
+เครื่องผู้ลงคะแนนสุ่มฐานวัดให้โฟตอนแต่ละตัว ($+$ คือแนวตรง, $\times$ คือแนวทแยง)
+แล้วบันทึกบิตที่วัดได้ในแถว Basis และ Measure ตามลำดับ
+มุมขวาของตารางเปลี่ยนเป็น basis sifting pending ดังรูปที่~\ref{fig:manual-keygen}
+เลื่อนตารางไปทางขวาเพื่อดูโฟตอนถัดไป แล้วกดปุ่ม ``Sift Bases (Reconciliation)''
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_measured.png}
+\caption{ขั้นตอนสร้างกุญแจ: ผลการวัดที่เครื่องผู้ลงคะแนน}
+\label{fig:manual-keygen}
+\end{figure}
+
+\paragraph{2.3 คัดกรองฐานวัด (Basis Sifting)}
+เครื่องผู้ลงคะแนนส่งฐานที่ใช้วัดให้เซิร์ฟเวอร์ และเซิร์ฟเวอร์ประกาศดัชนีของโฟตอนที่ฐานตรงกันแบบสาธารณะ
+การ์ด Basis Sifting (Reconciliation) Result แสดงข้อมูลดังนี้ (รูปที่~\ref{fig:manual-sifting})
+\begin{itemize}
+  \item Match Index: ดัชนีโฟตอนที่ฐานตรงกัน พร้อมจำนวนบิตและอัตราที่ได้ (yield)
+  \item ตาราง Kept/Result: บิตที่เก็บไว้ในแต่ละตำแหน่ง
+  \item สถิติ ได้แก่ Photons Received, Matching Bases (Sifted), Discarded Positions และ
+        Target Requirement ($n$) พร้อมป้าย Sufficient เมื่อบิตที่ได้เพียงพอ
+  \item แถบ Basis Match Ratio เทียบกับค่าทางทฤษฎีประมาณ 50\%
+\end{itemize}
+เมื่อขึ้นป้าย Reconciliation Complete ให้กดปุ่ม ``Calculate QBER''
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_sifting.png}
+\caption{ผลการคัดกรองฐานวัด (Basis Sifting)}
+\label{fig:manual-sifting}
+\end{figure}
+
+\paragraph{2.4 ประเมิน QBER และตรวจจับผู้ดักฟัง}
+เซิร์ฟเวอร์ประกาศดัชนีบิตทดสอบ (Test Bits Index) และเปิดเผยค่าบิตในตำแหน่งเหล่านั้น
+ตารางเทียบแถว Server Disclosed กับ Voter Measured
+แถว Result แสดง 0 เมื่อสองค่าตรงกัน และ 1 เมื่อไม่ตรงกัน
+ด้านล่างแสดงจำนวนบิตตัวอย่างที่สละ (Sample Bits Tested) จำนวนบิตที่ไม่ตรงกัน (Sample Bit Mismatches)
+ค่า QBER ที่วัดได้ และเพดานความปลอดภัย (Security Threshold Limit) 11\%
+ดังรูปที่~\ref{fig:manual-qber}
+\begin{itemize}
+  \item QBER $\le$ 11\%: ขึ้นกล่อง Channel Integrity Verdict: SECURE พร้อมสูตรคำนวณ
+        จากนั้นกดปุ่ม ``Run Privacy Amplification''
+  \item QBER $>$ 11\%: ขึ้นข้อความ EAVESDROPPING DETECTED ระบบยกเลิกเซสชัน (ABORTED)
+        และทำลายกุญแจทั้งหมดทันที ต้องเริ่มเซสชันใหม่ ดังรูปที่~\ref{fig:manual-qber-eve}
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_qber.png}
+\caption{การประเมิน QBER กรณีช่องสัญญาณปลอดภัย}
+\label{fig:manual-qber}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-11-05_125208.png  (Basis Sifting Result + QBER Estimation, กรณีตรวจพบ Eve) >>>
+\maybegraphics[width=0.9\textwidth]{figures/manual_sifting_qber.png}
+\caption{การประเมิน QBER กรณีตรวจพบผู้ดักฟัง}
+\label{fig:manual-qber-eve}
+\end{figure}
+
+\paragraph{2.5 ขยายความลับ (Privacy Amplification)}
+ระบบบีบอัดบิตที่เหลือด้วยเมทริกซ์ Toeplitz ($T_S$) และแสดงค่า Raw Input Bits ($n = m + s$),
+Security Margin ($s$) ที่สละ, Amplified Key ($m$) และ Compression Ratio
+พร้อมป้าย Information-Theoretically Secure ดังรูปที่~\ref{fig:manual-pa}
+จากนั้นกดปุ่ม ``Establish Key''
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_pa.png}
+\caption{ผลการขยายความลับด้วย Toeplitz Universal Hashing}
+\label{fig:manual-pa}
+\end{figure}
+
+\paragraph{2.6 ได้กุญแจสุดท้าย (Key Established)}
+การ์ด Final Key แสดงกุญแจที่ได้ทั้งในรูปสตริงบิตและแยกเป็นบิตรายตัว
+พร้อมความยาวกุญแจ (เช่น 64 bits) ดังรูปที่~\ref{fig:manual-final-key}
+กุญแจนี้จะใช้เข้ารหัส OTP ในขั้นลงคะแนน กดปุ่ม ``Proceed to Ballot'' เพื่อไปขั้นถัดไป
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_keygen_final_key.png}
+\caption{กุญแจสุดท้ายที่ได้จากการกระจายกุญแจควอนตัม}
+\label{fig:manual-final-key}
+\end{figure}
+
+\subsection{ขั้นตอนที่ 3: ลงคะแนน (Cast Vote)}
+
+\begin{enumerate}
+  \item เลือกผู้สมัคร 1 คนจากการ์ด ซึ่งแสดงชื่อ รหัสผู้สมัคร และ Binary ID
+        (ตัวอย่างในระบบ: 000, 001, 010, 011) \tbd{ที่มาของรายชื่อผู้สมัคร เช่น กำหนดไว้ในฐานข้อมูลอย่างไร}
+  \item ตรวจดูกล่อง One-Time Pad Encryption ซึ่งแสดง Vote (plaintext), Key (QKD) และ
+        Encrypted vote (ผลลัพธ์ XOR ของสองค่าแรก) แบบทันที
+  \item กดปุ่ม ``Submit Encrypted Ballot''
+\end{enumerate}
+
+การเข้ารหัสเกิดขึ้นที่เบราว์เซอร์ของผู้ลงคะแนน ค่าที่ส่งออกไปยังเซิร์ฟเวอร์คือข้อความที่เข้ารหัสแล้วเท่านั้น
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-11-05_124654.png  (หน้า Cast Your Ballot, เลือกผู้สมัคร) >>>
+\maybegraphics[width=0.9\textwidth]{figures/manual_cast_select.png}
+\caption{หน้า Cast Your Ballot: เลือกผู้สมัคร}
+\label{fig:manual-cast1}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-11-05_124718.png  (One-Time Pad Encryption + ปุ่ม Submit Encrypted Ballot) >>>
+\maybegraphics[width=0.9\textwidth]{figures/manual_cast_otp.png}
+\caption{การเข้ารหัสบัตรลงคะแนนด้วย One-Time Pad และปุ่มส่งบัตร}
+\label{fig:manual-cast2}
+\end{figure}
+
+\subsection{ขั้นตอนที่ 4: ยืนยันผล (Confirmation)}
+
+ระบบแสดง Ballot Submitted พร้อมใบรับ Ballot Receipt ดังรูปที่~\ref{fig:manual-receipt}
+ซึ่งประกอบด้วย วันเวลา Voter ID Session ID Vote (plaintext) Key bits used Encrypted vote
+และ Candidate โดยค่า plaintext และกุญแจแสดงเพื่อการสาธิตเท่านั้น (Prototype note)
+ระบบจริงต้องเก็บเฉพาะค่าที่เข้ารหัสแล้ว
+
+ปุ่มด้านล่างคือ View Results (ไปหน้า Results) และ New Session (เริ่มเซสชันใหม่)
+เบื้องหลังเซิร์ฟเวอร์ถอดรหัสด้วย $M = C \oplus K$ นับคะแนน ทำลายกุญแจทันที
+และเปลี่ยนสถานะเซสชันเป็น \texttt{VOTE\_CAST}
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-11-05_124737.png  (หน้า Ballot Submitted / Ballot Receipt) >>>
+\maybegraphics[width=0.9\textwidth]{figures/manual_receipt.png}
+\caption{หน้ายืนยันผลและใบรับบัตรลงคะแนน}
+\label{fig:manual-receipt}
+\end{figure}
+
+%------------------------------------------------------------
+\section{การเรียกดูผล (Results)}
+
+เลือกเมนู Results เพื่อเปิดรายงาน QKD BB84 Quantum Simulation Report ของการเลือกตั้งที่ระบุ
+(เช่น \texttt{ELECT2026}) ดังรูปที่~\ref{fig:manual-results}
+
+\begin{figure}[htbp]
+\centering
+% <<< ใส่รูป: Screenshot_2026-11-05_125237.png  (หน้า Results / QKD BB84 Quantum Simulation Report) >>>
+\maybegraphics[width=0.95\textwidth]{figures/manual_results.png}
+\caption{หน้ารายงานผลการจำลอง QKD BB84}
+\label{fig:manual-results}
+\end{figure}
+
+\subsection{ปุ่มและตัวเลือกด้านบน}
+\begin{itemize}
+  \item Back to Home: กลับหน้าแรก
+  \item Refresh Logs: โหลดบันทึกล่าสุดใหม่
+  \item Voter view / Practical view / System view: สลับมุมมองของรายงาน
+\end{itemize}
+
+\subsection{การ์ดสรุป}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|p{9.5cm}|}
+\hline
+\textbf{การ์ด} & \textbf{ความหมาย} \\ \hline
+Total QKD Sessions & จำนวนเซสชันที่เริ่มทั้งหมด \\ \hline
+Ballots Cast & จำนวนบัตรที่ส่งแล้ว (สถานะ \texttt{VOTE\_CAST}) \\ \hline
+Keys Established & จำนวนกุญแจ OTP ที่สร้างสำเร็จ \\ \hline
+Aborted Sessions & เซสชันที่ถูกยกเลิกเพราะ QBER เกินเกณฑ์ \\ \hline
+Average QBER & ค่า QBER เฉลี่ยของทุกเซสชัน \\ \hline
+\end{tabular}
+\caption{การ์ดสรุปในหน้า Results}
+\label{tab:manual-cards}
+\end{table}
+
+\subsection{ตารางเซสชัน}
+\begin{itemize}
+  \item ค้นหาด้วย Session ID หรือ Voter ID ในช่องค้นหา
+  \item กรองด้วยปุ่ม All, Vote Cast, Key Ready และ Aborted (แต่ละปุ่มแสดงจำนวนเซสชัน)
+  \item คอลัมน์ในตาราง ได้แก่ Session ID, Voter ID, QBER (สีเขียวเมื่ออยู่ในเกณฑ์ สีแดงเมื่อเกินเกณฑ์),
+        Status, OTP Key Generated, Timestamp และ Actions
+  \item ปุ่ม Inspect BB84: เปิดหน้าต่างแสดงรายละเอียดการกระจายกุญแจของเซสชันนั้น (รายละเอียดด้านล่าง)
+  \item ปุ่ม Replay: ทำการส่งนั้นซ้ำอีกครั้ง
+\end{itemize}
+
+\subsection{หน้าต่างตรวจสอบเซสชัน (Inspect BB84)}
+เมื่อกดปุ่ม Inspect BB84 ในแถวของเซสชันใด ระบบเปิดหน้าต่างซ้อน (Modal)
+แสดงบันทึกการกระจายกุญแจของเซสชันนั้นย้อนหลัง ดังรูปที่~\ref{fig:manual-inspect}
+ข้อมูลที่แสดงขึ้นกับมุมมองที่เลือกไว้ (Voter view, Practical view หรือ System view)
+ซึ่งระบุไว้ในกล่อง Simulation Diagnostic Trace ด้านบนสุดของหน้าต่าง
+\begin{itemize}
+  \item ข้อมูลเซสชัน: Voter ID, สถานะ (Status เช่น \texttt{VOTE\_CAST}),
+        QBER Error Rate เทียบกับเพดาน 11\% และเวลาที่สร้างเซสชัน (Created At)
+  \item Generated OTP Key: กุญแจ OTP ที่ได้จากเซสชันนี้
+  \item Voter Terminal Verification \& Sifting Trace: บันทึกแต่ละขั้นตอนตามลำดับเดียวกับขั้นตอนสร้างกุญแจ
+        (หัวข้อขั้นตอนที่ 2) ได้แก่
+        \begin{enumerate}
+          \item Voter Terminal Qubit Measurement Log: ฐานวัดและผลการวัดของโฟตอนแต่ละตัว
+                พร้อมจำนวนโฟตอนที่ได้รับ
+          \item Basis Sifting (Reconciliation) Result: ดัชนีโฟตอนที่ฐานตรงกัน (Match Index)
+                บิตที่เก็บไว้ (Kept/Result) และจำนวนบิตที่ได้พร้อมอัตรา yield
+          \item ส่วนถัดไปของบันทึก: เลื่อนหน้าต่างลงเพื่อดูส่วนที่เหลือของการตรวจสอบ
+        \end{enumerate}
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.9\textwidth]{figures/manual_inspect_bb84.png}
+\caption{หน้าต่าง Inspect BB84 แสดงบันทึกการกระจายกุญแจของเซสชัน}
+\label{fig:manual-inspect}
+\end{figure}
+
+\subsection{หน้าผลคะแนนการเลือกตั้ง (Election Results)}
+
+หน้า Election Results แสดงคะแนนรวมของผู้สมัครแต่ละคน
+ซึ่งนับจากบัตรลงคะแนนที่ถอดรหัส OTP แล้วที่ฝั่งเซิร์ฟเวอร์ ดังรูปที่~\ref{fig:manual-election-results}
+ส่วนหัวแสดงชื่อการเลือกตั้งและจำนวนบัตรที่เข้ารหัสและบันทึกแล้ว
+(เช่น General Election 2026 $\cdot$ 96 encrypted ballots recorded)
+และกลับหน้าก่อนหน้าได้ด้วยปุ่ม ``$\leftarrow$ Back''
+\begin{itemize}
+  \item Vote Distribution: แผนภูมิแท่งแสดงจำนวนคะแนนของผู้สมัครแต่ละคน โดยแต่ละคนมีสีประจำตัว
+  \item ตารางผลคะแนน: แสดงอันดับ (Rank) ชื่อผู้สมัคร (Candidate) พรรค (Party)
+        จำนวนคะแนน (Votes) และสัดส่วนคะแนน (Share) เรียงจากมากไปน้อย
+        ผู้สมัครที่ได้คะแนนสูงสุดมีป้าย LEADING กำกับ
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\maybegraphics[width=0.95\textwidth]{figures/manual_election_results.png}
+\caption{หน้าผลคะแนนการเลือกตั้ง (Election Results)}
+\label{fig:manual-election-results}
+\end{figure}
+
+\section{บันทึกการสื่อสาร (Transmission Logs)}
+
+\begin{itemize}
+  \item เข้าดูบันทึกการส่งข้อมูลของการโหวตในแต่ละครั้ง
+\end{itemize}
+
+%------------------------------------------------------------
+\section{การแก้ไขปัญหาเบื้องต้น}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|p{3.6cm}|p{4.2cm}|p{4.8cm}|}
+\hline
+\textbf{อาการ} & \textbf{สาเหตุที่เป็นไปได้} & \textbf{วิธีแก้} \\ \hline
+ขึ้น EAVESDROPPING DETECTED หรือสถานะ ABORTED & QBER เกิน 11\% (เปิด Simulate Eve หรือสัญญาณรบกวนสูง) & เริ่มเซสชันใหม่ด้วย New Session หรือปิด Simulate Eve ในหน้า Configure \\ \hline
+กุญแจไม่พอ (Key Shortfall) & ค่า $\delta$ ต่ำเกินไป ทำให้บิตหลังคัดกรองน้อยกว่าที่ต้องการ & เพิ่มค่า Safety Margin ($\delta$) หรือลด Target Key Size \\ \hline
+ประมวลผลช้าเมื่อใช้ IBM Quantum & ต้องรอคิวของคอมพิวเตอร์ควอนตัมจริง & ปิด Use Quantum Computer เพื่อใช้ Qiskit Aer \\ \hline
+เซสชันล่าสุดไม่ปรากฏใน Results & ข้อมูลยังไม่ถูกโหลดใหม่ & กด Refresh Logs \\ \hline
+
+\end{tabular}
+\caption{ปัญหาที่พบบ่อยและแนวทางแก้ไข}
+\label{tab:manual-trouble}
+\end{table}
+
+\section{ข้อควรทราบ}
+\begin{itemize}
+  \item ระบบเป็นต้นแบบเชิงการศึกษา ไม่ใช่ระบบเลือกตั้งจริง
+  \item หน้ายืนยันผลแสดง plaintext และกุญแจเพื่อการสาธิตเท่านั้น
+  \item ระบบไม่มีกระบวนการแก้ไขข้อผิดพลาดทางคลาสสิก หาก QBER เกินเกณฑ์จะยกเลิกทั้งเซสชัน
+  \item กุญแจแต่ละชุดใช้ได้เพียงครั้งเดียวแล้วถูกทำลายทิ้ง
+\end{itemize}
