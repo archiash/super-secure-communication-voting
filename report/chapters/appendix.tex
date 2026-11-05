@@ -2,7 +2,7 @@
 \chapter{การพิสูจน์ความปลอดภัยของกุญแจที่เชื่อมต่อจากหลายรอบ}
 \label{app:concat}
 
-ภาคผนวกนี้พิสูจน์ว่าการสร้างกุญแจหลายรอบแล้วนำมาต่อกัน (Multi-Session Key Concatenation) ไม่ทำให้ความปลอดภัยลดลง โดยแบ่งเป็น 2 ส่วน ส่วน \ref{sec:concat-ideal} พิสูจน์ในกรณีอุดมคติที่กุญแจแต่ละรอบสมบูรณ์แบบ และส่วน \ref{sec:concat-eps} ขยายผลไปยังกรณีจริงที่กุญแจแต่ละรอบมีความคลาดเคลื่อน $\varepsilon_i \lesssim 2^{-s}$ จาก Privacy Amplification
+ภาคผนวกนี้พิสูจน์ว่าการสร้างกุญแจหลายรอบแล้วนำมาต่อกัน (Multi-Session Key Concatenation) ไม่ทำให้ความปลอดภัยลดลง โดยแบ่งออกเป็น 2 ส่วน ได้แก่ ส่วนที่ \ref{sec:concat-ideal} พิสูจน์ในกรณีอุดมคติที่กุญแจแต่ละรอบสมบูรณ์แบบ และส่วนที่ \ref{sec:concat-eps} ขยายผลไปยังกรณีจริงที่กุญแจแต่ละรอบมีความคลาดเคลื่อน $\varepsilon_i \lesssim 2^{-s}$ จาก Privacy Amplification
 
 % ---- สภาพแวดล้อมแบบเบา (ไม่ต้องใช้ amsthm) ----
 \newcounter{statementB}[chapter]
