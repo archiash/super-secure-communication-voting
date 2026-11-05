@@ -5,7 +5,7 @@ Saves raw simulation data to JSON for instant re-plotting without re-testing.
 Features:
 1. All descriptions and metrics placed OUTSIDE the plot canvas.
 2. Axis labels sized down cleanly (fontsize=9.2).
-3. Raw trial data saved to backend/src/evaluation/data/priority2_raw_data.json.
+3. Raw trial data saved to backend/src/evaluation/data/exp2_qber_bias_data.json.
 4. If raw data exists, re-plots instantly without re-running quantum simulation.
 """
 
@@ -34,13 +34,12 @@ ARTIFACT_DIR = r"C:\Users\Archiash\.gemini\antigravity\brain\fe188d27-1463-46c3-
 for d in [DATA_DIR, PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
     os.makedirs(d, exist_ok=True)
 
-RAW_DATA_PATH = os.path.join(DATA_DIR, "priority2_raw_data.json")
+RAW_DATA_PATH = os.path.join(DATA_DIR, "exp2_qber_bias_data.json")
 
 def save_minimal(fig, filename):
-    for target in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-        path = os.path.join(target, filename)
-        fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
-    print(f"[SAVED] {filename}")
+    path = os.path.join(REPORT_FIG_DIR, filename)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f" -> [SAVED TO REPORT] {filename}")
 
 # ------------------------------------------------------------------------------
 # 1. Simulation & Data Caching
@@ -247,7 +246,7 @@ def plot_priority2(raw_data):
     ax.grid(axis='y', linestyle='-', linewidth=0.7, color='#f8fafc')
     ax.legend(frameon=False, loc='upper right', fontsize=8.6)
 
-    save_minimal(fig, "minimal_priority2_estimation_error_vs_keysize.png")
+    save_minimal(fig, "exp2_qber_estimation_bias.png")
     plt.close(fig)
 
     print("[SUCCESS] All Priority 2 minimalist graphs generated with outside text descriptions!")

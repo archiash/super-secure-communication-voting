@@ -24,16 +24,14 @@ REPORT_FIG_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "re
 REPORT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "report"))
 ARTIFACT_DIR = r"C:\Users\Archiash\.gemini\antigravity\brain\fe188d27-1463-46c3-aca9-529a07ed20b1"
 
-for d in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-    os.makedirs(d, exist_ok=True)
+os.makedirs(REPORT_FIG_DIR, exist_ok=True)
 
-MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_raw_data.json")
+MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_data.json")
 
 def save_minimal(fig, filename):
-    for target in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-        path = os.path.join(target, filename)
-        fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
-    print(f" -> [SAVED] {filename}")
+    path = os.path.join(REPORT_FIG_DIR, filename)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f" -> [SAVED TO REPORT] {filename}")
 
 
 plt.rcParams.update({
@@ -62,7 +60,7 @@ plt.rcParams.update({
 def render_all_plots(data=None):
     if data is None:
         if not os.path.exists(MASTER_DATA_PATH):
-            raise FileNotFoundError(f"Master data not found at {MASTER_DATA_PATH}. Please run run_all_benchmarks.py first.")
+            raise FileNotFoundError(f"Master data not found at {MASTER_DATA_PATH}. Please run eval_run_all.py first.")
         with open(MASTER_DATA_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -184,7 +182,7 @@ def render_all_plots(data=None):
         ax.tick_params(top=False, bottom=False, left=False, right=False)
 
     plt.subplots_adjust(wspace=0.28, hspace=0.42)
-    save_minimal(fig, "minimal_confusion_matrices_ibm_powers_of_2.png")
+    save_minimal(fig, "exp1_confusion_matrix_ibm.png")
     plt.close(fig)
 
     # ==========================================================================
@@ -296,7 +294,7 @@ def render_all_plots(data=None):
     ax.grid(axis='y', linestyle='-', linewidth=0.7, color='#f8fafc')
     ax.legend(frameon=False, loc='upper right', fontsize=8.6)
 
-    save_minimal(fig, "minimal_priority2_estimation_error_vs_keysize.png")
+    save_minimal(fig, "exp2_qber_estimation_bias.png")
     plt.close(fig)
 
     # ==========================================================================
@@ -497,7 +495,7 @@ def render_all_plots(data=None):
         ax2.legend(loc='lower left', frameon=False, fontsize=8.4)
 
         plt.subplots_adjust(wspace=0.22)
-        save_minimal(fig, "minimal_privacy_amplification_summary.png")
+        save_minimal(fig, "exp3_privacy_amplification.png")
         plt.close(fig)
 
     print("\n[COMPLETE] ALL Publication-Grade Minimal Figures Rendered Successfully!")

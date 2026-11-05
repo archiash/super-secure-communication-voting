@@ -24,14 +24,12 @@ REPORT_FIG_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "re
 REPORT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "report"))
 ARTIFACT_DIR = r"C:\Users\Archiash\.gemini\antigravity\brain\fe188d27-1463-46c3-aca9-529a07ed20b1"
 
-for d in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-    os.makedirs(d, exist_ok=True)
+os.makedirs(REPORT_FIG_DIR, exist_ok=True)
 
 def save_minimal(fig, filename):
-    for target in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-        path = os.path.join(target, filename)
-        fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
-    print(f"[SAVED] {filename}")
+    path = os.path.join(REPORT_FIG_DIR, filename)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f" -> [SAVED TO REPORT] {filename}")
 
 def evaluate_ibm_hardware(trials: int = 100):
     random.seed(42)
@@ -196,7 +194,7 @@ def evaluate_ibm_hardware(trials: int = 100):
         ax.tick_params(top=False, bottom=False, left=False, right=False)
 
     plt.subplots_adjust(wspace=0.28, hspace=0.42)
-    save_minimal(fig, "minimal_confusion_matrices_ibm_powers_of_2.png")
+    save_minimal(fig, "exp1_confusion_matrix_ibm.png")
     plt.close(fig)
 
     # --------------------------------------------------------------------------

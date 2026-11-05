@@ -27,7 +27,7 @@ from modules import qkd, service
 
 DATA_DIR = os.path.join(CURRENT_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
-MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_raw_data.json")
+MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_data.json")
 
 def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
     if os.path.exists(MASTER_DATA_PATH) and not force_retest:

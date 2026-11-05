@@ -34,8 +34,8 @@ ARTIFACT_DIR = r"C:\Users\Archiash\.gemini\antigravity\brain\fe188d27-1463-46c3-
 for d in [DATA_DIR, PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
     os.makedirs(d, exist_ok=True)
 
-RAW_DATA_PATH = os.path.join(DATA_DIR, "privacy_amplification_raw_data.json")
-MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_raw_data.json")
+RAW_DATA_PATH = os.path.join(DATA_DIR, "exp3_privacy_amplification_data.json")
+MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_data.json")
 
 
 def gf2_rank(matrix: np.ndarray) -> int:
@@ -138,7 +138,7 @@ def run_benchmark(trials: int = 100, force_retest: bool = False) -> dict:
         json.dump(raw_data, f, indent=2)
     print(f"\n[CACHE SAVED] Raw data saved to {RAW_DATA_PATH}")
 
-    # Also update master_benchmark_raw_data.json
+    # Also update master_benchmark_data.json
     if os.path.exists(MASTER_DATA_PATH):
         try:
             with open(MASTER_DATA_PATH, "r", encoding="utf-8") as f:
@@ -154,10 +154,9 @@ def run_benchmark(trials: int = 100, force_retest: bool = False) -> dict:
 
 
 def save_minimal(fig, filename):
-    for target in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-        path = os.path.join(target, filename)
-        fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
-    print(f" -> [SAVED] {filename}")
+    path = os.path.join(REPORT_FIG_DIR, filename)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f" -> [SAVED TO REPORT] {filename}")
 
 
 def plot_results(data: dict):
@@ -319,7 +318,7 @@ def plot_results(data: dict):
     ax2.legend(loc='lower left', frameon=False, fontsize=8.4)
 
     plt.subplots_adjust(wspace=0.22)
-    save_minimal(fig, "minimal_privacy_amplification_summary.png")
+    save_minimal(fig, "exp3_privacy_amplification.png")
     plt.close(fig)
 
     print("\n[COMPLETE] All Privacy Amplification evaluation figures generated successfully!")

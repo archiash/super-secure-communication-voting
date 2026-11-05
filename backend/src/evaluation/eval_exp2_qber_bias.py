@@ -29,14 +29,12 @@ REPORT_FIG_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "re
 REPORT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "..", "..", "report"))
 ARTIFACT_DIR = r"C:\Users\Archiash\.gemini\antigravity\brain\fe188d27-1463-46c3-aca9-529a07ed20b1"
 
-for d in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-    os.makedirs(d, exist_ok=True)
+os.makedirs(REPORT_FIG_DIR, exist_ok=True)
 
 def save_minimal(fig, filename):
-    for target in [PLOTS_DIR, REPORT_FIG_DIR, REPORT_DIR, ARTIFACT_DIR]:
-        path = os.path.join(target, filename)
-        fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
-    print(f"[SAVED] {filename}")
+    path = os.path.join(REPORT_FIG_DIR, filename)
+    fig.savefig(path, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f" -> [SAVED TO REPORT] {filename}")
 
 
 plt.rcParams.update({
@@ -227,7 +225,7 @@ def run_convergence_evaluation(trials: int = 100):
     ax.grid(axis='y', linestyle='-', linewidth=0.7, color='#f1f5f9')
     ax.legend(frameon=False, loc='upper right', fontsize=9)
 
-    save_minimal(fig, "minimal_priority2_estimation_error_vs_keysize.png")
+    save_minimal(fig, "exp2_qber_estimation_bias.png")
     plt.close(fig)
 
     table_data = []
