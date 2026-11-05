@@ -1,14 +1,14 @@
 """
-Master Benchmark & Data Persistence Suite for QKD Voting System
-Runs all evaluation suites ONCE, saves complete raw data to JSON,
-and allows instant re-plotting and customization without re-testing.
+Master Benchmark & Data Collection Suite for QKD Voting System
+Runs all evaluation suites ONCE, saves complete raw data to 'data/benchmark_results.json',
+and allows instant re-plotting and modular analysis without re-testing.
 
 Suites Included:
-1. Priority 1: Eavesdropping Detection & QBER Threshold Calibration (Local Sim & IBM Hardware)
-2. Priority 1 (CM): Confusion Matrices across Powers of 2 (Local Sim & IBM Hardware)
-3. Priority 2: Sample QBER vs. Actual Key QBER & Convergence across Key Sizes
-4. Priority 3: End-to-End One-Time Pad (OTP) Ballot Decryption & Shannon Entropy Secrecy
-5. Key Sizing: Safety Margin delta Optimization (24 bits & Optimal delta vs Key Size)
+1. Experiment 1: Confusion Matrices & QBER Detection (Local Sim & IBM Kingston Hardware)
+2. Experiment 2: Sample QBER vs. Actual Key QBER & Convergence across Key Sizes
+3. Experiment 3: Privacy Amplification & Eve Knowledge Elimination via Toeplitz Hashing
+4. Supplementary: End-to-End One-Time Pad (OTP) Ballot Decryption & Shannon Entropy
+5. Supplementary: Key Sizing Safety Margin Delta Optimization
 """
 
 import os
@@ -23,41 +23,66 @@ SRC_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-from modules import qkd, service
+from modules import qkd, service, privacy_amplification as pa
 
 DATA_DIR = os.path.join(CURRENT_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
-MASTER_DATA_PATH = os.path.join(DATA_DIR, "master_benchmark_data.json")
+BENCHMARK_RESULTS_PATH = os.path.join(DATA_DIR, "benchmark_results.json")
+
+
+def gf2_rank(matrix: np.ndarray) -> int:
+    """Compute the rank of a binary matrix over GF(2) using Gaussian elimination."""
+    M = matrix.copy() % 2
+    nrows, ncols = M.shape
+    r = 0
+    for c in range(ncols):
+        pivot = -1
+        for row in range(r, nrows):
+            if M[row, c] == 1:
+                pivot = row
+                break
+        if pivot == -1:
+            continue
+        M[[r, pivot]] = M[[pivot, r]]
+        for row in range(r + 1, nrows):
+            if M[row, c] == 1:
+                M[row] ^= M[r]
+        r += 1
+        if r == nrows:
+            break
+    return r
+
 
 def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
-    if os.path.exists(MASTER_DATA_PATH) and not force_retest:
-        print(f"[CACHE FOUND] Master benchmark data exists at: {MASTER_DATA_PATH}")
-        print("Loading cached data directly (Use force_retest=True to re-simulate)...")
-        with open(MASTER_DATA_PATH, "r", encoding="utf-8") as f:
+    if os.path.exists(BENCHMARK_RESULTS_PATH) and not force_retest:
+        print("=" * 75)
+        print(f"[CACHE FOUND] Benchmark results exist at: {BENCHMARK_RESULTS_PATH}")
+        print("Loading cached data directly (Use --retest or force_retest=True to re-simulate)...")
+        print("=" * 75)
+        with open(BENCHMARK_RESULTS_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    print("=====================================================================")
+    print("=" * 75)
     print(f"RUNNING MASTER QKD BENCHMARK SUITE ({trials} trials per condition)")
-    print("=====================================================================")
+    print("=" * 75)
     random.seed(42)
     np.random.seed(42)
 
-    master_data = {
-        "metadata": {
-            "trials_per_test": trials,
-            "threshold_percent": 11.0,
-            "ibm_hardware_calibrated_noise": 0.0282,
-            "ibm_backend": "ibm_kingston (156-qubit Heron QPU)",
-            "voting_payload": "VT3 (24 bits)"
-        }
+    metadata = {
+        "trials_per_test": trials,
+        "threshold_percent": 11.0,
+        "ibm_hardware_calibrated_noise": 0.0282,
+        "ibm_backend": "ibm_kingston (156-qubit Heron QPU)",
+        "voting_payload": "VT3 (24 bits)",
+        "powers_of_2": [8, 16, 32, 64, 128, 256]
     }
 
-    # --------------------------------------------------------------------------
-    # 1. PRIORITY 1: Eavesdropping Detection vs. Hardware Noise
-    # --------------------------------------------------------------------------
-    print("\n[Suite 1/5] Running Priority 1: Eavesdropping Detection (QBER Separation)...")
+    # ==========================================================================
+    # 1. EXPERIMENT 1: Confusion Matrices & QBER Detection (Local Sim & IBM Hardware)
+    # ==========================================================================
+    print("\n[Suite 1/5] Running Experiment 1: Eavesdropping Detection & Confusion Matrices...")
     p1_key_sizes = [8, 16, 24]
-    p1_results = {}
+    p1_separation = {}
     for n in p1_key_sizes:
         total_q = service.calculate_key_length(0.8, n)
         # Local Sim (No Eve)
@@ -70,7 +95,7 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             err = sum(1 for i in range(w-n) if s_a[i] != s_b[i]) if w >= 2*n else 0
             loc_q.append((err / (w-n))*100.0 if (w >= 2*n and w > n) else 0.0)
 
-        # IBM Hardware (No Eve)
+        # IBM Hardware (No Eve, 2.82% Noise)
         ibm_q = []
         for _ in range(trials):
             sim = qkd.simulate_bb84_protocal(key_size=total_q, per_time_bits=total_q, has_eavesdropping=False, use_ibm=True, channel_noise=0.0282)
@@ -80,7 +105,7 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             err = sum(1 for i in range(w-n) if s_a[i] != s_b[i]) if w >= 2*n else 0
             ibm_q.append((err / (w-n))*100.0 if (w >= 2*n and w > n) else 0.0)
 
-        # With Eve (Attacked)
+        # With Eve (Intercept-Resend)
         eve_q = []
         for _ in range(trials):
             sim = qkd.simulate_bb84_protocal(key_size=total_q, per_time_bits=total_q, has_eavesdropping=True, use_ibm=False, channel_noise=0.0)
@@ -90,7 +115,7 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             err = sum(1 for i in range(w-n) if s_a[i] != s_b[i]) if w >= 2*n else 0
             eve_q.append((err / (w-n))*100.0 if (w >= 2*n and w > n) else 25.0)
 
-        p1_results[str(n)] = {
+        p1_separation[str(n)] = {
             "local_mean": float(np.mean(loc_q)),
             "ibm_mean": float(np.mean(ibm_q)),
             "eve_mean": float(np.mean(eve_q)),
@@ -98,12 +123,7 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             "ibm_trials": ibm_q,
             "eve_trials": eve_q
         }
-    master_data["priority1_qber_separation"] = p1_results
 
-    # --------------------------------------------------------------------------
-    # 2. PRIORITY 1: Confusion Matrices across Powers of 2 (Local & IBM)
-    # --------------------------------------------------------------------------
-    print("[Suite 2/5] Running Confusion Matrices across Powers of 2 [8, 16, 32, 64, 128, 256]...")
     powers_of_2 = [8, 16, 32, 64, 128, 256]
     cm_local = {}
     cm_ibm = {}
@@ -130,7 +150,13 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             if q_e > 11.0: tp_l += 1
             else: fn_l += 1
 
-        cm_local[str(n)] = {"TN": tn_l, "FP": fp_l, "FN": fn_l, "TP": tp_l, "qubits": total_q}
+        cm_local[str(n)] = {
+            "TN": tn_l, "FP": fp_l, "FN": fn_l, "TP": tp_l,
+            "Accuracy": ((tn_l + tp_l) / (trials * 2)) * 100.0,
+            "Recall": (tp_l / (tp_l + fn_l) * 100.0) if (tp_l + fn_l) > 0 else 0.0,
+            "Precision": (tp_l / (tp_l + fp_l) * 100.0) if (tp_l + fp_l) > 0 else 0.0,
+            "qubits": total_q
+        }
 
         # IBM Hardware Confusion Matrix
         tn_i, fp_i, fn_i, tp_i = 0, 0, 0, 0
@@ -151,15 +177,18 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             if q_e > 11.0: tp_i += 1
             else: fn_i += 1
 
-        cm_ibm[str(n)] = {"TN": tn_i, "FP": fp_i, "FN": fn_i, "TP": tp_i, "qubits": total_q}
+        cm_ibm[str(n)] = {
+            "TN": tn_i, "FP": fp_i, "FN": fn_i, "TP": tp_i,
+            "Accuracy": ((tn_i + tp_i) / (trials * 2)) * 100.0,
+            "Recall": (tp_i / (tp_i + fn_i) * 100.0) if (tp_i + fn_i) > 0 else 0.0,
+            "Precision": (tp_i / (tp_i + fp_i) * 100.0) if (tp_i + fp_i) > 0 else 0.0,
+            "qubits": total_q
+        }
 
-    master_data["confusion_matrix_local"] = cm_local
-    master_data["confusion_matrix_ibm"] = cm_ibm
-
-    # --------------------------------------------------------------------------
-    # 3. PRIORITY 2: Blind Verification (Sample QBER vs. Actual Key QBER)
-    # --------------------------------------------------------------------------
-    print("[Suite 3/5] Running Priority 2: Blind Verification (Sample vs Key QBER)...")
+    # ==========================================================================
+    # 2. EXPERIMENT 2: Blind Verification (Sample QBER vs. Actual Key QBER)
+    # ==========================================================================
+    print("\n[Suite 2/5] Running Experiment 2: Blind Verification & Estimation Bias...")
     n_v = 24
     total_q = service.calculate_key_length(0.8, n_v)
 
@@ -201,7 +230,6 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             s_eve.append((sum(1 for i in t_idx if s_a[i] != s_b[i]) / len(t_idx)) * 100.0)
             k_eve.append((sum(1 for i in k_idx if s_a[i] != s_b[i]) / len(k_idx)) * 100.0)
 
-    # Priority 2 convergence and all-keysize scatter
     p2_conv = {}
     scatter_by_keysize = {}
     comb_norm = {"sample_qber": [], "key_qber": [], "key_size": []}
@@ -268,7 +296,6 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
         comb_ibm["sample_qber"].extend(si_list); comb_ibm["key_qber"].extend(ki_list); comb_ibm["key_size"].extend([ks]*len(si_list))
         comb_eve["sample_qber"].extend(se_list); comb_eve["key_qber"].extend(ke_list); comb_eve["key_size"].extend([ks]*len(se_list))
 
-    # Add 24-bit voting key to scatter_by_keysize and combined
     scatter_by_keysize["24"] = {
         "normal": {"sample_qber": s_norm, "key_qber": k_norm},
         "ibm_hardware": {"sample_qber": s_ibm, "key_qber": k_ibm},
@@ -278,27 +305,62 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
     comb_ibm["sample_qber"].extend(s_ibm); comb_ibm["key_qber"].extend(k_ibm); comb_ibm["key_size"].extend([24]*len(s_ibm))
     comb_eve["sample_qber"].extend(s_eve); comb_eve["key_qber"].extend(k_eve); comb_eve["key_size"].extend([24]*len(s_eve))
 
-    master_data["priority2_blind_verification"] = {
-        "scatter_24bits": scatter_by_keysize["24"],
-        "scatter_by_keysize": scatter_by_keysize,
-        "scatter_all_keysizes": {
-            "normal": comb_norm,
-            "ibm_hardware": comb_ibm,
-            "eve": comb_eve
-        },
-        "convergence_powers_of_2": p2_conv
-    }
+    # ==========================================================================
+    # 3. EXPERIMENT 3: Privacy Amplification (Eve Knowledge Elimination)
+    # ==========================================================================
+    print("\n[Suite 3/5] Running Experiment 3: Privacy Amplification (Eve Knowledge Elimination)...")
+    security_params = [8, 16, 32]
+    undetected_qber = 0.08
+    pa_results = {}
 
-    # --------------------------------------------------------------------------
-    # 4. PRIORITY 3: OTP Ballot Decryption & Error Correction & Shannon Entropy
-    # --------------------------------------------------------------------------
-    print("[Suite 4/5] Running Priority 3: End-to-End OTP Encryption & Ballot Correctness...")
+    for n in powers_of_2:
+        pa_results[str(n)] = {}
+        for s in security_params:
+            N_raw = pa.calculate_required_raw_length(target_key_length=n, security_parameter=s, qber=undetected_qber)
+            k_before_list = []
+            k_after_list = []
+            disappeared_count = 0
+
+            for _ in range(trials):
+                known_mask = np.random.rand(N_raw) < (2.0 * undetected_qber)
+                k_before = int(np.sum(known_mask))
+                k_before_list.append(k_before)
+
+                unknown_indices = np.where(~known_mask)[0]
+                seed = pa.generate_toeplitz_seed(N_raw, n)
+                T = pa.construct_toeplitz_matrix(seed, n, N_raw)
+                
+                T_unknown = T[:, unknown_indices]
+                r = gf2_rank(T_unknown)
+                k_after = max(0, n - r)
+                k_after_list.append(k_after)
+
+                if k_after == 0:
+                    disappeared_count += 1
+
+            pct_disappeared = (disappeared_count / trials) * 100.0
+            pa_results[str(n)][str(s)] = {
+                "n_target": n,
+                "security_parameter": s,
+                "n_raw_input": N_raw,
+                "undetected_qber": undetected_qber,
+                "k_before_mean": float(np.mean(k_before_list)),
+                "k_before_std": float(np.std(k_before_list)),
+                "k_after_mean": float(np.mean(k_after_list)),
+                "k_after_max": int(np.max(k_after_list)),
+                "pct_fully_disappeared": float(pct_disappeared),
+                "leftover_hash_leakage_bound": float(2.0 ** (-s) / math.log(2))
+            }
+
+    # ==========================================================================
+    # 4. SUPPLEMENTARY: OTP Ballot Decryption & Shannon Entropy Secrecy
+    # ==========================================================================
+    print("\n[Suite 4/5] Running Supplementary: End-to-End OTP Encryption & Shannon Entropy...")
     ballot_text = "VT3"
     ballot_bin = "".join(f"{ord(c):08b}" for c in ballot_text)
     n_otp = len(ballot_bin)  # 24 bits
     total_q = service.calculate_key_length(0.8, n_otp)
 
-    # 4.1 Ballot recovery With vs Without error correction under IBM Hardware Noise (2.82%)
     succ_no_ec = 0
     succ_with_ec = 0
     ciphertexts = []
@@ -314,25 +376,21 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
             k_alice = "".join(s_a[i] for i in k_idx)
             k_bob_raw = "".join(s_b[i] for i in k_idx)
 
-            # Encrypt ballot: C = M ^ K_alice
             c_bits = "".join(str(int(m) ^ int(k)) for m, k in zip(ballot_bin, k_alice))
             ciphertexts.append(c_bits)
 
-            # Decrypt WITHOUT Error Correction: M' = C ^ K_bob_raw
             m_dec_no_ec = "".join(str(int(c) ^ int(k)) for c, k in zip(c_bits, k_bob_raw))
             if m_dec_no_ec == ballot_bin:
                 succ_no_ec += 1
 
-            # Decrypt WITH Cascade Error Correction: K_bob = K_alice -> 100% recovery
             succ_with_ec += 1
 
-    # Shannon Entropy of OTP Ciphertext: H(C) = - p0 log2(p0) - p1 log2(p1)
     all_c_bits = "".join(ciphertexts)
     p1 = all_c_bits.count('1') / len(all_c_bits) if all_c_bits else 0.5
     p0 = 1.0 - p1
     entropy = - (p0 * math.log2(p0) + p1 * math.log2(p1)) if (0 < p0 < 1) else 1.0
 
-    master_data["priority3_otp_ballot_correctness"] = {
+    otp_ballot_results = {
         "payload": ballot_text,
         "n_bits": n_otp,
         "trials": trials,
@@ -344,31 +402,29 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
         "p1_frequency": float(p1)
     }
 
-    # --------------------------------------------------------------------------
-    # 5. KEY SIZING: Delta Optimization (24 bits & Optimal delta vs Key Size)
-    # --------------------------------------------------------------------------
-    print("[Suite 5/5] Running Key Sizing: Safety Margin delta Optimization...")
-    deltas = [0.0, 0.25, 0.5, 0.8, 1.0]
-    n_k = 24
+    # ==========================================================================
+    # 5. SUPPLEMENTARY: Key Sizing Delta Optimization
+    # ==========================================================================
+    print("\n[Suite 5/5] Running Supplementary: Key Sizing Safety Margin Delta Optimization...")
+    deltas = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.5]
     delta_success_local = []
     delta_success_ibm = []
 
     for d in deltas:
-        tq = service.calculate_key_length(d, n_k)
+        tq = service.calculate_key_length(d, n_v)
         succ_l, succ_i = 0, 0
         for _ in range(trials):
-            # Local
             sim_l = qkd.simulate_bb84_protocal(key_size=tq, per_time_bits=tq, has_eavesdropping=False, use_ibm=False, channel_noise=0.0)
-            if len(qkd.filter_key_by_basis(sim_l['server_key'], sim_l['server_encryption_basis'], sim_l['client_decryption_basis'])) >= 2*n_k:
+            if len(qkd.filter_key_by_basis(sim_l['server_key'], sim_l['server_encryption_basis'], sim_l['client_decryption_basis'])) >= 2*n_v:
                 succ_l += 1
-            # IBM
+
             sim_i = qkd.simulate_bb84_protocal(key_size=tq, per_time_bits=tq, has_eavesdropping=False, use_ibm=True, channel_noise=0.0282)
-            if len(qkd.filter_key_by_basis(sim_i['server_key'], sim_i['server_encryption_basis'], sim_i['client_decryption_basis'])) >= 2*n_k:
+            if len(qkd.filter_key_by_basis(sim_i['server_key'], sim_i['server_encryption_basis'], sim_i['client_decryption_basis'])) >= 2*n_v:
                 succ_i += 1
+
         delta_success_local.append((succ_l / trials) * 100.0)
         delta_success_ibm.append((succ_i / trials) * 100.0)
 
-    # Optimal delta vs key size
     candidate_deltas = [0.0, 0.25, 0.5, 0.8, 1.0, 1.25, 1.5]
     eval_sizes = [8, 16, 24, 32, 40]
     optimal_deltas = []
@@ -386,7 +442,7 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
                 break
         optimal_deltas.append(best_d)
 
-    master_data["keysizing_delta_optimization"] = {
+    delta_results = {
         "n_target": 24,
         "deltas": deltas,
         "success_rate_local": delta_success_local,
@@ -397,15 +453,77 @@ def run_all_benchmarks(trials: int = 100, force_retest: bool = False):
         }
     }
 
-    # Save to disk
-    with open(MASTER_DATA_PATH, "w", encoding="utf-8") as f:
-        json.dump(master_data, f, indent=2)
+    # ==========================================================================
+    # ASSEMBLE UNIFIED DATASET
+    # ==========================================================================
+    unified_data = {
+        "metadata": metadata,
+        "exp1_confusion_matrix": {
+            "ibm_hardware": cm_ibm,
+            "local_simulation": cm_local,
+            "qber_separation": p1_separation
+        },
+        "exp2_qber_estimation_bias": {
+            "convergence": p2_conv,
+            "scatter_24bits": scatter_by_keysize["24"],
+            "scatter_by_keysize": scatter_by_keysize,
+            "scatter_all_keysizes": {
+                "normal": comb_norm,
+                "ibm_hardware": comb_ibm,
+                "eve": comb_eve
+            }
+        },
+        "exp3_privacy_amplification": {
+            "metadata": {
+                "trials_per_condition": trials,
+                "undetected_qber_scenario": undetected_qber,
+                "key_sizes": powers_of_2,
+                "security_parameters": security_params,
+                "hash_family": "2-Universal Toeplitz Hashing over GF(2)"
+            },
+            "results": pa_results
+        },
+        "supplementary": {
+            "otp_ballot_correctness": otp_ballot_results,
+            "delta_optimization": delta_results
+        },
+        # Compatibility aliases for legacy helper scripts
+        "confusion_matrix_ibm": cm_ibm,
+        "confusion_matrix_local": cm_local,
+        "priority1_qber_separation": p1_separation,
+        "priority2_blind_verification": {
+            "scatter_24bits": scatter_by_keysize["24"],
+            "scatter_by_keysize": scatter_by_keysize,
+            "scatter_all_keysizes": {
+                "normal": comb_norm,
+                "ibm_hardware": comb_ibm,
+                "eve": comb_eve
+            },
+            "convergence_powers_of_2": p2_conv
+        },
+        "privacy_amplification_analysis": {
+            "metadata": {
+                "trials_per_condition": trials,
+                "undetected_qber_scenario": undetected_qber,
+                "key_sizes": powers_of_2,
+                "security_parameters": security_params
+            },
+            "results": pa_results
+        },
+        "priority3_otp_ballot_correctness": otp_ballot_results,
+        "keysizing_delta_optimization": delta_results
+    }
 
-    print("\n=====================================================================")
-    print(f"[COMPLETE] Master raw benchmark data successfully saved to:")
-    print(f" -> {MASTER_DATA_PATH}")
-    print("=====================================================================")
-    return master_data
+    with open(BENCHMARK_RESULTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(unified_data, f, indent=2)
+
+    print("\n" + "=" * 75)
+    print(f"[COMPLETE] Benchmark results successfully saved to:")
+    print(f" -> {BENCHMARK_RESULTS_PATH}")
+    print("=" * 75)
+    return unified_data
+
 
 if __name__ == "__main__":
-    run_all_benchmarks(trials=100, force_retest=False)
+    force = "--retest" in sys.argv or "--force" in sys.argv
+    run_all_benchmarks(trials=100, force_retest=force)
