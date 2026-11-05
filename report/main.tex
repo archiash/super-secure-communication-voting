@@ -6,7 +6,7 @@
 %% documentation.
 
 \projectNo{P069-1}
-\acadyear{2025}
+\acadyear{2026}
 
 \titleTH{ระบบโหวตความปลอดภัยสูงโดยใช้การกระจายคีย์แบบควอนตัม}
 \titleEN{Super-Secure Voting System Using Quantum Key Distribution}
@@ -18,9 +18,8 @@
 
 \cpeadvisor{sanpawat}
 \cpecommittee{navadon}
-\cpecommittee{santi}
+\cpecommittee{chinawat}
 
-\committee{รศ.ดร.\,นิพนธ์ ธีรอำพน}{Assoc.\,Prof.\,Nipon Theera-Umpon, Ph.D.}
 
 %% Some possible packages to include:
 \usepackage[final]{graphicx} % for including graphics
@@ -103,11 +102,34 @@
 \ifindex\indexpage\fi
 
 \begin{biosketch}
-\begin{center}
-  \includegraphics[width=1.5in]{mugshot.jpg}
-\end{center}
-Your biosketch goes here. Make sure it sits inside
-the \texttt{biosketch} environment.
+% รูปผู้เขียน: วางไฟล์ที่ figures/author_<ชื่อ>.jpg ถ้ายังไม่มีไฟล์จะแสดงกรอบว่างแทน
+\newcommand{\authorphoto}[1]{%
+  \IfFileExists{#1}{\includegraphics[width=1.2in,height=1.5in,keepaspectratio]{#1}}%
+  {\fbox{\parbox[c][1.5in][c]{1.2in}{\centering\small รูปถ่าย}}}}
+\newcommand{\authorbio}[5]{%
+  \begin{center}\authorphoto{#1}\end{center}
+  \begin{tabular}{@{}l@{\quad}p{0.7\textwidth}@{}}
+    \textbf{ชื่อ-นามสกุล} & #2 \\
+    \textbf{รหัสนักศึกษา} & #3 \\
+    \textbf{การศึกษา} & #4 \\
+    \textbf{อีเมล} & \texttt{#5}
+  \end{tabular}\par\bigskip}
+
+\authorbio{figures/author_pakin.jpg}{นายภคิน นิรมิตสีมา}{660610782}
+  {ปริญญาตรี สาขาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่}
+  {pakin\_ni@cmu.ac.th}
+
+\authorbio{figures/author_yuttakan.jpg}{นายยุทธกานต์ สาจุ้ย}{660610787}
+  {ปริญญาตรี สาขาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่}
+  {gong6321@gmail.com}
+
+\authorbio{figures/author_atinan.jpg}{นายอาทินันท์ แจ้งสว่าง}{660610807}
+  {ปริญญาตรี สาขาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่}
+  {atinanhome@gmail.com}
+
+\authorbio{figures/author_paisit.jpg}{นายไพสิฐ เลิศอนันต์พิพัฒน์}{660612155}
+  {ปริญญาตรี สาขาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่}
+  {paisitture@gmail.com}
 \end{biosketch}
 \fi % \ifproject
 \end{document}
