@@ -39,7 +39,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 - [ ] Hold the file boundaries. PR-01 touches only `backend/src/modules/privacy_amplification.py` and `backend/src/evaluation/test_privacy_amplification.py`.
 - [ ] Hold the file boundaries. PR-02 touches only `backend/src/modules/models.py`, `backend/src/modules/service.py`, and `backend/src/modules/router.py`.
 - [ ] Hold the file boundaries. PR-03 touches only `backend/src/evaluation/test_spec.py` and `backend/src/evaluation/generate_test_spec_report.py`.
-- [ ] Hold the file boundaries. PR-04 touches only `Front_end/src/types/qkd.ts`, `Front_end/src/services/`, and `Front_end/src/pages/`.
+- [ ] Hold the file boundaries. PR-04 touches only `frontend/src/types/qkd.ts`, `frontend/src/services/`, and `frontend/src/pages/`.
 - [ ] Hold the review gate. PR-04 changes an interaction. It waits for the operator review in chat with screenshots and a video before merge.
 
 ### PR mechanics, for every PR
@@ -232,21 +232,21 @@ Each live lane runs on its own cloud VM at the PR head. Drive through `control-u
 
 **Files.**
 
-- [ ] Edit `Front_end/src/types/qkd.ts`.
-- [ ] Edit `Front_end/src/services/real-api.ts`.
-- [ ] Edit `Front_end/src/services/mock-api.ts`.
-- [ ] Edit `Front_end/src/pages/ConfigurePage.tsx`.
-- [ ] Edit `Front_end/src/pages/KeyGenerationPage.tsx`.
-- [ ] Edit `Front_end/src/pages/KeyGenerationPage.module.css`.
+- [ ] Edit `frontend/src/types/qkd.ts`.
+- [ ] Edit `frontend/src/services/real-api.ts`.
+- [ ] Edit `frontend/src/services/mock-api.ts`.
+- [ ] Edit `frontend/src/pages/ConfigurePage.tsx`.
+- [ ] Edit `frontend/src/pages/KeyGenerationPage.tsx`.
+- [ ] Edit `frontend/src/pages/KeyGenerationPage.module.css`.
 
 **Build.**
 
-- [ ] Add `privacyAmplificationEnabled`, `paSeed`, and `paCompressionRatio` to `Front_end/src/types/qkd.ts`.
-- [ ] Add toggle switch for Privacy Amplification in `Front_end/src/pages/ConfigurePage.tsx`.
-- [ ] Update qubit sizing recommendation text in `Front_end/src/pages/ConfigurePage.tsx`.
-- [ ] Add Stage 4 card for Privacy Amplification in `Front_end/src/pages/KeyGenerationPage.tsx`.
-- [ ] Add matrix seed display and compression badge styles in `Front_end/src/pages/KeyGenerationPage.module.css`.
-- [ ] Update `Front_end/src/services/mock-api.ts` to compute simulated Toeplitz hash for offline demo.
+- [ ] Add `privacyAmplificationEnabled`, `paSeed`, and `paCompressionRatio` to `frontend/src/types/qkd.ts`.
+- [ ] Add toggle switch for Privacy Amplification in `frontend/src/pages/ConfigurePage.tsx`.
+- [ ] Update qubit sizing recommendation text in `frontend/src/pages/ConfigurePage.tsx`.
+- [ ] Add Stage 4 card for Privacy Amplification in `frontend/src/pages/KeyGenerationPage.tsx`.
+- [ ] Add matrix seed display and compression badge styles in `frontend/src/pages/KeyGenerationPage.module.css`.
+- [ ] Update `frontend/src/services/mock-api.ts` to compute simulated Toeplitz hash for offline demo.
 
 **You see.**
 
@@ -254,7 +254,7 @@ Each live lane runs on its own cloud VM at the PR head. Drive through `control-u
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Frontend unit test suite validates configuration toggle and stage card rendering. Run `npm test -- --watchAll=false` in `Front_end`.
+- [ ] Frontend unit test suite validates configuration toggle and stage card rendering. Run `npm test -- --watchAll=false` in `frontend`.
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on `grok-4.7-xhigh-fast` at the PR head, per the boot recipe.
 
@@ -272,7 +272,7 @@ Each live lane runs on its own cloud VM at the PR head. Drive through `control-u
 **Verify, perf.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
 - [ ] Metric. Frontend production bundle size of compiled assets.
-- [ ] Probe. Run `npm run build` in `Front_end` and check output bundle size.
+- [ ] Probe. Run `npm run build` in `frontend` and check output bundle size.
 - [ ] Baseline. Record trunk production bundle size of 285400 bytes.
 - [ ] Rule. Head production bundle size must remain under 310000 bytes.
 
@@ -328,3 +328,4 @@ Read `TEST_SPEC.md` for test suite specifications.
 Read Bennett, Brassard, Crepeau, and Maurer (1995), Generalized Privacy Amplification.
 Read Renner (2005), Security of Quantum Key Distribution.
 Apply `pstack/skills/technical-writing/SKILL.md` and `pstack/skills/unslop/SKILL.md` before edits.
+

@@ -35,7 +35,7 @@ RESET = "\033[0m"
 
 ROOT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = ROOT_DIR / "backend"
-FRONTEND_DIR = ROOT_DIR / "Front_end"
+FRONTEND_DIR = ROOT_DIR / "frontend"
 
 
 def log(prefix: str, color: str, message: str) -> None:
