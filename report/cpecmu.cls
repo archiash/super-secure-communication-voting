@@ -423,7 +423,7 @@
   \setcounter{page}{1}
   \bgroup
   \ifcpe\@summaryTH\else\@summaryEN\fi%
-  \par\vspace*{1cm}\par
+  \par\vspace*{5mm}\par
   \ifcpe%
     ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่
     ได้อนุมัติให้โครงงานนี้เป็นส่วน\-หนึ่งของการศึกษาตามหลักสูตรปริญญาวิศวกรรมศาสตรบัณฑิต
@@ -435,7 +435,7 @@
   \fi
   \begin{flushright}
     \begin{tabular}{@{}cl@{}}
-      \\[1cm]
+      \\[5mm]
       \makebox[3.5in]{\dotfill} &
         \ifcpe หัวหน้าภาควิชาวิศวกรรมคอมพิวเตอร์\else Department chair\fi\\
       (\ifcpe\@deptChairTH\else\@deptChairEN\fi)
@@ -445,12 +445,12 @@
   \ifcpe คณะกรรมการสอบโครงงาน\else Project examination committee:\fi
   \begin{flushright}
     \begin{tabular}{@{}cl@{}}
-      \\[1cm]
+      \\[5mm]
       \makebox[3.5in]{\dotfill} &
         \ifcpe ประธานกรรมการ\else Main advisor / Chair\fi \\
       (\ifcpe\@advisorTH\else\@advisorEN\fi)
       \setcounter{@committeeIdx}{0}%
-      \@listcommittee{\ifcpe TH\else EN\fi}{\\[1cm]
+      \@listcommittee{\ifcpe TH\else EN\fi}{\\[5mm]
         \makebox[3.5in]{\dotfill} & \ifcpe กรรมการ\else Committee member\fi \\
         (}
       {)}%
