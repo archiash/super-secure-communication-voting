@@ -1,4 +1,132 @@
 % !TEX root = ../main.tex
-\chapter{\ifenglish Manual\else คู่มือการใช้งานระบบ\fi}
+\chapter{การพิสูจน์ความปลอดภัยของกุญแจที่เชื่อมต่อจากหลายรอบ}
+\label{app:concat}
 
-เนื้อหาคู่มือการใช้งานระบบเว็บแอปพลิเคชันจำลองการโหวตด้วยโพรโทคอล BB84 และ One-Time Pad
+ภาคผนวกนี้พิสูจน์ว่าการสร้างกุญแจหลายรอบแล้วนำมาต่อกัน (Multi-Session Key Concatenation) ไม่ทำให้ความปลอดภัยลดลง โดยแบ่งเป็น 2 ส่วน ส่วน \ref{sec:concat-ideal} พิสูจน์ในกรณีอุดมคติที่กุญแจแต่ละรอบสมบูรณ์แบบ และส่วน \ref{sec:concat-eps} ขยายผลไปยังกรณีจริงที่กุญแจแต่ละรอบมีความคลาดเคลื่อน $\varepsilon_i \lesssim 2^{-s}$ จาก Privacy Amplification
+
+% ---- สภาพแวดล้อมแบบเบา (ไม่ต้องใช้ amsthm) ----
+\newcounter{statementB}[chapter]
+\renewcommand{\thestatementB}{\arabic{statementB}}
+\newenvironment{statementB}[2]{\par\medskip\refstepcounter{statementB}\noindent\textbf{#1~\thestatementB}\ifx\relax#2\relax\else~(#2)\fi\textbf{.}\ }{\par\medskip}
+\newenvironment{proofB}{\par\noindent\textit{Proof.}\ }{\hfill\rule{0.6em}{0.6em}\par\medskip}
+
+\section{Idealized Case: Perfect Keys}
+\label{sec:concat-ideal}
+
+\begin{statementB}{Definition}{}
+Let $K^{(1)},\ldots,K^{(r)}$ be secret keys from $r$ independent key-generation processes, $K^{(i)}\in\{0,1\}^{l_i}$. Let $E$ denote all side information available to the adversary other than the ciphertext $C$ of the plaintext under consideration (public communication, other ciphertexts, plaintexts of other messages, and the information $E^{(i)}$ leaked in the $i$-th process). The concatenated key is
+\[
+K_{\mathrm{total}}=K^{(1)}\Vert K^{(2)}\Vert\cdots\Vert K^{(r)},
+\qquad |K_{\mathrm{total}}|=\sum_{i=1}^{r}l_i .
+\]
+\end{statementB}
+
+\begin{statementB}{Assumption}{}\label{assump:concat}
+\begin{itemize}
+    \item[(A1)] \textbf{Independence of keys.} $P(K^{(1)},\ldots,K^{(r)})=\prod_{i=1}^{r}P(K^{(i)})$.
+    \item[(A2)] \textbf{Secrecy of each key.} For every $i$, $I\bigl(K^{(i)};E,K^{(1)},\ldots,K^{(i-1)}\bigr)=0$.
+    \item[(A3)] \textbf{Uniformity.} $K^{(i)}\sim\mathrm{Unif}(\{0,1\}^{l_i})$ for every $i$.
+    \item[(A4)] \textbf{Independence from the plaintext.} With $M$ the plaintext and $n\mathrel{:=}|M|$, $I\bigl(M;K^{(1)},\ldots,K^{(r)},E\bigr)=0$.
+\end{itemize}
+\textbf{Single-use convention.} Each portion of $K_{\mathrm{total}}$ used as a One-Time Pad key encrypts only one plaintext. This is a condition on how keys are used, not a probabilistic assumption: since $E$ may contain other ciphertexts, reusing a key portion would give the adversary further observations of the same key bits and may violate (A2) or (A4). Conditional probabilities $P(\cdot\mid E=e)$ and $P(\cdot\mid M=m,E=e)$ are considered only where the conditioning event has positive probability.
+\end{statementB}
+
+\begin{statementB}{Lemma}{Additivity of Entropy}\label{lem:concat-entropy}
+Under (A1) and (A3), $H(K_{\mathrm{total}})=\sum_{i=1}^{r}l_i=|K_{\mathrm{total}}|$, and $K_{\mathrm{total}}$ is uniformly distributed over $\{0,1\}^{|K_{\mathrm{total}}|}$.
+\end{statementB}
+\begin{proofB}
+By the chain rule, $H(K_{\mathrm{total}})=\sum_i H\bigl(K^{(i)}\mid K^{(1)},\ldots,K^{(i-1)}\bigr)$. By (A1) each term equals $H(K^{(i)})$, and by (A3) $H(K^{(i)})=l_i$. For uniformity, for every $k=(k^{(1)},\ldots,k^{(r)})$,
+\[
+P(K_{\mathrm{total}}=k)=\prod_{i=1}^{r}P(K^{(i)}=k^{(i)})=\prod_{i=1}^{r}2^{-l_i}=2^{-|K_{\mathrm{total}}|}. 
+\]
+\end{proofB}
+
+\begin{statementB}{Theorem}{Zero Leakage of the Concatenated Key}\label{thm:concat-zero-leakage}
+Under (A1) and (A2), $I(K_{\mathrm{total}};E)=0$.
+\end{statementB}
+\begin{proofB}
+By the chain rule, $I(K_{\mathrm{total}};E)=\sum_{i=1}^{r}I\bigl(K^{(i)};E\mid K^{(1)},\ldots,K^{(i-1)}\bigr)$. For each $i$,
+\[
+I\bigl(K^{(i)};E,K^{(<i)}\bigr)=I\bigl(K^{(i)};K^{(<i)}\bigr)+I\bigl(K^{(i)};E\mid K^{(<i)}\bigr),
+\]
+where $K^{(<i)}$ abbreviates $K^{(1)},\ldots,K^{(i-1)}$. The left side is $0$ by (A2), so $I\bigl(K^{(i)};E\mid K^{(<i)}\bigr)=0$ (both terms on the right are non-negative). Summing over $i$ gives $I(K_{\mathrm{total}};E)=0$.
+\end{proofB}
+
+\begin{statementB}{Corollary}{Zero Leakage of any Sub-block}\label{cor:subblock-zero-leakage}
+If $K_M$ is any deterministic function of $K_{\mathrm{total}}$ (e.g.\ a fixed-length prefix), then $I(K_M;E)=0$.
+\end{statementB}
+\begin{proofB}
+By the data-processing inequality $0\le I(K_M;E)\le I(K_{\mathrm{total}};E)=0$.
+\end{proofB}
+
+\begin{statementB}{Theorem}{Perfect Secrecy with a Concatenated Key}\label{thm:concat-otp}
+Let $M$ be an $n$-bit plaintext and $|K_{\mathrm{total}}|\ge n$. Let $K_M=K_{\mathrm{total}}[1:n]$ and $C=M\oplus K_M$. Under (A1)--(A4) and the single-use convention,
+\[
+\boxed{I(M;C,E)=0}\qquad\text{equivalently}\qquad \boxed{H(M\mid C,E)=H(M)}.
+\]
+\end{statementB}
+\begin{proofB}
+\emph{Step 1.} By Lemma~\ref{lem:concat-entropy}, $K_{\mathrm{total}}$ is uniform; $K_M$ consists of $n$ fixed coordinates of it, hence $K_M\sim\mathrm{Unif}(\{0,1\}^n)$.
+
+\emph{Step 2.} By Corollary~\ref{cor:subblock-zero-leakage}, $I(K_M;E)=0$, so $K_M$ and $E$ are independent.
+
+\emph{Step 3.} By (A4), $M$ is independent of $(K_{\mathrm{total}},E)$, hence of $(K_M,E)$. Together with Step~2, $P(m,k,e)=P(m)P(k)P(e)$, i.e.\ $M,K_M,E$ are mutually independent.
+
+\emph{Step 4.} For all $m,c$ and all $e$ with $P(E=e)>0$,
+\[
+P(C=c\mid M=m,E=e)=P(K_M=c\oplus m\mid M=m,E=e)=P(K_M=c\oplus m)=2^{-n}.
+\]
+
+\emph{Step 5.} By (A4), $P(M=m\mid E=e)=P(M=m)$. By Bayes' rule,
+\[
+P(M=m\mid C=c,E=e)=\frac{2^{-n}P(M=m)}{2^{-n}\sum_{m'}P(M=m')}=P(M=m),
+\]
+so observing $(C,E)$ does not change the distribution of $M$, which gives $I(M;C,E)=0$.
+\end{proofB}
+
+\begin{statementB}{Corollary}{Security Preservation under Concatenation}\label{cor:concat-security}
+If $r$ independent key-generation processes produce fresh keys satisfying (A1)--(A4) and $\sum_i l_i\ge n$, then $I(M;C,E)=0$. Hence increasing $r$ increases the available secret-key length without reducing the perfect-secrecy guarantee, provided every additional key satisfies the assumptions.
+\end{statementB}
+
+\begin{statementB}{Remark}{Scope and Single Use}
+Concatenation preserves perfect secrecy only when each key is fresh, mutually independent, uniform, independent of the plaintext, secret from the adversary, and used at most once. If a key block is reused, $C\oplus C'=(M\oplus K_M)\oplus(M'\oplus K_M)=M\oplus M'$, the key cancels and the adversary learns $M\oplus M'$ directly; if $M'$ is also known, $K_M=C'\oplus M'$ is recovered, violating (A2). Verifying that a particular key-generation mechanism satisfies (A1)--(A4) is outside the scope of this appendix. The result concerns only the adversary's information; it does not address whether the Server's and the Voter's keys are identical.
+\end{statementB}
+
+\section{Realistic Case: \texorpdfstring{$\varepsilon$}{epsilon}-Secure Keys}
+\label{sec:concat-eps}
+
+In the implemented system each accepted session key is only \emph{close} to uniform and independent of the adversary, with distance $\varepsilon\lesssim 2^{-s}$ given by the Leftover Hash Lemma. Assumptions (A2)--(A3) therefore hold only approximately. Let $d(\cdot,\cdot)$ denote the trace distance (the statistical distance when all systems are classical), $U_l$ the uniform distribution on $\{0,1\}^l$, and $K^{(<i)}=(K^{(1)},\ldots,K^{(i-1)})$.
+
+\begin{statementB}{Definition}{$\varepsilon_i$-secure key}
+$K^{(i)}$ is $\varepsilon_i$-secure if $d\bigl(\rho_{K^{(i)}K^{(<i)}E},\,U_{l_i}\otimes\rho_{K^{(<i)}E}\bigr)\le\varepsilon_i$.
+\end{statementB}
+
+\begin{statementB}{Theorem}{Concatenation of $\varepsilon$-Secure Keys}\label{thm:concat-eps}
+If $K^{(i)}$ is $\varepsilon_i$-secure for $i=1,\ldots,r$, then
+\[
+d\bigl(\rho_{K_{\mathrm{total}}E},\,U_{|K_{\mathrm{total}}|}\otimes\rho_E\bigr)\le\sum_{i=1}^{r}\varepsilon_i .
+\]
+\end{statementB}
+\begin{proofB}
+Define hybrids $H_j=\rho_{K^{(1)}\cdots K^{(j)}E}\otimes U_{l_{j+1}}\otimes\cdots\otimes U_{l_r}$ for $j=0,\ldots,r$, so $H_r=\rho_{K_{\mathrm{total}}E}$ and $H_0=U\otimes\rho_E$. Then
+\[
+H_j=\rho_{K^{(<j)}K^{(j)}E}\otimes U_{>j},\qquad
+H_{j-1}=\rho_{K^{(<j)}E}\otimes U_j\otimes U_{>j}.
+\]
+Appending the same independent state $U_{>j}$ does not change trace distance, so $d(H_j,H_{j-1})=d\bigl(\rho_{K^{(<j)}K^{(j)}E},\rho_{K^{(<j)}E}\otimes U_j\bigr)\le\varepsilon_j$. The triangle inequality gives $d(H_r,H_0)\le\sum_j\varepsilon_j$.
+\end{proofB}
+
+\begin{statementB}{Corollary}{$\varepsilon$-Perfect Secrecy with a Concatenated Key}\label{cor:concat-eps-otp}
+Let $M$ be an $n$-bit plaintext independent of $(K_{\mathrm{total}},E)$, $|K_{\mathrm{total}}|\ge n$, $K_M=K_{\mathrm{total}}[1:n]$ and $C=M\oplus K_M$. Under the single-use convention, with $\varepsilon\mathrel{:=}\sum_i\varepsilon_i$,
+\[
+d\bigl(\rho_{MCE},\,P_M\otimes U_n\otimes\rho_E\bigr)\le\varepsilon .
+\]
+In the ideal state $P_M\otimes U_n\otimes\rho_E$ the ciphertext carries no information about $M$ (Theorem~\ref{thm:concat-otp}), so any adversary's advantage in guessing $M$ over the prior guess is at most $\varepsilon$.
+\end{statementB}
+\begin{proofB}
+Let $\Phi$ map $(m,k,e)\mapsto(m,\,m\oplus k[1:n],\,e)$. Then $\rho_{MCE}=\Phi\bigl(P_M\otimes\rho_{K_{\mathrm{total}}E}\bigr)$, and since $m\oplus U_n$ is uniform and independent of $m$, $\Phi\bigl(P_M\otimes U\otimes\rho_E\bigr)=P_M\otimes U_n\otimes\rho_E$. By data processing and Theorem~\ref{thm:concat-eps}, the distance is at most $d\bigl(\rho_{K_{\mathrm{total}}E},U\otimes\rho_E\bigr)\le\varepsilon$.
+\end{proofB}
+
+\begin{statementB}{Remark}{Application to the Voting System}
+Sessions that are aborted (QBER above the threshold) are discarded completely. The number of accepted sessions needed for an $n$-bit ballot is fixed, $r=\lceil n/l\rceil$, where $l$ is the length of one accepted session key; aborted attempts only repeat the process with fresh randomness and fresh Toeplitz seeds. With $\varepsilon_i\lesssim2^{-s}$, the overall error is at most $r\cdot2^{-s}$; for example $s=16$ and $r=4$ give $\varepsilon\lesssim2^{-14}$. Thus concatenation does not leave the security level unchanged, but it degrades it linearly in $r$, so $s$ should be chosen such that $r\cdot2^{-s}$ is acceptably small.
+\end{statementB}
