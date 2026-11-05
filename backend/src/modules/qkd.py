@@ -12,10 +12,10 @@ from qiskit.transpiler import generate_preset_pass_manager
 try:
     from core.config import settings
     DEFAULT_IBM_TOKEN = getattr(settings, "ibm_token", "")
+    USE_IBM_QUANTUM = getattr(settings, "use_ibm_quantum", os.getenv("USE_IBM_QUANTUM", "false").lower() in ("true", "1", "yes"))
 except Exception:
     DEFAULT_IBM_TOKEN = os.getenv("IBM_TOKEN", "")
-
-USE_IBM_QUANTUM = os.getenv("USE_IBM_QUANTUM", "false").lower() in ("true", "1", "yes")
+    USE_IBM_QUANTUM = os.getenv("USE_IBM_QUANTUM", "false").lower() in ("true", "1", "yes")
 IBM_TOKEN = DEFAULT_IBM_TOKEN
 
 _service = None
@@ -97,7 +97,11 @@ def run_quantum_circuit(qc, times = 1, use_ibm: bool = USE_IBM_QUANTUM):
 
 def simulate_bb84_protocal(key_size = 64, per_time_bits = 64, has_eavesdropping = False, use_ibm: bool = USE_IBM_QUANTUM, channel_noise: float = 0.0):
     effective_noise = channel_noise
-    use_real_hardware = os.getenv("USE_REAL_IBM_HARDWARE", "true").lower() in ("true", "1", "yes")
+    try:
+        from core.config import settings
+        use_real_hardware = getattr(settings, "use_real_ibm_hardware", os.getenv("USE_REAL_IBM_HARDWARE", "true").lower() in ("true", "1", "yes"))
+    except Exception:
+        use_real_hardware = os.getenv("USE_REAL_IBM_HARDWARE", "true").lower() in ("true", "1", "yes")
     actual_use_ibm = use_ibm and use_real_hardware
 
     if use_ibm and not actual_use_ibm and effective_noise == 0.0:
