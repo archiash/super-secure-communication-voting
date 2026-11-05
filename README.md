@@ -1,12 +1,12 @@
 # Super-Secure Communication for Voting System Using Quantum Key Distribution (BB84 + OTP)
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-8.2+-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Qiskit](https://img.shields.io/badge/Qiskit-2.5+-6929C4?logo=qiskit&logoColor=white)](https://qiskit.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Beanie%20ODM-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![LaTeX](https://img.shields.io/badge/LaTeX-XeLaTeX%2074%20Pages-008080?logo=latex&logoColor=white)](https://www.latex-project.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Qiskit](https://img.shields.io/badge/Qiskit-6929C4?logo=qiskit&logoColor=white)](https://qiskit.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![LaTeX](https://img.shields.io/badge/LaTeX-XeLaTeX-008080?logo=latex&logoColor=white)](https://www.latex-project.org/)
 
 An educational, interactive, and cryptographically provable quantum-secured voting platform. The system implements the **BB84 Quantum Key Distribution (QKD)** protocol, **2-Universal Toeplitz Hashing (Privacy Amplification)**, and **One-Time Pad (OTP)** ballot encryption. It provides Information-Theoretic Security against quantum and classical adversaries, supporting both local noise simulation on **Qiskit Aer** and cloud execution on physical **IBM Quantum QPUs** (e.g., 156-qubit Heron processor `ibm_kingston`).
 
@@ -25,7 +25,7 @@ super-secure-communication-voting/
 │   ├── .env.template         # Backend environment variables template
 │   └── requirements.txt      # Python dependencies
 │
-├── frontend/                 # React 19 + TypeScript + Vite Web Application
+├── frontend/                 # React + TypeScript + Vite Web Application
 │   ├── src/                  # Stepper UI, multi-perspective inspection & voting views
 │   ├── .env.template         # Frontend environment variables template
 │   └── package.json          # Node dependencies and scripts
@@ -34,7 +34,7 @@ super-secure-communication-voting/
 │   ├── chapters/             # Chapters 1-5, Appendix A (Proof) & Appendix B (Manual)
 │   ├── figures/              # Canonical publication figures and manual screenshots
 │   ├── references.bib        # Verified BibTeX bibliography
-│   └── main.tex              # Master LaTeX document (74 pages)
+│   └── main.tex              # Master LaTeX document
 │
 └── run.py                    # One-click development runner (Backend + Frontend)
 ```
@@ -44,8 +44,8 @@ super-secure-communication-voting/
 ## ⚡ Prerequisites
 
 Make sure you have the following installed on your machine:
-- **Python**: Version `3.10` or higher (`3.11+` recommended)
-- **Node.js**: Version `18.0.0` or higher & `npm`
+- **Python** & `pip`
+- **Node.js** & `npm`
 - **MongoDB**: A running local instance (`mongodb://localhost:27017`) or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cloud cluster
 - *(Optional)* **IBM Quantum Account**: An API token from [IBM Quantum Platform](https://quantum.ibm.com/) (required only if running on physical quantum hardware)
 - *(Optional for Report)* **XeLaTeX & BibTeX**: MiKTeX or TeX Live with Thai language font support (`Laksaman`)
@@ -179,7 +179,7 @@ All generated figures are saved directly to `report/figures/`:
 
 ## 📄 Academic Report Compilation (XeLaTeX)
 
-The project includes the complete academic senior project thesis document (74 pages, Department of Computer Engineering, Chiang Mai University):
+The project includes the complete academic senior project thesis document (Department of Computer Engineering, Chiang Mai University):
 
 ```bash
 cd report
